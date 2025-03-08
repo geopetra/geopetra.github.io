@@ -24,6 +24,7 @@ const whenExternalScripts = (items: (() => AstroIntegration) | (() => AstroInteg
 export default defineConfig({
   output: 'static',
   site: 'https://geopetra.github.io',
+  base: '/',
 
   integrations: [
     tailwind({
