@@ -61,7 +61,7 @@ export const addTool = async (toolData) => {
 };
 
 // Get a tool with all related information
-export const getToolWithDetails = async (biotoolsID) => {
+export const getToolWithDetails = async (petrahubID) => {
   try {
     const { data: tool, error: toolError } = await supabase
       .from('tools')
@@ -76,7 +76,7 @@ export const getToolWithDetails = async (biotoolsID) => {
           petrology_terms(*)
         )
       `)
-      .eq('biotoolsID', biotoolsID)
+      .eq('petrahubID', petrahubID)
       .single();
     
     if (toolError) {
