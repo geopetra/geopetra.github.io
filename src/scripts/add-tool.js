@@ -21,9 +21,8 @@ async function addSampleTool() {
     description: 'A comprehensive simulation tool for petrological analysis and modeling of igneous and metamorphic processes.',
     homepage: 'https://github.com/petrosim/petrosim',
     version: '2.1.0',
-    logo: 'https://placehold.co/400x400?text=PetroSim',
-    publication_date: '2023-01-15',
-    last_update: '2023-12-10'
+    logo: 'https://placehold.co/400x400?text=PetroSim'
+    // Removed publication_date and last_update as they don't exist in the schema
   };
 
   // Insert the tool
