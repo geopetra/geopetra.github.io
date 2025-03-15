@@ -20,7 +20,7 @@
     "fix": "npm run fix:eslint && npm run fix:prettier",
     "fix:eslint": "eslint --fix .",
     "fix:prettier": "prettier -w .",
-    "add-tool": "node src/scripts/add-tool.js"
+    "add-tool": "node -r dotenv/config src/scripts/add-tool.js"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.11",
