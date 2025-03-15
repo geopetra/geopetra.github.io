@@ -1,0 +1,153 @@
+---
+import { getToolWithDetails } from '../../utils/database.js';
+import Layout from '~/layouts/PageLayout.astro';
+import { Icon } from 'astro-icon/components';
+
+// Get the tool ID from the URL
+const { petrahubid } = Astro.params;
+
+// Fetch the tool data
+const tool = await getToolWithDetails(petrahubid);
+
+// Handle 404 if tool not found
+if (!tool) {
+  return Astro.redirect('/404');
+}
+
+const metadata = {
+  title: `${tool.name} - Petrology Tool Details`,
+  description: tool.description,
+};
+---
+
+<Layout metadata={metadata}>
+  <section class="px-4 py-16 sm:px-6 mx-auto lg:px-8 lg:py-20 max-w-6xl">
+    <div class="grid gap-6 row-gap-10 md:grid-cols-1">
+      <div class="md:pb-6 md:pr-16">
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="text-3xl font-bold tracking-tight sm:text-4xl sm:leading-none">{tool.name}</h2>
+          <a href="/tools" class="text-blue-600 hover:text-blue-800 flex items-center">
+            <Icon name="tabler:arrow-left" class="w-5 h-5 mr-1" />
+            Back to Tools
+          </a>
+        </div>
+
+        {tool.version && (
+          <div class="mb-2">
+            <span class="font-semibold">Version:</span> {tool.version}
+          </div>
+        )}
+
+        <div class="mb-6">
+          <p class="text-gray-700 dark:text-gray-400">{tool.description}</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {tool.homepage && (
+            <div>
+              <h3 class="font-semibold mb-2">Homepage</h3>
+              <a href={tool.homepage} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 flex items-center">
+                <Icon name="tabler:external-link" class="w-4 h-4 mr-1" />
+                Visit Website
+              </a>
+            </div>
+          )}
+
+          {tool.license && (
+            <div>
+              <h3 class="font-semibold mb-2">License</h3>
+              <p>{tool.license}</p>
+            </div>
+          )}
+
+          {tool.accessibility && (
+            <div>
+              <h3 class="font-semibold mb-2">Accessibility</h3>
+              <p>{tool.accessibility}</p>
+            </div>
+          )}
+
+          {tool.cost && (
+            <div>
+              <h3 class="font-semibold mb-2">Cost</h3>
+              <p>{tool.cost}</p>
+            </div>
+          )}
+
+          {tool.maturity && (
+            <div>
+              <h3 class="font-semibold mb-2">Maturity</h3>
+              <p>{tool.maturity}</p>
+            </div>
+          )}
+        </div>
+
+        {tool.topics && tool.topics.length > 0 && (
+          <div class="mb-8">
+            <h3 class="font-semibold mb-3">Topics</h3>
+            <div class="flex flex-wrap gap-2">
+              {tool.topics.map((topic) => (
+                <span class="px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900 rounded-full">
+                  {topic.term}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {tool.functions && tool.functions.length > 0 && (
+          <div class="mb-8">
+            <h3 class="font-semibold mb-3">Functions</h3>
+            <ul class="list-disc pl-5 space-y-2">
+              {tool.functions.map((func) => (
+                <li>
+                  <span class="font-medium">{func.operation.join(', ')}</span>
+                  {func.note && <span class="text-gray-600 dark:text-gray-400"> - {func.note}</span>}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {tool.operating_systems && tool.operating_systems.length > 0 && (
+          <div class="mb-8">
+            <h3 class="font-semibold mb-3">Operating Systems</h3>
+            <div class="flex flex-wrap gap-2">
+              {tool.operating_systems.map((os) => (
+                <span class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 rounded-full">
+                  {os.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {tool.tool_types && tool.tool_types.length > 0 && (
+          <div class="mb-8">
+            <h3 class="font-semibold mb-3">Tool Types</h3>
+            <div class="flex flex-wrap gap-2">
+              {tool.tool_types.map((type) => (
+                <span class="px-3 py-1 text-sm bg-green-100 dark:bg-green-900 rounded-full">
+                  {type.type}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {tool.languages && tool.languages.length > 0 && (
+          <div class="mb-8">
+            <h3 class="font-semibold mb-3">Programming Languages</h3>
+            <div class="flex flex-wrap gap-2">
+              {tool.languages.map((lang) => (
+                <span class="px-3 py-1 text-sm bg-purple-100 dark:bg-purple-900 rounded-full">
+                  {lang.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+</Layout>

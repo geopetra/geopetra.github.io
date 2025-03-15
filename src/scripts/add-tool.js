@@ -1,212 +1,206 @@
-// Script to add a sample tool to the database
+// Script to add tools to the database
 import { supabase } from '../utils/supabase.js';
 
 /**
- * Check the database schema to help with debugging
+ * Test the database connection
  */
-async function checkTableSchema() {
+async function testConnection() {
   try {
     console.log('Testing Supabase connection...');
     
-    // Try a simple query to see what we get back
-    const { data: sampleRow, error: sampleError } = await supabase
+    const { data, error } = await supabase
       .from('tools')
       .select('*')
       .limit(1);
       
-    if (sampleError) {
-      console.error('Error fetching sample row:', sampleError);
-      
-      // Check if it's a connection issue
-      if (sampleError.message && sampleError.message.includes('fetch failed')) {
-        console.error('Connection to Supabase failed. Please check:');
-        console.error('1. Your internet connection');
-        console.error('2. Supabase service status');
-        console.error('3. Your Supabase URL and key in .env file');
-      }
-    } else {
-      console.log('Supabase connection successful');
-      console.log('Sample row structure:', sampleRow.length > 0 ? Object.keys(sampleRow[0]) : 'No rows found');
+    if (error) {
+      console.error('Error connecting to database:', error);
+      return false;
     }
-  } catch (e) {
-    console.error('Exception during schema check:', e);
-    console.error('Error details:', e.message);
     
-    // Check for network-related errors
-    if (e.message && e.message.includes('fetch failed')) {
-      console.error('Network error connecting to Supabase. Please check your internet connection.');
-    }
+    console.log('Connection successful!');
+    return true;
+  } catch (e) {
+    console.error('Connection failed:', e.message);
+    return false;
   }
 }
 
 /**
- * Add a sample tool and related data to the database
+ * Add a tool and its related data to the database
+ * @param {Object} toolDefinition - The tool definition object
  */
-async function addSampleTool() {
-  // Check the table schema to debug
-  await checkTableSchema();
+async function addTool(toolDefinition) {
+  const {
+    tool,
+    topics = [],
+    operatingSystems = [],
+    functions = [],
+    toolTypes = [],
+    languages = []
+  } = toolDefinition;
   
   // Check if the tool already exists
   const { data: existingTool } = await supabase
     .from('tools')
     .select('*')
-    .eq('name', 'PetroSim')
+    .eq('petrahubid', tool.petrahubid)
     .single();
 
   if (existingTool) {
-    console.log('Tool already exists:', existingTool.name);
-    return;
+    console.log(`Tool already exists: ${existingTool.name} (${existingTool.petrahubid})`);
+    return existingTool;
   }
 
-  // Sample tool data
-  const toolData = {
-    name: 'PetroSim',
-    petrahubid: 'petrosim',  // Changed to lowercase to match database column name
-    description: 'A comprehensive simulation tool for petrological analysis and modeling of igneous and metamorphic processes.',
-    homepage: 'https://github.com/petrosim/petrosim',
-    version: '2.1.0',
-    accessibility: 'Open source',
-    cost: 'Free',
-    maturity: 'Mature',
-    license: 'MIT'
-  };
-
   // Insert the tool
-  const { data: tool, error } = await supabase
+  const { data: newTool, error } = await supabase
     .from('tools')
-    .insert([toolData])
+    .insert([tool])
     .select()
     .single();
 
   if (error) {
     console.error('Error adding tool:', error);
-    
-    // Try to get more details about the error
-    console.log('Tool data that failed:', toolData);
-    
-    // Try inserting with minimal fields to see if that works
-    const minimalToolData = {
-      name: 'PetroSim-Minimal',
-      petrahubid: 'petrosim-minimal', // Added required field
-      description: 'Minimal test'
-    };
-    
-    console.log('Trying with minimal data:', minimalToolData);
-    const { data: minimalTool, error: minimalError } = await supabase
-      .from('tools')
-      .insert([minimalToolData])
-      .select()
-      .single();
-      
-    if (minimalError) {
-      console.error('Even minimal insert failed:', minimalError);
-    } else {
-      console.log('Minimal insert succeeded:', minimalTool);
-      
-      // Clean up the test entry
-      const { error: deleteError } = await supabase
-        .from('tools')
-        .delete()
-        .eq('id', minimalTool.id);
-        
-      if (deleteError) {
-        console.error('Error deleting test entry:', deleteError);
-      }
-    }
-    
-    return;
+    return null;
   }
 
-  console.log('Tool added successfully:', tool.name);
-
-  // Add topics
-  const topics = [
-    { term: 'Igneous Petrology', tool_id: tool.id },
-    { term: 'Metamorphic Petrology', tool_id: tool.id },
-    { term: 'Geochemistry', tool_id: tool.id }
-  ];
-
-  const { error: topicsError } = await supabase
-    .from('topics')
-    .insert(topics);
-
-  if (topicsError) {
-    console.error('Error adding topics:', topicsError);
-  } else {
-    console.log('Topics added successfully');
-  }
-
-  // Add operating systems
-  const operatingSystems = [
-    { name: 'Windows', tool_id: tool.id },
-    { name: 'Mac', tool_id: tool.id },     // Changed from 'macOS' to 'Mac' to match the constraint
-    { name: 'Linux', tool_id: tool.id }
-  ];
-
-  const { error: osError } = await supabase
-    .from('operating_systems')
-    .insert(operatingSystems);
-
-  if (osError) {
-    console.error('Error adding operating systems:', osError);
-  } else {
-    console.log('Operating systems added successfully');
-  }
-
-  // Add functions
-  const functions = [
-    { operation: ['Modelling'], tool_id: tool.id, note: 'Phase equilibria modeling' },
-    { operation: ['Calculation'], tool_id: tool.id, note: 'Geothermobarometry' },
-    { operation: ['Analysis'], tool_id: tool.id, note: 'Mineral chemistry analysis' }
-  ];
-
-  const { error: functionsError } = await supabase
-    .from('functions')
-    .insert(functions);
-
-  if (functionsError) {
-    console.error('Error adding functions:', functionsError);
-  } else {
-    console.log('Functions added successfully');
-  }
-
-  // Add tool types
-  const toolTypes = [
-    { type: 'Desktop application', tool_id: tool.id },
-    { type: 'Command-line tool', tool_id: tool.id }
-  ];
-
-  const { error: toolTypesError } = await supabase
-    .from('tool_types')
-    .insert(toolTypes);
-
-  if (toolTypesError) {
-    console.error('Error adding tool types:', toolTypesError);
-  } else {
-    console.log('Tool types added successfully');
-  }
-
-  // Add languages
-  const languages = [
-    { name: 'Python', tool_id: tool.id },
-    { name: 'C++', tool_id: tool.id }
-  ];
-
-  const { error: languagesError } = await supabase
-    .from('languages')
-    .insert(languages);
-
-  if (languagesError) {
-    console.error('Error adding languages:', languagesError);
-  } else {
-    console.log('Languages added successfully');
-  }
-
-  console.log('Tool and related data added successfully!');
+  console.log(`Tool added successfully: ${newTool.name}`);
+  
+  // Add related data
+  await Promise.all([
+    addRelatedData('topics', topics, newTool.id),
+    addRelatedData('operating_systems', operatingSystems, newTool.id),
+    addRelatedData('functions', functions, newTool.id),
+    addRelatedData('tool_types', toolTypes, newTool.id),
+    addRelatedData('languages', languages, newTool.id)
+  ]);
+  
+  console.log(`All data for ${newTool.name} added successfully!`);
+  return newTool;
 }
 
-// Run the function
-addSampleTool()
+/**
+ * Add related data for a tool
+ * @param {string} table - The table name
+ * @param {Array} items - The items to add
+ * @param {string} toolId - The tool ID
+ */
+async function addRelatedData(table, items, toolId) {
+  if (!items || items.length === 0) {
+    console.log(`No ${table} to add`);
+    return;
+  }
+  
+  // Add tool_id to each item
+  const itemsWithToolId = items.map(item => ({
+    ...item,
+    tool_id: toolId
+  }));
+  
+  const { error } = await supabase
+    .from(table)
+    .insert(itemsWithToolId);
+    
+  if (error) {
+    console.error(`Error adding ${table}:`, error);
+  } else {
+    console.log(`${table} added successfully`);
+  }
+}
+
+// Tool definitions
+const tools = [
+  {
+    tool: {
+      name: 'PetroSim',
+      petrahubid: 'petrosim',
+      description: 'A comprehensive simulation tool for petrological analysis and modeling of igneous and metamorphic processes.',
+      homepage: 'https://github.com/petrosim/petrosim',
+      version: '2.1.0',
+      accessibility: 'Open source',
+      cost: 'Free',
+      maturity: 'Mature',
+      license: 'MIT'
+    },
+    topics: [
+      { term: 'Igneous Petrology' },
+      { term: 'Metamorphic Petrology' },
+      { term: 'Geochemistry' }
+    ],
+    operatingSystems: [
+      { name: 'Windows' },
+      { name: 'Mac' },
+      { name: 'Linux' }
+    ],
+    functions: [
+      { operation: ['Modelling'], note: 'Phase equilibria modeling' },
+      { operation: ['Calculation'], note: 'Geothermobarometry' },
+      { operation: ['Analysis'], note: 'Mineral chemistry analysis' }
+    ],
+    toolTypes: [
+      { type: 'Desktop application' },
+      { type: 'Command-line tool' }
+    ],
+    languages: [
+      { name: 'Python' },
+      { name: 'C++' }
+    ]
+  },
+  // Add more tools here as needed
+  {
+    tool: {
+      name: 'GeoThermo',
+      petrahubid: 'geothermo',
+      description: 'A tool for thermodynamic calculations in geosciences, focusing on mineral equilibria.',
+      homepage: 'https://example.com/geothermo',
+      version: '1.5.2',
+      accessibility: 'Open source',
+      cost: 'Free',
+      maturity: 'Mature',
+      license: 'GPL-3.0'
+    },
+    topics: [
+      { term: 'Thermodynamics' },
+      { term: 'Geochemistry' },
+      { term: 'Metamorphic Petrology' }
+    ],
+    operatingSystems: [
+      { name: 'Windows' },
+      { name: 'Linux' }
+    ],
+    functions: [
+      { operation: ['Calculation'], note: 'Thermodynamic calculations' },
+      { operation: ['Modelling'], note: 'Phase diagram generation' }
+    ],
+    toolTypes: [
+      { type: 'Desktop application' }
+    ],
+    languages: [
+      { name: 'C++' },
+      { name: 'Fortran' }
+    ]
+  }
+];
+
+// Main function
+async function main() {
+  // Test connection first
+  const connected = await testConnection();
+  if (!connected) {
+    console.error('Database connection failed. Exiting.');
+    process.exit(1);
+  }
+  
+  // Process each tool
+  for (const toolDefinition of tools) {
+    await addTool(toolDefinition);
+  }
+  
+  console.log('All tools processed successfully!');
+}
+
+// Run the script
+main()
   .then(() => {
     console.log('Script completed');
     process.exit(0);

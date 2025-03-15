@@ -1,6 +1,23 @@
 ---
+import { getTools } from '../../utils/database.js';
 import Layout from '~/layouts/PageLayout.astro';
-import ToolsList from '~/components/widgets/ToolsList.astro';
+import { Icon } from 'astro-icon/components';
+
+// Fetch all tools
+const tools = await getTools();
+
+// Group tools by first letter for alphabetical listing
+const toolsByLetter = tools.reduce((acc, tool) => {
+  const firstLetter = tool.name.charAt(0).toUpperCase();
+  if (!acc[firstLetter]) {
+    acc[firstLetter] = [];
+  }
+  acc[firstLetter].push(tool);
+  return acc;
+}, {});
+
+// Sort the letters
+const sortedLetters = Object.keys(toolsByLetter).sort();
 
 const metadata = {
   title: 'Petrology Tools Database',
@@ -9,5 +26,66 @@ const metadata = {
 ---
 
 <Layout metadata={metadata}>
-  <ToolsList />
+  <section class="px-4 py-16 sm:px-6 mx-auto lg:px-8 lg:py-20 max-w-6xl">
+    <div class="mb-10 md:mx-auto text-center md:mb-12 max-w-3xl">
+      <h2 class="text-4xl md:text-5xl font-bold leading-tighter tracking-tighter mb-4">
+        Petrology Tools Directory
+      </h2>
+      <p class="text-xl text-gray-600 dark:text-slate-400">
+        Browse our comprehensive collection of tools for petrological research and analysis
+      </p>
+    </div>
+
+    {sortedLetters.length > 0 ? (
+      <div class="mb-8">
+        <div class="flex flex-wrap justify-center gap-2 mb-4">
+          {sortedLetters.map((letter) => (
+            <a href={`#section-${letter}`} class="px-3 py-1 bg-blue-100 dark:bg-blue-900 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800">
+              {letter}
+            </a>
+          ))}
+        </div>
+      </div>
+    ) : (
+      <div class="text-center py-10">
+        <p class="text-xl">No tools found in the database.</p>
+      </div>
+    )}
+
+    {sortedLetters.map((letter) => (
+      <div id={`section-${letter}`} class="mb-12">
+        <h3 class="text-2xl font-bold mb-6 pb-2 border-b border-gray-300 dark:border-gray-700">
+          {letter}
+        </h3>
+        <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {toolsByLetter[letter].map((tool) => (
+            <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+              <div class="p-5">
+                <h4 class="text-xl font-semibold mb-2">{tool.name}</h4>
+                <p class="text-gray-700 dark:text-gray-400 mb-4 line-clamp-3">
+                  {tool.description}
+                </p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                  {tool.topics && tool.topics.slice(0, 3).map((topic) => (
+                    <span class="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900 rounded-full">
+                      {topic.term}
+                    </span>
+                  ))}
+                  {tool.topics && tool.topics.length > 3 && (
+                    <span class="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 rounded-full">
+                      +{tool.topics.length - 3} more
+                    </span>
+                  )}
+                </div>
+                <a href={`/tools/${tool.petrahubid}`} class="inline-flex items-center text-blue-600 hover:text-blue-800">
+                  View details
+                  <Icon name="tabler:arrow-right" class="w-4 h-4 ml-1" />
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </section>
 </Layout>
