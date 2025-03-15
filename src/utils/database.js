@@ -62,22 +62,31 @@ export const addTool = async (toolData) => {
 
 // Get a tool with all related information
 export const getToolWithDetails = async (biotoolsID) => {
-  const { data: tool, error: toolError } = await supabase
-    .from('tools')
-    .select(`
-      *,
-      functions(*),
-      tool_types(*),
-      topics(*),
-      operating_systems(*),
-      languages(*),
-      tool_petrology_terms(
-        petrology_terms(*)
-      )
-    `)
-    .eq('biotoolsID', biotoolsID)
-    .single();
-  
-  if (toolError) throw toolError;
-  return tool;
+  try {
+    const { data: tool, error: toolError } = await supabase
+      .from('tools')
+      .select(`
+        *,
+        functions(*),
+        tool_types(*),
+        topics(*),
+        operating_systems(*),
+        languages(*),
+        tool_petrology_terms(
+          petrology_terms(*)
+        )
+      `)
+      .eq('biotoolsID', biotoolsID)
+      .single();
+    
+    if (toolError) {
+      console.error('Error fetching tool details:', toolError);
+      return null;
+    }
+    
+    return tool;
+  } catch (error) {
+    console.error('Exception in getToolWithDetails:', error);
+    return null;
+  }
 };
