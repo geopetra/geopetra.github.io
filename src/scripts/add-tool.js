@@ -1,7 +1,20 @@
 // Script to add a sample tool to the database
 import { supabase } from '../utils/supabase.js';
 
+async function checkTableSchema() {
+  // This function will help us see what columns actually exist in the tools table
+  const { data, error } = await supabase.rpc('get_table_definition', { table_name: 'tools' });
+  
+  if (error) {
+    console.error('Error getting table schema:', error);
+  } else {
+    console.log('Table schema for tools:', data);
+  }
+}
+
 async function addSampleTool() {
+  // First, check the table schema to debug
+  await checkTableSchema();
   // First, check if the tool already exists
   const { data: existingTool } = await supabase
     .from('tools')
@@ -17,7 +30,6 @@ async function addSampleTool() {
   // Sample tool data
   const toolData = {
     name: 'PetroSim',
-    petrahubID: 'petrosim',
     description: 'A comprehensive simulation tool for petrological analysis and modeling of igneous and metamorphic processes.',
     homepage: 'https://github.com/petrosim/petrosim',
     version: '2.1.0',
