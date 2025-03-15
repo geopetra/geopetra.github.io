@@ -6,7 +6,7 @@ async function addSampleTool() {
   const { data: existingTool } = await supabase
     .from('tools')
     .select('*')
-    .eq('biotoolsID', 'petrosim')
+    .eq('name', 'PetroSim')
     .single();
 
   if (existingTool) {
@@ -17,7 +17,6 @@ async function addSampleTool() {
   // Sample tool data
   const toolData = {
     name: 'PetroSim',
-    biotoolsID: 'petrosim',
     description: 'A comprehensive simulation tool for petrological analysis and modeling of igneous and metamorphic processes.',
     homepage: 'https://github.com/petrosim/petrosim',
     version: '2.1.0',
