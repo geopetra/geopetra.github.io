@@ -1,9 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Hard-coded credentials for development
-// These should match your .env file values
-const SUPABASE_URL = "https://asswafzcwlijbmpujslf.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzc3dhZnpjd2xpamJtcHVqc2xmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIwMTI4MzEsImV4cCI6MjA1NzU4ODgzMX0.KQeypYeYRjayckR3UEhAzfiiWxzIxC4Uc4gywBW2ZbM";
+// Default placeholder values - these will be replaced by environment variables
+const DEFAULT_URL = "https://your-project.supabase.co";
+const DEFAULT_KEY = "your-anon-key";
 
 // Determine if we're in a Node.js environment or browser/Astro environment
 const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
@@ -20,9 +19,9 @@ if (isNode) {
     // dotenv might not be installed, which is fine
   }
 
-  // Use environment variables or fall back to hard-coded values
-  supabaseUrl = process.env.PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || SUPABASE_URL;
-  supabaseAnonKey = process.env.PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || SUPABASE_ANON_KEY;
+  // Use environment variables with fallbacks
+  supabaseUrl = process.env.PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || DEFAULT_URL;
+  supabaseAnonKey = process.env.PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || DEFAULT_KEY;
   
   console.log("Node.js environment detected");
 } else {
@@ -38,11 +37,11 @@ if (isNode) {
     console.log("Error accessing import.meta.env:", e.message);
   }
   
-  // Fall back to hard-coded values if needed
+  // Fall back to default values if needed
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.log("Falling back to hard-coded Supabase credentials");
-    supabaseUrl = SUPABASE_URL;
-    supabaseAnonKey = SUPABASE_ANON_KEY;
+    console.log("Falling back to default Supabase credentials - please set environment variables");
+    supabaseUrl = DEFAULT_URL;
+    supabaseAnonKey = DEFAULT_KEY;
   }
 }
 
