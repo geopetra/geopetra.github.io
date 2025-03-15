@@ -20,8 +20,11 @@ async function addSampleTool() {
     petrahubID: 'petrosim',
     description: 'A comprehensive simulation tool for petrological analysis and modeling of igneous and metamorphic processes.',
     homepage: 'https://github.com/petrosim/petrosim',
-    version: '2.1.0'
-    // Removed logo, publication_date, and last_update as they don't exist in the schema
+    version: '2.1.0',
+    accessibility: 'Open source',
+    cost: 'Free',
+    maturity: 'Mature',
+    license: 'MIT'
   };
 
   // Insert the tool
@@ -40,9 +43,9 @@ async function addSampleTool() {
 
   // Add topics
   const topics = [
-    { name: 'Igneous Petrology', tool_id: tool.id },
-    { name: 'Metamorphic Petrology', tool_id: tool.id },
-    { name: 'Geochemistry', tool_id: tool.id }
+    { term: 'Igneous Petrology', tool_id: tool.id },
+    { term: 'Metamorphic Petrology', tool_id: tool.id },
+    { term: 'Geochemistry', tool_id: tool.id }
   ];
 
   const { error: topicsError } = await supabase
@@ -74,9 +77,9 @@ async function addSampleTool() {
 
   // Add functions
   const functions = [
-    { name: 'Phase equilibria modeling', tool_id: tool.id },
-    { name: 'Geothermobarometry', tool_id: tool.id },
-    { name: 'Mineral chemistry analysis', tool_id: tool.id }
+    { operation: ['Modelling'], tool_id: tool.id, note: 'Phase equilibria modeling' },
+    { operation: ['Calculation'], tool_id: tool.id, note: 'Geothermobarometry' },
+    { operation: ['Analysis'], tool_id: tool.id, note: 'Mineral chemistry analysis' }
   ];
 
   const { error: functionsError } = await supabase
@@ -87,6 +90,38 @@ async function addSampleTool() {
     console.error('Error adding functions:', functionsError);
   } else {
     console.log('Functions added successfully');
+  }
+
+  // Add tool types
+  const toolTypes = [
+    { type: 'Desktop application', tool_id: tool.id },
+    { type: 'Command-line tool', tool_id: tool.id }
+  ];
+
+  const { error: toolTypesError } = await supabase
+    .from('tool_types')
+    .insert(toolTypes);
+
+  if (toolTypesError) {
+    console.error('Error adding tool types:', toolTypesError);
+  } else {
+    console.log('Tool types added successfully');
+  }
+
+  // Add languages
+  const languages = [
+    { name: 'Python', tool_id: tool.id },
+    { name: 'C++', tool_id: tool.id }
+  ];
+
+  const { error: languagesError } = await supabase
+    .from('languages')
+    .insert(languages);
+
+  if (languagesError) {
+    console.error('Error adding languages:', languagesError);
+  } else {
+    console.log('Languages added successfully');
   }
 
   console.log('Tool and related data added successfully!');
