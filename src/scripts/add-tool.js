@@ -17,6 +17,7 @@ async function addSampleTool() {
   // Sample tool data
   const toolData = {
     name: 'PetroSim',
+    petrahubID: 'petrosim',
     description: 'A comprehensive simulation tool for petrological analysis and modeling of igneous and metamorphic processes.',
     homepage: 'https://github.com/petrosim/petrosim',
     version: '2.1.0',
