@@ -1,5 +1,5 @@
 // Script to add a sample tool to the database
-import { supabase } from '../utils/supabase-direct.js';
+import { supabase } from '../utils/supabase.js';
 
 async function addSampleTool() {
   // First, check if the tool already exists
