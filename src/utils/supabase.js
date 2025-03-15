@@ -32,12 +32,12 @@ if (isNode) {
   // and remove before deploying to production
   if (!supabaseUrl) {
     console.warn("Using fallback Supabase URL - replace with your actual URL");
-    supabaseUrl = "https://your-project-id.supabase.co";
+    supabaseUrl = "https://asswafzcwlijbmpujslf.supabase.co";
   }
   
   if (!supabaseAnonKey) {
     console.warn("Using fallback Supabase Anon Key - replace with your actual key");
-    supabaseAnonKey = "your-anon-key";
+    supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzc3dhZnpjd2xpamJtcHVqc2xmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIwMTI4MzEsImV4cCI6MjA1NzU4ODgzMX0.KQeypYeYRjayckR3UEhAzfiiWxzIxC4Uc4gywBW2ZbM";
   }
 }
 
