@@ -3,12 +3,41 @@ import { supabase } from '../utils/supabase.js';
 
 async function checkTableSchema() {
   // This function will help us see what columns actually exist in the tools table
-  const { data, error } = await supabase.rpc('get_table_definition', { table_name: 'tools' });
-  
-  if (error) {
-    console.error('Error getting table schema:', error);
-  } else {
-    console.log('Table schema for tools:', data);
+  try {
+    // First try using RPC if available
+    const { data, error } = await supabase.rpc('get_table_definition', { table_name: 'tools' });
+    
+    if (error) {
+      console.error('Error getting table schema via RPC:', error);
+      
+      // Fallback: query the information_schema directly
+      const { data: columns, error: columnsError } = await supabase
+        .from('information_schema.columns')
+        .select('column_name, data_type')
+        .eq('table_name', 'tools');
+      
+      if (columnsError) {
+        console.error('Error querying information_schema:', columnsError);
+      } else {
+        console.log('Columns in tools table:', columns);
+      }
+    } else {
+      console.log('Table schema for tools:', data);
+    }
+    
+    // Also try a simple query to see what we get back
+    const { data: sampleRow, error: sampleError } = await supabase
+      .from('tools')
+      .select('*')
+      .limit(1);
+      
+    if (sampleError) {
+      console.error('Error fetching sample row:', sampleError);
+    } else {
+      console.log('Sample row structure:', sampleRow.length > 0 ? Object.keys(sampleRow[0]) : 'No rows found');
+    }
+  } catch (e) {
+    console.error('Exception during schema check:', e);
   }
 }
 
@@ -30,6 +59,7 @@ async function addSampleTool() {
   // Sample tool data
   const toolData = {
     name: 'PetroSim',
+    petrahubID: 'petrosim',  // Adding this back
     description: 'A comprehensive simulation tool for petrological analysis and modeling of igneous and metamorphic processes.',
     homepage: 'https://github.com/petrosim/petrosim',
     version: '2.1.0',
@@ -48,6 +78,39 @@ async function addSampleTool() {
 
   if (error) {
     console.error('Error adding tool:', error);
+    
+    // Try to get more details about the error
+    console.log('Tool data that failed:', toolData);
+    
+    // Try inserting with minimal fields to see if that works
+    const minimalToolData = {
+      name: 'PetroSim-Minimal',
+      description: 'Minimal test'
+    };
+    
+    console.log('Trying with minimal data:', minimalToolData);
+    const { data: minimalTool, error: minimalError } = await supabase
+      .from('tools')
+      .insert([minimalToolData])
+      .select()
+      .single();
+      
+    if (minimalError) {
+      console.error('Even minimal insert failed:', minimalError);
+    } else {
+      console.log('Minimal insert succeeded:', minimalTool);
+      
+      // Clean up the test entry
+      const { error: deleteError } = await supabase
+        .from('tools')
+        .delete()
+        .eq('id', minimalTool.id);
+        
+      if (deleteError) {
+        console.error('Error deleting test entry:', deleteError);
+      }
+    }
+    
     return;
   }
 
