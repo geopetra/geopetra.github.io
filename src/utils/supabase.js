@@ -20,9 +20,31 @@ if (isNode) {
   supabaseAnonKey = process.env.PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
 } else {
   // In browser/Astro environment, use import.meta.env
-  supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-  supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  try {
+    supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+    supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  } catch (e) {
+    console.error("Error accessing import.meta.env:", e);
+  }
+  
+  // Fallback to hardcoded values for development only
+  // IMPORTANT: Replace these with your actual Supabase credentials
+  // and remove before deploying to production
+  if (!supabaseUrl) {
+    console.warn("Using fallback Supabase URL - replace with your actual URL");
+    supabaseUrl = "https://your-project-id.supabase.co";
+  }
+  
+  if (!supabaseAnonKey) {
+    console.warn("Using fallback Supabase Anon Key - replace with your actual key");
+    supabaseAnonKey = "your-anon-key";
+  }
 }
+
+// Log the environment for debugging
+console.log("Environment:", isNode ? "Node.js" : "Browser/Astro");
+console.log("Supabase URL available:", !!supabaseUrl);
+console.log("Supabase Anon Key available:", !!supabaseAnonKey);
 
 // Throw a more helpful error if the keys are missing
 if (!supabaseUrl || !supabaseAnonKey) {
