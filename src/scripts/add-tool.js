@@ -116,7 +116,7 @@ async function addSampleTool() {
   // Add operating systems
   const operatingSystems = [
     { name: 'Windows', tool_id: tool.id },
-    { name: 'macOS', tool_id: tool.id },
+    { name: 'Mac', tool_id: tool.id },     // Changed from 'macOS' to 'Mac' to match the constraint
     { name: 'Linux', tool_id: tool.id }
   ];
 
