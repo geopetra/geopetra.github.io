@@ -4,28 +4,7 @@ import { supabase } from '../utils/supabase.js';
 async function checkTableSchema() {
   // This function will help us see what columns actually exist in the tools table
   try {
-    // First try using RPC if available
-    const { data, error } = await supabase.rpc('get_table_definition', { table_name: 'tools' });
-    
-    if (error) {
-      console.error('Error getting table schema via RPC:', error);
-      
-      // Fallback: query the information_schema directly
-      const { data: columns, error: columnsError } = await supabase
-        .from('information_schema.columns')
-        .select('column_name, data_type')
-        .eq('table_name', 'tools');
-      
-      if (columnsError) {
-        console.error('Error querying information_schema:', columnsError);
-      } else {
-        console.log('Columns in tools table:', columns);
-      }
-    } else {
-      console.log('Table schema for tools:', data);
-    }
-    
-    // Also try a simple query to see what we get back
+    // Try a simple query to see what we get back
     const { data: sampleRow, error: sampleError } = await supabase
       .from('tools')
       .select('*')
@@ -59,7 +38,7 @@ async function addSampleTool() {
   // Sample tool data
   const toolData = {
     name: 'PetroSim',
-    petrahubID: 'petrosim',  // Adding this back
+    petrahubid: 'petrosim',  // Changed to lowercase to match database column name
     description: 'A comprehensive simulation tool for petrological analysis and modeling of igneous and metamorphic processes.',
     homepage: 'https://github.com/petrosim/petrosim',
     version: '2.1.0',
@@ -85,6 +64,7 @@ async function addSampleTool() {
     // Try inserting with minimal fields to see if that works
     const minimalToolData = {
       name: 'PetroSim-Minimal',
+      petrahubid: 'petrosim-minimal', // Added required field
       description: 'Minimal test'
     };
     
