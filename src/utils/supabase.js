@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
 // Default placeholder values - these will be replaced by environment variables
+// In production, these should never be used - proper environment variables should be set
 const DEFAULT_URL = "https://your-project.supabase.co";
 const DEFAULT_KEY = "your-anon-key";
 
@@ -45,8 +46,23 @@ if (isNode) {
   }
 }
 
-console.log("Supabase URL available:", !!supabaseUrl);
-console.log("Supabase Anon Key available:", !!supabaseAnonKey);
+// Only log in development environment
+if (process.env.NODE_ENV !== 'production') {
+  console.log("Supabase URL available:", !!supabaseUrl);
+  console.log("Supabase Anon Key available:", !!supabaseAnonKey);
+}
 
 // Create the Supabase client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Test the connection in development mode
+if (process.env.NODE_ENV !== 'production' && typeof window !== 'undefined') {
+  // Simple health check
+  supabase.from('tools').select('id').limit(1).then(({ error }) => {
+    if (error) {
+      console.warn('Supabase connection test failed:', error.message);
+    } else {
+      console.log('Supabase connection successful');
+    }
+  });
+}

@@ -1,8 +1,10 @@
 // Script to add a sample tool to the database
 import { supabase } from '../utils/supabase.js';
 
+/**
+ * Check the database schema to help with debugging
+ */
 async function checkTableSchema() {
-  // This function will help us see what columns actually exist in the tools table
   try {
     // Try a simple query to see what we get back
     const { data: sampleRow, error: sampleError } = await supabase
@@ -20,10 +22,14 @@ async function checkTableSchema() {
   }
 }
 
+/**
+ * Add a sample tool and related data to the database
+ */
 async function addSampleTool() {
-  // First, check the table schema to debug
+  // Check the table schema to debug
   await checkTableSchema();
-  // First, check if the tool already exists
+  
+  // Check if the tool already exists
   const { data: existingTool } = await supabase
     .from('tools')
     .select('*')
