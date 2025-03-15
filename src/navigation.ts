@@ -10,6 +10,10 @@ export const headerData = {
       text: 'Tools',
       links: [
         {
+          text: 'All Tools',
+          href: getPermalink('/tools'),
+        },
+        {
           text: 'Test 1',
           href: getPermalink('/homes/mobile-app'),
         },
