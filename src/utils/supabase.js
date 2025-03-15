@@ -1,10 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Default placeholder values - these will be replaced by environment variables
-// In production, these should never be used - proper environment variables should be set
-const DEFAULT_URL = "https://your-project.supabase.co";
-const DEFAULT_KEY = "your-anon-key";
-
 // Determine if we're in a Node.js environment or browser/Astro environment
 const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
 
@@ -13,6 +8,7 @@ let supabaseAnonKey;
 
 if (isNode) {
   // In Node.js environment, use process.env
+  // Make sure these are set in your .env file
   try {
     // Try to load from .env file if dotenv is available
     require('dotenv').config();
@@ -20,66 +16,21 @@ if (isNode) {
     // dotenv might not be installed, which is fine
   }
 
-  // Use environment variables with fallbacks
-  supabaseUrl = process.env.PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || DEFAULT_URL;
-  supabaseAnonKey = process.env.PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || DEFAULT_KEY;
-  
-  console.log("Node.js environment detected");
+  supabaseUrl = process.env.PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  supabaseAnonKey = process.env.PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
 } else {
-  // In browser/Astro environment
-  try {
-    // Try to use import.meta.env first
-    if (typeof import.meta !== 'undefined' && import.meta.env) {
-      supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-      supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-      console.log("Using import.meta.env variables");
-    }
-  } catch (e) {
-    console.log("Error accessing import.meta.env:", e.message);
-  }
-  
-  // Fall back to default values if needed
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.log("Falling back to default Supabase credentials - please set environment variables");
-    supabaseUrl = DEFAULT_URL;
-    supabaseAnonKey = DEFAULT_KEY;
-  }
+  // In browser/Astro environment, use import.meta.env
+  supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 }
 
-// Only log in development environment
-if (process.env.NODE_ENV !== 'production') {
-  console.log("Supabase URL available:", !!supabaseUrl);
-  console.log("Supabase Anon Key available:", !!supabaseAnonKey);
+// Throw a more helpful error if the keys are missing
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    'Supabase URL and Anon Key are required. ' +
+    'In Astro, set PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY in .env file. ' +
+    'In Node.js scripts, set SUPABASE_URL and SUPABASE_ANON_KEY in .env file.'
+  );
 }
 
-// Create the Supabase client with options for better error handling
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-  },
-  global: {
-    fetch: (...args) => {
-      return fetch(...args).catch(err => {
-        console.error('Supabase fetch error:', err.message);
-        throw err;
-      });
-    }
-  }
-});
-
-// Test the connection in development mode
-if (process.env.NODE_ENV !== 'production' && typeof window !== 'undefined') {
-  // Simple health check with better error handling
-  supabase.from('tools').select('id').limit(1)
-    .then(({ data, error }) => {
-      if (error) {
-        console.warn('Supabase connection test failed:', error.message);
-      } else {
-        console.log('Supabase connection successful');
-      }
-    })
-    .catch(err => {
-      console.error('Supabase connection test exception:', err.message);
-    });
-}
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
