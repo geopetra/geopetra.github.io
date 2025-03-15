@@ -6,6 +6,8 @@ import { supabase } from '../utils/supabase.js';
  */
 async function checkTableSchema() {
   try {
+    console.log('Testing Supabase connection...');
+    
     // Try a simple query to see what we get back
     const { data: sampleRow, error: sampleError } = await supabase
       .from('tools')
@@ -14,11 +16,26 @@ async function checkTableSchema() {
       
     if (sampleError) {
       console.error('Error fetching sample row:', sampleError);
+      
+      // Check if it's a connection issue
+      if (sampleError.message && sampleError.message.includes('fetch failed')) {
+        console.error('Connection to Supabase failed. Please check:');
+        console.error('1. Your internet connection');
+        console.error('2. Supabase service status');
+        console.error('3. Your Supabase URL and key in .env file');
+      }
     } else {
+      console.log('Supabase connection successful');
       console.log('Sample row structure:', sampleRow.length > 0 ? Object.keys(sampleRow[0]) : 'No rows found');
     }
   } catch (e) {
     console.error('Exception during schema check:', e);
+    console.error('Error details:', e.message);
+    
+    // Check for network-related errors
+    if (e.message && e.message.includes('fetch failed')) {
+      console.error('Network error connecting to Supabase. Please check your internet connection.');
+    }
   }
 }
 

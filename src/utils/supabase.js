@@ -52,17 +52,34 @@ if (process.env.NODE_ENV !== 'production') {
   console.log("Supabase Anon Key available:", !!supabaseAnonKey);
 }
 
-// Create the Supabase client
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Create the Supabase client with options for better error handling
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+  },
+  global: {
+    fetch: (...args) => {
+      return fetch(...args).catch(err => {
+        console.error('Supabase fetch error:', err.message);
+        throw err;
+      });
+    }
+  }
+});
 
 // Test the connection in development mode
 if (process.env.NODE_ENV !== 'production' && typeof window !== 'undefined') {
-  // Simple health check
-  supabase.from('tools').select('id').limit(1).then(({ error }) => {
-    if (error) {
-      console.warn('Supabase connection test failed:', error.message);
-    } else {
-      console.log('Supabase connection successful');
-    }
-  });
+  // Simple health check with better error handling
+  supabase.from('tools').select('id').limit(1)
+    .then(({ data, error }) => {
+      if (error) {
+        console.warn('Supabase connection test failed:', error.message);
+      } else {
+        console.log('Supabase connection successful');
+      }
+    })
+    .catch(err => {
+      console.error('Supabase connection test exception:', err.message);
+    });
 }
