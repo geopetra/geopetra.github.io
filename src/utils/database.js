@@ -2,6 +2,24 @@
 
 import { supabase } from './supabase.js';
 
+// Get all tools
+export const getTools = async () => {
+  const { data, error } = await supabase
+    .from('tools')
+    .select(`
+      *,
+      topics(*)
+    `)
+    .order('name');
+    
+  if (error) {
+    console.error('Error fetching tools:', error);
+    return [];
+  }
+  
+  return data || [];
+};
+
 // Add a new tool with related information
 export const addTool = async (toolData) => {
   const { 

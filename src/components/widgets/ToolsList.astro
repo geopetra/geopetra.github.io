@@ -1,6 +1,6 @@
 ---
 import { getTools } from '../../utils/database';
-import { Image } from '../common/Image.astro';
+import Image from '../common/Image.astro';
 import Button from '../ui/Button.astro';
 
 const tools = await getTools();
@@ -50,7 +50,7 @@ const tools = await getTools();
         </div>
         
         <div class="mt-auto pt-4">
-          <Button href={`/tools/${tool.biotoolsID}`} variant="primary" class="w-full">
+          <Button href={`/tools/${tool.biotools_id || tool.biotoolsID}`} variant="primary" class="w-full">
             View Details
           </Button>
         </div>
