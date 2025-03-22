@@ -31,8 +31,9 @@ async function testConnection() {
 /**
  * Add a tool and its related data to the database
  * @param {Object} toolDefinition - The tool definition object
+ * @param {boolean} updateIfExists - Whether to update the tool if it already exists
  */
-async function addTool(toolDefinition) {
+async function addTool(toolDefinition, updateIfExists = true) {
   const {
     tool,
     topics = [],
@@ -49,36 +50,68 @@ async function addTool(toolDefinition) {
     .eq('petrahubid', tool.petrahubid)
     .single();
 
+  let toolToUse;
+
   if (existingTool) {
-    console.log(`Tool already exists: ${existingTool.name} (${existingTool.petrahubid})`);
-    return existingTool;
+    if (updateIfExists) {
+      console.log(`Updating existing tool: ${existingTool.name} (${existingTool.petrahubid})`);
+      
+      // Update the tool with new values
+      const { data: updatedTool, error } = await supabase
+        .from('tools')
+        .update(tool)
+        .eq('id', existingTool.id)
+        .select()
+        .single();
+        
+      if (error) {
+        console.error('Error updating tool:', error);
+        return existingTool; // Return existing tool even if update fails
+      }
+      
+      console.log(`Tool updated successfully: ${updatedTool.name}`);
+      toolToUse = updatedTool;
+      
+      // Delete existing related data to replace with new data
+      await Promise.all([
+        deleteRelatedData('topics', existingTool.id),
+        deleteRelatedData('operating_systems', existingTool.id),
+        deleteRelatedData('functions', existingTool.id),
+        deleteRelatedData('tool_types', existingTool.id),
+        deleteRelatedData('languages', existingTool.id)
+      ]);
+    } else {
+      console.log(`Tool already exists: ${existingTool.name} (${existingTool.petrahubid})`);
+      return existingTool;
+    }
+  } else {
+    // Insert the tool
+    const { data: newTool, error } = await supabase
+      .from('tools')
+      .insert([tool])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error adding tool:', error);
+      return null;
+    }
+
+    console.log(`Tool added successfully: ${newTool.name}`);
+    toolToUse = newTool;
   }
-
-  // Insert the tool
-  const { data: newTool, error } = await supabase
-    .from('tools')
-    .insert([tool])
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Error adding tool:', error);
-    return null;
-  }
-
-  console.log(`Tool added successfully: ${newTool.name}`);
   
   // Add related data
   await Promise.all([
-    addRelatedData('topics', topics, newTool.id),
-    addRelatedData('operating_systems', operatingSystems, newTool.id),
-    addRelatedData('functions', functions, newTool.id),
-    addRelatedData('tool_types', toolTypes, newTool.id),
-    addRelatedData('languages', languages, newTool.id)
+    addRelatedData('topics', topics, toolToUse.id),
+    addRelatedData('operating_systems', operatingSystems, toolToUse.id),
+    addRelatedData('functions', functions, toolToUse.id),
+    addRelatedData('tool_types', toolTypes, toolToUse.id),
+    addRelatedData('languages', languages, toolToUse.id)
   ]);
   
-  console.log(`All data for ${newTool.name} added successfully!`);
-  return newTool;
+  console.log(`All data for ${toolToUse.name} added successfully!`);
+  return toolToUse;
 }
 
 /**
@@ -94,6 +127,46 @@ async function checkForNewSchema() {
     return !error;
   } catch (e) {
     return false;
+  }
+}
+
+/**
+ * Delete related data for a tool
+ * @param {string} table - The table name
+ * @param {string} toolId - The tool ID
+ */
+async function deleteRelatedData(table, toolId) {
+  // Special handling for topics with new schema
+  if (table === 'topics') {
+    const useNewSchema = await checkForNewSchema();
+    
+    if (useNewSchema) {
+      // Delete from junction table
+      const { error } = await supabase
+        .from('tool_topic_terms')
+        .delete()
+        .eq('tool_id', toolId);
+        
+      if (error) {
+        console.error(`Error deleting from tool_topic_terms:`, error);
+      } else {
+        console.log(`Deleted topic relationships for tool ID ${toolId}`);
+      }
+      
+      return;
+    }
+  }
+  
+  // For other tables or old schema
+  const { error } = await supabase
+    .from(table)
+    .delete()
+    .eq('tool_id', toolId);
+    
+  if (error) {
+    console.error(`Error deleting from ${table}:`, error);
+  } else {
+    console.log(`Deleted ${table} for tool ID ${toolId}`);
   }
 }
 
@@ -269,6 +342,10 @@ const tools = [
 
 // Main function
 async function main() {
+  // Parse command line arguments
+  const args = process.argv.slice(2);
+  const skipUpdates = args.includes('--skip-updates');
+  
   // Test connection first
   const connected = await testConnection();
   if (!connected) {
@@ -276,9 +353,11 @@ async function main() {
     process.exit(1);
   }
   
+  console.log(`Running with update mode: ${skipUpdates ? 'disabled' : 'enabled'}`);
+  
   // Process each tool
   for (const toolDefinition of tools) {
-    await addTool(toolDefinition);
+    await addTool(toolDefinition, !skipUpdates);
   }
   
   console.log('All tools processed successfully!');
