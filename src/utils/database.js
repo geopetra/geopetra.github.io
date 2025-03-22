@@ -253,6 +253,23 @@ export const getToolWithDetails = async (petrahubid) => {
       name: relation.languages?.name
     })).filter(lang => lang.name);
     
+    // Process functions to ensure operation is always in a consistent format
+    const functions = (tool.tool_functions || []).map(func => {
+      // If operation is a string but should be an array, convert it
+      if (func.operation && typeof func.operation === 'string') {
+        try {
+          // Try to parse it as JSON if it looks like an array
+          if (func.operation.startsWith('[') && func.operation.endsWith(']')) {
+            func.operation = JSON.parse(func.operation);
+          }
+        } catch (e) {
+          // If parsing fails, keep it as a string
+          console.log(`Failed to parse operation as JSON: ${func.operation}`);
+        }
+      }
+      return func;
+    });
+    
     // Replace the nested structures with flattened arrays
     const transformedTool = {
       ...tool,
@@ -260,7 +277,7 @@ export const getToolWithDetails = async (petrahubid) => {
       toolTypes,
       operatingSystems,
       languages,
-      functions: tool.tool_functions || [],
+      functions,
       // Remove the nested structures
       tool_topics: undefined,
       tool_type_relations: undefined,

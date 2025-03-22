@@ -253,9 +253,9 @@ const tools = [
       { name: 'Linux' }
     ],
     functions: [
-      { function_name: 'Phase equilibria modeling', description: 'Models phase equilibria in igneous and metamorphic systems', note: 'Uses thermodynamic databases' },
-      { function_name: 'Geothermobarometry', description: 'Calculates pressure and temperature conditions', note: 'Multiple calibrations available' },
-      { function_name: 'Mineral chemistry analysis', description: 'Analyzes mineral compositions', note: 'Supports various mineral groups' }
+      { function_name: 'Phase equilibria modeling', description: 'Models phase equilibria in igneous and metamorphic systems', note: 'Uses thermodynamic databases', operation: ['Phase equilibria modeling'] },
+      { function_name: 'Geothermobarometry', description: 'Calculates pressure and temperature conditions', note: 'Multiple calibrations available', operation: ['Geothermobarometry'] },
+      { function_name: 'Mineral chemistry analysis', description: 'Analyzes mineral compositions', note: 'Supports various mineral groups', operation: ['Mineral chemistry analysis'] }
     ],
     toolTypes: [
       { type: 'Desktop application' },
@@ -307,8 +307,8 @@ const tools = [
       { name: 'Windows' }
     ],
     functions: [
-      { function_name: 'Thermodynamic calculations', description: 'Performs thermodynamic calculations for mineral assemblages', note: 'Based on Gibbs free energy minimization' },
-      { function_name: 'Phase diagram generation', description: 'Generates phase diagrams for rock compositions', note: 'P-T, T-X, and P-X diagrams' }
+      { function_name: 'Thermodynamic calculations', description: 'Performs thermodynamic calculations for mineral assemblages', note: 'Based on Gibbs free energy minimization', operation: ['Thermodynamic calculations'] },
+      { function_name: 'Phase diagram generation', description: 'Generates phase diagrams for rock compositions', note: 'P-T, T-X, and P-X diagrams', operation: ['Phase diagram generation'] }
     ],
     toolTypes: [
       { type: 'Workflow' },
@@ -316,6 +316,62 @@ const tools = [
     ],
     languages: [
       { name: 'MATLAB' }
+    ]
+  },
+  {
+    basicInfo: {
+      name: 'GeoThermo',
+      petrahubid: 'geothermo',
+      description: 'Advanced thermodynamic modeling tool for geological processes',
+      homepage: 'https://github.com/geothermo/geothermo',
+      accessibility: 'Open Source',
+      cost: 'Free',
+      development_stage: 'Beta',
+      license: 'Apache 2.0',
+      documentation: 'https://geothermo.readthedocs.io/',
+      citation: JSON.stringify({
+        papers: [
+          {
+            title: 'GeoThermo: A new approach to thermodynamic modeling in geology',
+            authors: 'Johnson R, Williams S',
+            journal: 'Computers & Geosciences',
+            year: 2023,
+            doi: '10.1234/geothermo'
+          }
+        ]
+      }),
+      support: JSON.stringify({
+        contacts: [
+          {
+            name: 'Rachel Johnson',
+            email: 'rjohnson@geothermo.org',
+            role: 'Lead Developer'
+          }
+        ]
+      })
+    },
+    topics: [
+      { term: 'Thermodynamics' },
+      { term: 'Geochemistry' },
+      { term: 'Metamorphic Petrology' }
+    ],
+    operatingSystems: [
+      { name: 'Windows' },
+      { name: 'Linux' },
+      { name: 'Mac' }
+    ],
+    functions: [
+      { function_name: 'Thermodynamic modeling', description: 'Comprehensive thermodynamic modeling of geological systems', note: 'Uses multiple databases', operation: ['Thermodynamic modeling'] },
+      { function_name: 'Phase diagram calculation', description: 'Calculates phase diagrams for various compositions', note: 'Supports P-T, T-X diagrams', operation: ['Phase diagram calculation'] },
+      { function_name: 'Reaction path modeling', description: 'Models reaction paths in P-T-X space', note: 'Includes kinetic constraints', operation: ['Reaction path modeling'] }
+    ],
+    toolTypes: [
+      { type: 'Desktop application' },
+      { type: 'Library' }
+    ],
+    languages: [
+      { name: 'Python' },
+      { name: 'Fortran' }
     ]
   }
 ];
