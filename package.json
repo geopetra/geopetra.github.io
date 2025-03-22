@@ -22,7 +22,8 @@
     "fix:prettier": "prettier -w .",
     "add-tool": "node -r dotenv/config src/scripts/add-tool.js",
     "add-terms": "node -r dotenv/config src/scripts/add-terms.js",
-    "migrate-topics": "node -r dotenv/config src/scripts/migrate-topics.js"
+    "migrate-topics": "node -r dotenv/config src/scripts/migrate-topics.js",
+    "manage-tools": "node -r dotenv/config src/scripts/manage-tools.js"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.11",
