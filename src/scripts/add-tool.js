@@ -311,7 +311,7 @@ const tools = [
       { function_name: 'Phase diagram generation', description: 'Generates phase diagrams for rock compositions', note: 'P-T, T-X, and P-X diagrams' }
     ],
     toolTypes: [
-      { type: 'Script package' },
+      { type: 'Workflow' },
       { type: 'Command-line tool' }
     ],
     languages: [
