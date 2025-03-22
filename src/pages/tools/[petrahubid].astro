@@ -115,7 +115,7 @@ const metadata = {
             <ul class="list-disc pl-5 space-y-2">
               {tool.functions.map((func) => (
                 <li>
-                  <span class="font-medium">{func.operation && Array.isArray(func.operation) ? func.operation.join(', ') : func.operation || ''}</span>
+                  <span class="font-medium">{func.operation || func.function_name || ''}</span>
                   {func.note && <span class="text-gray-600 dark:text-gray-400"> - {func.note}</span>}
                 </li>
               ))}

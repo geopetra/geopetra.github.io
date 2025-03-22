@@ -253,19 +253,11 @@ export const getToolWithDetails = async (petrahubid) => {
       name: relation.languages?.name
     })).filter(lang => lang.name);
     
-    // Process functions to ensure operation is always in a consistent format
+    // Process functions to ensure operation is in a consistent format
     const functions = (tool.tool_functions || []).map(func => {
-      // If operation is a string but should be an array, convert it
-      if (func.operation && typeof func.operation === 'string') {
-        try {
-          // Try to parse it as JSON if it looks like an array
-          if (func.operation.startsWith('[') && func.operation.endsWith(']')) {
-            func.operation = JSON.parse(func.operation);
-          }
-        } catch (e) {
-          // If parsing fails, keep it as a string
-          console.log(`Failed to parse operation as JSON: ${func.operation}`);
-        }
+      // Ensure operation exists, use function_name as fallback
+      if (!func.operation && func.function_name) {
+        func.operation = func.function_name;
       }
       return func;
     });
