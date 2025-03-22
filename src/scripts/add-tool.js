@@ -151,35 +151,33 @@ const tools = [
   // Add more tools here as needed
   {
     tool: {
-      name: 'GeoThermo',
-      petrahubid: 'geothermo',
-      description: 'A tool for thermodynamic calculations in geosciences, focusing on mineral equilibria.',
-      homepage: 'https://example.com/geothermo',
-      version: '1.5.2',
+      name: 'LinaForma',
+      petrahubid: 'linaforma',
+      description: 'Inverse workflow for quantitative $P$-$T$',
+      homepage: 'https://github.com/TMackay-Champion/LinaForma',
+      version: '1.0.0',
       accessibility: 'Open source',
       cost: 'Free',
       maturity: 'Mature',
-      license: 'GPL-3.0'
+      license: 'GPLv3'
     },
     topics: [
-      { term: 'Thermodynamics' },
-      { term: 'Geochemistry' },
-      { term: 'Metamorphic Petrology' }
+      { term: 'Phase Equilibrium Modelling' },
+      { term: 'Metamorphic Petrology' },
+      { term: 'Igneous Petrology' }
     ],
     operatingSystems: [
-      { name: 'Windows' },
-      { name: 'Linux' }
+      { name: 'Windows' }
     ],
     functions: [
       { operation: ['Calculation'], note: 'Thermodynamic calculations' },
       { operation: ['Modelling'], note: 'Phase diagram generation' }
     ],
     toolTypes: [
-      { type: 'Desktop application' }
+      { type: 'MATLAB script package' }
     ],
     languages: [
-      { name: 'C++' },
-      { name: 'Fortran' }
+      { name: 'MATLAB' }
     ]
   }
 ];
