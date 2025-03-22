@@ -1,4 +1,6 @@
 // Script to add tools to the database
+// Load environment variables first
+import 'dotenv/config';
 import { supabase } from '../utils/supabase.js';
 
 /**
