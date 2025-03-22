@@ -81,15 +81,126 @@ const metadata = {
             </div>
           )}
           
-          {tool.operating_systems && tool.operating_systems.length > 0 && (
+          {tool.operatingSystems && tool.operatingSystems.length > 0 && (
             <div class="mb-6">
               <h2 class="text-2xl font-semibold mb-2">Operating Systems</h2>
               <div class="flex flex-wrap gap-2">
-                {tool.operating_systems.map((os) => (
+                {tool.operatingSystems.map((os) => (
                   <span class="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-full">
                     {os.name}
                   </span>
                 ))}
+              </div>
+            </div>
+          )}
+          
+          {tool.toolTypes && tool.toolTypes.length > 0 && (
+            <div class="mb-6">
+              <h2 class="text-2xl font-semibold mb-2">Tool Types</h2>
+              <div class="flex flex-wrap gap-2">
+                {tool.toolTypes.map((type) => (
+                  <span class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 rounded-full">
+                    {type.type}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {tool.languages && tool.languages.length > 0 && (
+            <div class="mb-6">
+              <h2 class="text-2xl font-semibold mb-2">Programming Languages</h2>
+              <div class="flex flex-wrap gap-2">
+                {tool.languages.map((lang) => (
+                  <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 rounded-full">
+                    {lang.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {tool.documentation && (
+            <div class="mb-6">
+              <h2 class="text-2xl font-semibold mb-2">Documentation</h2>
+              <a href={tool.documentation} target="_blank" rel="noopener noreferrer" 
+                 class="text-blue-600 dark:text-blue-400 hover:underline">
+                View Documentation
+              </a>
+            </div>
+          )}
+          
+          {tool.development_stage && (
+            <div class="mb-6">
+              <h2 class="text-2xl font-semibold mb-2">Development Stage</h2>
+              <p>{tool.development_stage}</p>
+            </div>
+          )}
+          
+          {tool.license && (
+            <div class="mb-6">
+              <h2 class="text-2xl font-semibold mb-2">License</h2>
+              <p>{tool.license}</p>
+            </div>
+          )}
+          {tool.citation && (
+            <div class="mb-6">
+              <h2 class="text-2xl font-semibold mb-2">Citation</h2>
+              <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                {(() => {
+                  try {
+                    const citationData = typeof tool.citation === 'string' ? JSON.parse(tool.citation) : tool.citation;
+                    return (
+                      <div>
+                        {citationData.papers && citationData.papers.map((paper) => (
+                          <div class="mb-3 last:mb-0">
+                            <p class="font-medium">{paper.title}</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                              {paper.authors} ({paper.year}). {paper.journal}.
+                              {paper.doi && (
+                                <a href={`https://doi.org/${paper.doi}`} target="_blank" rel="noopener noreferrer" 
+                                   class="ml-1 text-blue-600 hover:text-blue-800">
+                                  DOI: {paper.doi}
+                                </a>
+                              )}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  } catch (e) {
+                    return <p>{tool.citation}</p>;
+                  }
+                })()}
+              </div>
+            </div>
+          )}
+
+          {tool.support && (
+            <div class="mb-6">
+              <h2 class="text-2xl font-semibold mb-2">Support</h2>
+              <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                {(() => {
+                  try {
+                    const supportData = typeof tool.support === 'string' ? JSON.parse(tool.support) : tool.support;
+                    return (
+                      <div>
+                        {supportData.contacts && supportData.contacts.map((contact) => (
+                          <div class="mb-2 last:mb-0">
+                            <p class="font-medium">{contact.name} {contact.role && `(${contact.role})`}</p>
+                            {contact.email && (
+                              <a href={`mailto:${contact.email}`} class="text-blue-600 hover:text-blue-800">
+                                {contact.email}
+                              </a>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  } catch (e) {
+                    return <p>{tool.support}</p>;
+                  }
+                })()}
               </div>
             </div>
           )}

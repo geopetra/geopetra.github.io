@@ -361,9 +361,9 @@ const tools = [
       { name: 'Mac' }
     ],
     functions: [
-      { function_name: 'Thermodynamic modeling', description: 'Comprehensive thermodynamic modeling of geological systems', note: 'Uses multiple databases', },
-      { function_name: 'Phase diagram calculation', description: 'Calculates phase diagrams for various compositions', note: 'Supports P-T, T-X diagrams', },
-      { function_name: 'Reaction path modeling', description: 'Models reaction paths in P-T-X space', note: 'Includes kinetic constraints', }
+      { function_name: 'Thermodynamic modeling', description: 'Comprehensive thermodynamic modeling of geological systems', note: 'Uses multiple databases', operation: ['Thermodynamic modeling'] },
+      { function_name: 'Phase diagram calculation', description: 'Calculates phase diagrams for various compositions', note: 'Supports P-T, T-X diagrams', operation: ['Phase diagram calculation'] },
+      { function_name: 'Reaction path modeling', description: 'Models reaction paths in P-T-X space', note: 'Includes kinetic constraints', operation: ['Reaction path modeling'] }
     ],
     toolTypes: [
       { type: 'Desktop application' },
