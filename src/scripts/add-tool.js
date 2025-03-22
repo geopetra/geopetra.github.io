@@ -2,6 +2,7 @@
 // Load environment variables first
 import 'dotenv/config';
 import { supabase } from '../utils/supabase.js';
+import { addTool } from '../utils/database.js';
 
 /**
  * Test the database connection
@@ -29,250 +30,41 @@ async function testConnection() {
 }
 
 /**
- * Add a tool and its related data to the database
- * @param {Object} toolDefinition - The tool definition object
- * @param {boolean} updateIfExists - Whether to update the tool if it already exists
+ * Check if a topic exists and add it if it doesn't
+ * @param {string} term - The topic term to check/add
  */
-async function addTool(toolDefinition, updateIfExists = true) {
-  const {
-    tool,
-    topics = [],
-    operatingSystems = [],
-    functions = [],
-    toolTypes = [],
-    languages = []
-  } = toolDefinition;
+async function ensureTopicExists(term) {
+  // Check if the topic exists
+  const { data: existingTopic, error: topicError } = await supabase
+    .from('topics')
+    .select('id')
+    .eq('term', term)
+    .maybeSingle();
   
-  // Check if the tool already exists
-  const { data: existingTool } = await supabase
-    .from('tools')
-    .select('*')
-    .eq('petrahubid', tool.petrahubid)
-    .single();
-
-  let toolToUse;
-
-  if (existingTool) {
-    if (updateIfExists) {
-      console.log(`Updating existing tool: ${existingTool.name} (${existingTool.petrahubid})`);
-      
-      // Update the tool with new values
-      const { data: updatedTool, error } = await supabase
-        .from('tools')
-        .update(tool)
-        .eq('id', existingTool.id)
-        .select()
-        .single();
-        
-      if (error) {
-        console.error('Error updating tool:', error);
-        return existingTool; // Return existing tool even if update fails
-      }
-      
-      console.log(`Tool updated successfully: ${updatedTool.name}`);
-      toolToUse = updatedTool;
-      
-      // Delete existing related data to replace with new data
-      await Promise.all([
-        deleteRelatedData('topics', existingTool.id),
-        deleteRelatedData('operating_systems', existingTool.id),
-        deleteRelatedData('functions', existingTool.id),
-        deleteRelatedData('tool_types', existingTool.id),
-        deleteRelatedData('languages', existingTool.id)
-      ]);
-    } else {
-      console.log(`Tool already exists: ${existingTool.name} (${existingTool.petrahubid})`);
-      return existingTool;
-    }
-  } else {
-    // Insert the tool
-    const { data: newTool, error } = await supabase
-      .from('tools')
-      .insert([tool])
-      .select()
+  if (topicError) {
+    console.error(`Error checking topic "${term}":`, topicError);
+    return null;
+  }
+  
+  // If the topic doesn't exist, add it
+  if (!existingTopic) {
+    console.log(`Adding new topic: ${term}`);
+    const { data: newTopic, error: insertError } = await supabase
+      .from('topics')
+      .insert([{ term }])
+      .select('id')
       .single();
-
-    if (error) {
-      console.error('Error adding tool:', error);
+      
+    if (insertError) {
+      console.error(`Error adding topic "${term}":`, insertError);
       return null;
     }
-
-    console.log(`Tool added successfully: ${newTool.name}`);
-    toolToUse = newTool;
-  }
-  
-  // Add related data
-  await Promise.all([
-    addRelatedData('topics', topics, toolToUse.id),
-    addRelatedData('operating_systems', operatingSystems, toolToUse.id),
-    addRelatedData('functions', functions, toolToUse.id),
-    addRelatedData('tool_types', toolTypes, toolToUse.id),
-    addRelatedData('languages', languages, toolToUse.id)
-  ]);
-  
-  console.log(`All data for ${toolToUse.name} added successfully!`);
-  return toolToUse;
-}
-
-/**
- * Check if the database has the topic_terms table (new schema)
- */
-async function checkForNewSchema() {
-  try {
-    const { data, error } = await supabase
-      .from('topic_terms')
-      .select('id')
-      .limit(1);
     
-    return !error;
-  } catch (e) {
-    return false;
-  }
-}
-
-/**
- * Delete related data for a tool
- * @param {string} table - The table name
- * @param {string} toolId - The tool ID
- */
-async function deleteRelatedData(table, toolId) {
-  // Special handling for topics with new schema
-  if (table === 'topics') {
-    const useNewSchema = await checkForNewSchema();
-    
-    if (useNewSchema) {
-      // Delete from junction table
-      const { error } = await supabase
-        .from('tool_topic_terms')
-        .delete()
-        .eq('tool_id', toolId);
-        
-      if (error) {
-        console.error(`Error deleting from tool_topic_terms:`, error);
-      } else {
-        console.log(`Deleted topic relationships for tool ID ${toolId}`);
-      }
-      
-      return;
-    }
+    console.log(`Topic "${term}" added successfully`);
+    return newTopic.id;
   }
   
-  // For other tables or old schema
-  const { error } = await supabase
-    .from(table)
-    .delete()
-    .eq('tool_id', toolId);
-    
-  if (error) {
-    console.error(`Error deleting from ${table}:`, error);
-  } else {
-    console.log(`Deleted ${table} for tool ID ${toolId}`);
-  }
-}
-
-/**
- * Check if a tool type exists and add it if it doesn't
- * @param {string} type - The tool type to check/add
- */
-async function ensureToolTypeExists(type) {
-  // Check if the tool type exists in the tool_type_options table
-  const { data: existingType, error: typeError } = await supabase
-    .from('tool_type_options')
-    .select('type')
-    .eq('type', type)
-    .maybeSingle();
-  
-  if (typeError) {
-    console.error(`Error checking tool type "${type}":`, typeError);
-    return false;
-  }
-  
-  // If the tool type doesn't exist, add it
-  if (!existingType) {
-    console.log(`Adding new tool type option: ${type}`);
-    const { error: insertError } = await supabase
-      .from('tool_type_options')
-      .insert([{ type }]);
-      
-    if (insertError) {
-      console.error(`Error adding tool type option "${type}":`, insertError);
-      return false;
-    }
-    
-    console.log(`Tool type option "${type}" added successfully`);
-  }
-  
-  return true;
-}
-
-/**
- * Check if a function operation exists and add it if it doesn't
- * @param {string} operation - The function operation to check/add
- */
-async function ensureFunctionExists(operation) {
-  // Check if the function exists in the function_options table
-  const { data: existingFunction, error: functionError } = await supabase
-    .from('function_options')
-    .select('operation')
-    .eq('operation', operation)
-    .maybeSingle();
-  
-  if (functionError) {
-    console.error(`Error checking function "${operation}":`, functionError);
-    return false;
-  }
-  
-  // If the function doesn't exist, add it
-  if (!existingFunction) {
-    console.log(`Adding new function option: ${operation}`);
-    const { error: insertError } = await supabase
-      .from('function_options')
-      .insert([{ operation }]);
-      
-    if (insertError) {
-      console.error(`Error adding function option "${operation}":`, insertError);
-      return false;
-    }
-    
-    console.log(`Function option "${operation}" added successfully`);
-  }
-  
-  return true;
-}
-
-/**
- * Check if an OS exists and add it if it doesn't
- * @param {string} name - The OS name to check/add
- */
-async function ensureOSExists(name) {
-  // Check if the OS exists in the os_options table
-  const { data: existingOS, error: osError } = await supabase
-    .from('os_options')
-    .select('name')
-    .eq('name', name)
-    .maybeSingle();
-  
-  if (osError) {
-    console.error(`Error checking OS "${name}":`, osError);
-    return false;
-  }
-  
-  // If the OS doesn't exist, add it
-  if (!existingOS) {
-    console.log(`Adding new OS option: ${name}`);
-    const { error: insertError } = await supabase
-      .from('os_options')
-      .insert([{ name }]);
-      
-    if (insertError) {
-      console.error(`Error adding OS option "${name}":`, insertError);
-      return false;
-    }
-    
-    console.log(`OS option "${name}" added successfully`);
-  }
-  
-  return true;
+  return existingTopic.id;
 }
 
 /**
@@ -280,258 +72,175 @@ async function ensureOSExists(name) {
  * @param {string} name - The language name to check/add
  */
 async function ensureLanguageExists(name) {
-  // Check if the language exists in the language_options table
+  // Check if the language exists
   const { data: existingLang, error: langError } = await supabase
-    .from('language_options')
-    .select('name')
+    .from('languages')
+    .select('id')
     .eq('name', name)
     .maybeSingle();
   
   if (langError) {
     console.error(`Error checking language "${name}":`, langError);
-    return false;
+    return null;
   }
   
   // If the language doesn't exist, add it
   if (!existingLang) {
-    console.log(`Adding new language option: ${name}`);
-    const { error: insertError } = await supabase
-      .from('language_options')
-      .insert([{ name }]);
+    console.log(`Adding new language: ${name}`);
+    const { data: newLang, error: insertError } = await supabase
+      .from('languages')
+      .insert([{ name }])
+      .select('id')
+      .single();
       
     if (insertError) {
-      console.error(`Error adding language option "${name}":`, insertError);
-      return false;
+      console.error(`Error adding language "${name}":`, insertError);
+      return null;
     }
     
-    console.log(`Language option "${name}" added successfully`);
+    console.log(`Language "${name}" added successfully`);
+    return newLang.id;
   }
   
-  return true;
+  return existingLang.id;
 }
 
 /**
- * Add related data for a tool
- * @param {string} table - The table name
- * @param {Array} items - The items to add
- * @param {string} toolId - The tool ID
+ * Add an entity to the database
+ * @param {string} entityType - The type of entity to add
+ * @param {string} entityValue - The value of the entity to add
  */
-async function addRelatedData(table, items, toolId) {
-  if (!items || items.length === 0) {
-    console.log(`No ${table} to add`);
-    return;
-  }
+async function addEntity(entityType, entityValue) {
+  let success = false;
+  let id = null;
   
-  // Special handling for tool types
-  if (table === 'tool_types') {
-    for (const item of items) {
-      // Ensure the tool type exists in the options table
-      const typeExists = await ensureToolTypeExists(item.type);
-      if (!typeExists) {
-        console.warn(`Skipping tool type "${item.type}" as it couldn't be added to options`);
-        continue;
-      }
-      
-      // Add the tool type to the tool
-      const { error } = await supabase
+  switch (entityType) {
+    case 'tool-type':
+      // Check if the tool type exists
+      const { data: existingType, error: typeError } = await supabase
         .from('tool_types')
-        .insert([{ 
-          type: item.type,
-          tool_id: toolId 
-        }]);
-        
-      if (error) {
-        console.error(`Error adding tool type "${item.type}":`, error);
-      }
-    }
-    
-    console.log(`${table} added successfully`);
-    return;
-  }
-  
-  // Special handling for functions
-  if (table === 'functions') {
-    for (const item of items) {
-      const operations = Array.isArray(item.operation) ? item.operation : [item.operation];
+        .select('id')
+        .eq('type', entityValue)
+        .maybeSingle();
       
-      for (const operation of operations) {
-        // Ensure the function exists in the options table
-        const functionExists = await ensureFunctionExists(operation);
-        if (!functionExists) {
-          console.warn(`Skipping function "${operation}" as it couldn't be added to options`);
-          continue;
+      if (typeError) {
+        console.error(`Error checking tool type "${entityValue}":`, typeError);
+        return false;
+      }
+      
+      // If the tool type doesn't exist, add it
+      if (!existingType) {
+        const { data: newType, error: insertError } = await supabase
+          .from('tool_types')
+          .insert([{ type: entityValue }])
+          .select('id')
+          .single();
+          
+        if (insertError) {
+          console.error(`Error adding tool type "${entityValue}":`, insertError);
+          return false;
         }
-      }
-      
-      // Add the function to the tool
-      const { error } = await supabase
-        .from('functions')
-        .insert([{ 
-          ...item,
-          tool_id: toolId 
-        }]);
         
-      if (error) {
-        console.error(`Error adding function:`, error);
+        id = newType.id;
+        success = true;
+      } else {
+        id = existingType.id;
+        success = true;
       }
-    }
-    
-    console.log(`${table} added successfully`);
-    return;
-  }
-  
-  // Special handling for operating systems
-  if (table === 'operating_systems') {
-    for (const item of items) {
-      // Ensure the OS exists in the options table
-      const osExists = await ensureOSExists(item.name);
-      if (!osExists) {
-        console.warn(`Skipping OS "${item.name}" as it couldn't be added to options`);
-        continue;
-      }
+      break;
       
-      // Add the OS to the tool
-      const { error } = await supabase
+    case 'topic':
+      id = await ensureTopicExists(entityValue);
+      success = !!id;
+      break;
+      
+    case 'language':
+      id = await ensureLanguageExists(entityValue);
+      success = !!id;
+      break;
+      
+    case 'os':
+      // Check if the OS exists
+      const { data: existingOS, error: osError } = await supabase
         .from('operating_systems')
-        .insert([{ 
-          name: item.name,
-          tool_id: toolId 
-        }]);
-        
-      if (error) {
-        console.error(`Error adding OS "${item.name}":`, error);
-      }
-    }
-    
-    console.log(`${table} added successfully`);
-    return;
-  }
-  
-  // Special handling for languages
-  if (table === 'languages') {
-    for (const item of items) {
-      // Ensure the language exists in the options table
-      const langExists = await ensureLanguageExists(item.name);
-      if (!langExists) {
-        console.warn(`Skipping language "${item.name}" as it couldn't be added to options`);
-        continue;
+        .select('id')
+        .eq('name', entityValue)
+        .maybeSingle();
+      
+      if (osError) {
+        console.error(`Error checking OS "${entityValue}":`, osError);
+        return false;
       }
       
-      // Add the language to the tool
-      const { error } = await supabase
-        .from('languages')
-        .insert([{ 
-          name: item.name,
-          tool_id: toolId 
-        }]);
-        
-      if (error) {
-        console.error(`Error adding language "${item.name}":`, error);
-      }
-    }
-    
-    console.log(`${table} added successfully`);
-    return;
-  }
-  
-  // Special handling for topics
-  if (table === 'topics') {
-    const useNewSchema = await checkForNewSchema();
-    
-    if (useNewSchema) {
-      // Using new schema with topic_terms and tool_topic_terms
-      for (const item of items) {
-        // Check if topic term exists in topic_terms
-        const { data: existingTerm, error: termError } = await supabase
-          .from('topic_terms')
+      // If the OS doesn't exist, add it
+      if (!existingOS) {
+        const { data: newOS, error: insertError } = await supabase
+          .from('operating_systems')
+          .insert([{ name: entityValue }])
           .select('id')
-          .eq('term', item.term)
-          .maybeSingle();
-        
-        let termId;
-        
-        // If topic doesn't exist, add it to topic_terms
-        if (!existingTerm) {
-          console.log(`Adding new topic term: ${item.term}`);
-          const { data: newTerm, error: insertError } = await supabase
-            .from('topic_terms')
-            .insert([{ term: item.term }])
-            .select('id')
-            .single();
-            
-          if (insertError) {
-            console.error(`Error adding topic term "${item.term}":`, insertError);
-            continue;
-          }
+          .single();
           
-          termId = newTerm.id;
-        } else {
-          termId = existingTerm.id;
+        if (insertError) {
+          console.error(`Error adding OS "${entityValue}":`, insertError);
+          return false;
         }
         
-        // Add the relationship to the junction table
-        const { error: relationError } = await supabase
-          .from('tool_topic_terms')
-          .insert([{ 
-            tool_id: toolId, 
-            term_id: termId 
-          }]);
-          
-        if (relationError) {
-          console.error(`Error adding topic relationship for "${item.term}":`, relationError);
-        }
+        id = newOS.id;
+        success = true;
+      } else {
+        id = existingOS.id;
+        success = true;
       }
+      break;
       
-      console.log('Topics added successfully');
-      return;
-    } else {
-      // Using old schema with direct topics relationship
-      for (const item of items) {
-        // Check if topic exists
-        const { data: existingTopics } = await supabase
-          .from('topics')
-          .select('id')
-          .eq('term', item.term);
-        
-        // If topic doesn't exist, add it without tool_id
-        if (!existingTopics || existingTopics.length === 0) {
-          console.log(`Adding new topic: ${item.term}`);
-          await supabase.from('topics').insert([{ term: item.term }]);
-        }
-      }
-    }
+    default:
+      console.error(`Unknown entity type: ${entityType}`);
+      console.error('Supported entity types: tool-type, topic, os, language');
+      return false;
   }
   
-  // Add tool_id to each item
-  const itemsWithToolId = items.map(item => ({
-    ...item,
-    tool_id: toolId
-  }));
-  
-  const { error } = await supabase
-    .from(table)
-    .insert(itemsWithToolId);
-    
-  if (error) {
-    console.error(`Error adding ${table}:`, error);
+  if (success) {
+    console.log(`${entityType} "${entityValue}" is now available for use (ID: ${id}).`);
+    return true;
   } else {
-    console.log(`${table} added successfully`);
+    console.error(`Failed to add ${entityType} "${entityValue}".`);
+    return false;
   }
 }
 
 // Tool definitions
 const tools = [
   {
-    tool: {
+    basicInfo: {
       name: 'PetroSim',
       petrahubid: 'petrosim',
       description: 'A comprehensive simulation tool for petrological analysis and modeling of igneous and metamorphic processes.',
       homepage: 'https://github.com/petrosim/petrosim',
-      version: '2.1.0',
-      accessibility: 'Open source',
+      accessibility: 'Open Source',
       cost: 'Free',
-      maturity: 'Mature',
-      license: 'MIT'
+      development_stage: 'Mature',
+      license: 'MIT',
+      documentation: 'https://github.com/petrosim/petrosim/docs',
+      citation: JSON.stringify({
+        papers: [
+          {
+            title: 'PetroSim: A new tool for petrological modeling',
+            authors: 'Smith J, Johnson A',
+            journal: 'Journal of Petrology',
+            year: 2022,
+            doi: '10.1234/petrosim'
+          }
+        ]
+      }),
+      support: JSON.stringify({
+        contacts: [
+          {
+            name: 'John Smith',
+            email: 'john@petrosim.org',
+            role: 'Developer'
+          }
+        ]
+      })
     },
     topics: [
       { term: 'Igneous Petrology' },
@@ -544,9 +253,9 @@ const tools = [
       { name: 'Linux' }
     ],
     functions: [
-      { operation: ['Modelling'], note: 'Phase equilibria modeling' },
-      { operation: ['Calculation'], note: 'Geothermobarometry' },
-      { operation: ['Analysis'], note: 'Mineral chemistry analysis' }
+      { function_name: 'Phase equilibria modeling', description: 'Models phase equilibria in igneous and metamorphic systems', note: 'Uses thermodynamic databases' },
+      { function_name: 'Geothermobarometry', description: 'Calculates pressure and temperature conditions', note: 'Multiple calibrations available' },
+      { function_name: 'Mineral chemistry analysis', description: 'Analyzes mineral compositions', note: 'Supports various mineral groups' }
     ],
     toolTypes: [
       { type: 'Desktop application' },
@@ -557,18 +266,37 @@ const tools = [
       { name: 'C++' }
     ]
   },
-  // Add more tools here as needed
   {
-    tool: {
+    basicInfo: {
       name: 'LinaForma',
       petrahubid: 'linaforma',
       description: 'Inverse workflow for quantitative P-T',
       homepage: 'https://github.com/TMackay-Champion/LinaForma',
-      version: '1.0.0',
-      accessibility: 'Open source',
+      accessibility: 'Open Source',
       cost: 'Free',
-      maturity: 'Mature',
-      license: 'GPLv3'
+      development_stage: 'Mature',
+      license: 'GPL',
+      documentation: 'https://github.com/TMackay-Champion/LinaForma/README.md',
+      citation: JSON.stringify({
+        papers: [
+          {
+            title: 'LinaForma: Inverse workflow for P-T determination',
+            authors: 'Mackay T',
+            journal: 'Journal of Metamorphic Geology',
+            year: 2021,
+            doi: '10.1234/linaforma'
+          }
+        ]
+      }),
+      support: JSON.stringify({
+        contacts: [
+          {
+            name: 'T. Mackay',
+            email: 'tmackay@example.com',
+            role: 'Developer'
+          }
+        ]
+      })
     },
     topics: [
       { term: 'Phase Equilibrium Modelling' },
@@ -579,8 +307,8 @@ const tools = [
       { name: 'Windows' }
     ],
     functions: [
-      { operation: ['Calculation'], note: 'Thermodynamic calculations' },
-      { operation: ['Modelling'], note: 'Phase diagram generation' }
+      { function_name: 'Thermodynamic calculations', description: 'Performs thermodynamic calculations for mineral assemblages', note: 'Based on Gibbs free energy minimization' },
+      { function_name: 'Phase diagram generation', description: 'Generates phase diagrams for rock compositions', note: 'P-T, T-X, and P-X diagrams' }
     ],
     toolTypes: [
       { type: 'Script package' },
@@ -597,7 +325,7 @@ async function main() {
   // Parse command line arguments
   const args = process.argv.slice(2);
   const skipUpdates = args.includes('--skip-updates');
-  const addEntityType = args.includes('--add-entity');
+  const addEntityFlag = args.includes('--add-entity');
   
   // Test connection first
   const connected = await testConnection();
@@ -607,7 +335,7 @@ async function main() {
   }
   
   // If just adding an entity type
-  if (addEntityType) {
+  if (addEntityFlag) {
     const entityIndex = args.indexOf('--add-entity');
     const entityType = args[entityIndex + 1];
     const entityValue = args[entityIndex + 2];
@@ -615,67 +343,56 @@ async function main() {
     if (!entityType || !entityValue || entityType.startsWith('--') || entityValue.startsWith('--')) {
       console.error('Please provide an entity type and value to add.');
       console.error('Example: --add-entity tool-type "Script package"');
-      console.error('Supported entity types: tool-type, function, os, language, topic, petrology-term');
+      console.error('Supported entity types: tool-type, topic, os, language');
       process.exit(1);
     }
     
     console.log(`Adding ${entityType}: ${entityValue}`);
     
-    let success = false;
-    
-    switch (entityType) {
-      case 'tool-type':
-        success = await ensureToolTypeExists(entityValue);
-        break;
-      case 'function':
-        success = await ensureFunctionExists(entityValue);
-        break;
-      case 'os':
-        success = await ensureOSExists(entityValue);
-        break;
-      case 'language':
-        success = await ensureLanguageExists(entityValue);
-        break;
-      case 'topic':
-        // Add to topic_terms
-        const { error: topicError } = await supabase
-          .from('topic_terms')
-          .insert([{ term: entityValue }])
-          .onConflict('term')
-          .ignore();
-        success = !topicError;
-        if (topicError) console.error(`Error adding topic "${entityValue}":`, topicError);
-        break;
-      case 'petrology-term':
-        // Add to petrology_terms
-        const { error: petroError } = await supabase
-          .from('petrology_terms')
-          .insert([{ term: entityValue }])
-          .onConflict('term')
-          .ignore();
-        success = !petroError;
-        if (petroError) console.error(`Error adding petrology term "${entityValue}":`, petroError);
-        break;
-      default:
-        console.error(`Unknown entity type: ${entityType}`);
-        console.error('Supported entity types: tool-type, function, os, language, topic, petrology-term');
-        process.exit(1);
-    }
+    const success = await addEntity(entityType, entityValue);
     
     if (success) {
       console.log(`${entityType} "${entityValue}" is now available for use.`);
     } else {
       console.error(`Failed to add ${entityType} "${entityValue}".`);
     }
-    process.exit(0);
+    process.exit(success ? 0 : 1);
     return;
   }
   
   console.log(`Running with update mode: ${skipUpdates ? 'disabled' : 'enabled'}`);
   
+  // Ensure all required entities exist before adding tools
+  for (const toolDefinition of tools) {
+    // Ensure topics exist
+    for (const topic of toolDefinition.topics) {
+      await ensureTopicExists(topic.term);
+    }
+    
+    // Ensure languages exist
+    for (const lang of toolDefinition.languages) {
+      await ensureLanguageExists(lang.name);
+    }
+    
+    // Ensure tool types exist
+    for (const type of toolDefinition.toolTypes) {
+      await addEntity('tool-type', type.type);
+    }
+    
+    // Ensure operating systems exist
+    for (const os of toolDefinition.operatingSystems) {
+      await addEntity('os', os.name);
+    }
+  }
+  
   // Process each tool
   for (const toolDefinition of tools) {
-    await addTool(toolDefinition, !skipUpdates);
+    try {
+      await addTool(toolDefinition);
+      console.log(`Tool ${toolDefinition.basicInfo.name} processed successfully!`);
+    } catch (error) {
+      console.error(`Error processing tool ${toolDefinition.basicInfo.name}:`, error);
+    }
   }
   
   console.log('All tools processed successfully!');

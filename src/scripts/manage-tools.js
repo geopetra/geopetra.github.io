@@ -2,6 +2,7 @@
 // Load environment variables first
 import 'dotenv/config';
 import { supabase } from '../utils/supabase.js';
+import { getTools, getToolWithDetails, deleteTool, updateTool } from '../utils/database.js';
 import readline from 'readline';
 
 const rl = readline.createInterface({
@@ -38,78 +39,12 @@ async function testConnection() {
  * Get all tools from the database
  */
 async function getAllTools() {
-  const { data, error } = await supabase
-    .from('tools')
-    .select('id, name, petrahubid')
-    .order('name');
-    
-  if (error) {
-    console.error('Error fetching tools:', error);
-    return [];
-  }
-  
-  return data || [];
-}
-
-/**
- * Get a tool with all its details
- */
-async function getToolDetails(toolId) {
-  const { data: tool, error } = await supabase
-    .from('tools')
-    .select(`
-      *,
-      functions(*),
-      tool_types(*),
-      topics(*),
-      operating_systems(*),
-      languages(*)
-    `)
-    .eq('id', toolId)
-    .single();
-    
-  if (error) {
-    console.error('Error fetching tool details:', error);
-    return null;
-  }
-  
-  return tool;
-}
-
-/**
- * Delete a tool and all its related data
- */
-async function deleteTool(toolId) {
-  // Due to cascade delete in the database schema, 
-  // deleting the tool will automatically delete all related data
-  const { error } = await supabase
-    .from('tools')
-    .delete()
-    .eq('id', toolId);
-    
-  if (error) {
-    console.error('Error deleting tool:', error);
-    return false;
-  }
-  
-  return true;
-}
-
-/**
- * Update basic tool information
- */
-async function updateTool(toolId, updates) {
-  const { error } = await supabase
-    .from('tools')
-    .update(updates)
-    .eq('id', toolId);
-    
-  if (error) {
-    console.error('Error updating tool:', error);
-    return false;
-  }
-  
-  return true;
+  const tools = await getTools();
+  return tools.map(tool => ({
+    id: tool.id,
+    name: tool.name,
+    petrahubid: tool.petrahubid
+  }));
 }
 
 /**
@@ -134,6 +69,19 @@ async function displayTools() {
 }
 
 /**
+ * Format JSON for display
+ */
+function formatJSON(jsonString) {
+  try {
+    if (!jsonString) return 'N/A';
+    const obj = typeof jsonString === 'string' ? JSON.parse(jsonString) : jsonString;
+    return JSON.stringify(obj, null, 2);
+  } catch (e) {
+    return jsonString || 'N/A';
+  }
+}
+
+/**
  * Display tool details
  */
 async function displayToolDetails(tool) {
@@ -143,11 +91,21 @@ async function displayToolDetails(tool) {
   console.log(`ID: ${tool.petrahubid}`);
   console.log(`Description: ${tool.description}`);
   console.log(`Homepage: ${tool.homepage || 'N/A'}`);
-  console.log(`Version: ${tool.version || 'N/A'}`);
   console.log(`Accessibility: ${tool.accessibility || 'N/A'}`);
   console.log(`Cost: ${tool.cost || 'N/A'}`);
-  console.log(`Maturity: ${tool.maturity || 'N/A'}`);
+  console.log(`Development Stage: ${tool.development_stage || 'N/A'}`);
   console.log(`License: ${tool.license || 'N/A'}`);
+  console.log(`Documentation: ${tool.documentation || 'N/A'}`);
+  
+  if (tool.citation) {
+    console.log('\nCitation:');
+    console.log(formatJSON(tool.citation));
+  }
+  
+  if (tool.support) {
+    console.log('\nSupport:');
+    console.log(formatJSON(tool.support));
+  }
   
   if (tool.topics && tool.topics.length > 0) {
     console.log('\nTopics:');
@@ -156,9 +114,9 @@ async function displayToolDetails(tool) {
     });
   }
   
-  if (tool.operating_systems && tool.operating_systems.length > 0) {
+  if (tool.operatingSystems && tool.operatingSystems.length > 0) {
     console.log('\nOperating Systems:');
-    tool.operating_systems.forEach(os => {
+    tool.operatingSystems.forEach(os => {
       console.log(`- ${os.name}`);
     });
   }
@@ -166,13 +124,15 @@ async function displayToolDetails(tool) {
   if (tool.functions && tool.functions.length > 0) {
     console.log('\nFunctions:');
     tool.functions.forEach(func => {
-      console.log(`- ${func.operation.join(', ')}${func.note ? ` (${func.note})` : ''}`);
+      console.log(`- ${func.function_name}`);
+      if (func.description) console.log(`  Description: ${func.description}`);
+      if (func.note) console.log(`  Note: ${func.note}`);
     });
   }
   
-  if (tool.tool_types && tool.tool_types.length > 0) {
+  if (tool.toolTypes && tool.toolTypes.length > 0) {
     console.log('\nTool Types:');
-    tool.tool_types.forEach(type => {
+    tool.toolTypes.forEach(type => {
       console.log(`- ${type.type}`);
     });
   }
@@ -195,51 +155,102 @@ async function editToolMenu(tool) {
   console.log('1. Edit Name');
   console.log('2. Edit Description');
   console.log('3. Edit Homepage');
-  console.log('4. Edit Version');
-  console.log('5. Edit Accessibility');
-  console.log('6. Edit Cost');
-  console.log('7. Edit Maturity');
-  console.log('8. Edit License');
-  console.log('9. Return to Main Menu');
+  console.log('4. Edit Accessibility');
+  console.log('5. Edit Cost');
+  console.log('6. Edit Development Stage');
+  console.log('7. Edit License');
+  console.log('8. Edit Documentation');
+  console.log('9. Edit Citation (JSON)');
+  console.log('10. Edit Support (JSON)');
+  console.log('11. Return to Main Menu');
   
-  rl.question('Select an option (1-9): ', async (answer) => {
+  rl.question('Select an option (1-11): ', async (answer) => {
     const option = parseInt(answer.trim());
     
-    if (isNaN(option) || option < 1 || option > 9) {
+    if (isNaN(option) || option < 1 || option > 11) {
       console.log('Invalid option. Please try again.');
       await editToolMenu(tool);
       return;
     }
     
-    if (option === 9) {
+    if (option === 11) {
       await showMenu();
       return;
     }
     
-    const fields = ['name', 'description', 'homepage', 'version', 'accessibility', 'cost', 'maturity', 'license'];
+    const fields = [
+      'name', 'description', 'homepage', 'accessibility', 
+      'cost', 'development_stage', 'license', 'documentation',
+      'citation', 'support'
+    ];
     const fieldToEdit = fields[option - 1];
-    const currentValue = tool[fieldToEdit] || '';
+    let currentValue = tool[fieldToEdit] || '';
     
-    rl.question(`Enter new ${fieldToEdit} (current: ${currentValue}): `, async (newValue) => {
-      if (newValue.trim() === '') {
-        console.log('No changes made.');
-        await editToolMenu(tool);
-        return;
-      }
-      
-      const updates = { [fieldToEdit]: newValue.trim() };
-      const success = await updateTool(tool.id, updates);
-      
-      if (success) {
-        console.log(`${fieldToEdit} updated successfully!`);
-        // Refresh tool data
-        const updatedTool = await getToolDetails(tool.id);
-        await editToolMenu(updatedTool);
+    // Format JSON fields for display
+    if (fieldToEdit === 'citation' || fieldToEdit === 'support') {
+      currentValue = formatJSON(currentValue);
+      console.log(`Current ${fieldToEdit}:\n${currentValue}`);
+      console.log('\nEnter new JSON value (or press Enter to cancel):');
+    } else {
+      rl.question(`Enter new ${fieldToEdit} (current: ${currentValue}): `, async (newValue) => {
+        if (newValue.trim() === '') {
+          console.log('No changes made.');
+          await editToolMenu(tool);
+          return;
+        }
+        
+        const updates = { [fieldToEdit]: newValue.trim() };
+        const success = await updateTool(tool.id, updates);
+        
+        if (success) {
+          console.log(`${fieldToEdit} updated successfully!`);
+          // Refresh tool data
+          const updatedTool = await getToolWithDetails(tool.petrahubid);
+          await editToolMenu(updatedTool);
+        } else {
+          console.log(`Failed to update ${fieldToEdit}.`);
+          await editToolMenu(tool);
+        }
+      });
+      return;
+    }
+    
+    // For JSON fields, we need to collect multi-line input
+    let jsonInput = '';
+    const jsonInputHandler = (line) => {
+      if (line.trim() === 'DONE') {
+        rl.removeListener('line', jsonInputHandler);
+        
+        try {
+          // Validate JSON
+          const jsonObject = JSON.parse(jsonInput);
+          
+          // Update the field
+          updateTool(tool.id, { [fieldToEdit]: jsonInput })
+            .then(success => {
+              if (success) {
+                console.log(`${fieldToEdit} updated successfully!`);
+                // Refresh tool data
+                getToolWithDetails(tool.petrahubid)
+                  .then(updatedTool => {
+                    editToolMenu(updatedTool);
+                  });
+              } else {
+                console.log(`Failed to update ${fieldToEdit}.`);
+                editToolMenu(tool);
+              }
+            });
+        } catch (e) {
+          console.error('Invalid JSON format:', e.message);
+          editToolMenu(tool);
+        }
       } else {
-        console.log(`Failed to update ${fieldToEdit}.`);
-        await editToolMenu(tool);
+        jsonInput += line + '\n';
       }
-    });
+    };
+    
+    console.log('Enter JSON data (type DONE on a new line when finished):');
+    rl.on('line', jsonInputHandler);
   });
 }
 
@@ -276,7 +287,7 @@ async function showMenu() {
             return;
           }
           
-          const toolDetails = await getToolDetails(tools[index].id);
+          const toolDetails = await getToolWithDetails(tools[index].petrahubid);
           if (toolDetails) {
             await displayToolDetails(toolDetails);
           }
@@ -300,7 +311,7 @@ async function showMenu() {
             return;
           }
           
-          const toolDetails = await getToolDetails(tools[index].id);
+          const toolDetails = await getToolWithDetails(tools[index].petrahubid);
           if (toolDetails) {
             await editToolMenu(toolDetails);
           } else {
