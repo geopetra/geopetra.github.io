@@ -60,7 +60,7 @@ const metadata = {
               <div class="flex flex-wrap gap-2">
                 {tool.topics.map((topic) => (
                   <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-full">
-                    {topic.name}
+                    {topic.term || topic.name || ''}
                   </span>
                 ))}
               </div>
@@ -72,7 +72,10 @@ const metadata = {
               <h2 class="text-2xl font-semibold mb-2">Functions</h2>
               <ul class="list-disc pl-5">
                 {tool.functions.map((func) => (
-                  <li class="text-gray-700 dark:text-gray-300">{func.name}</li>
+                  <li class="text-gray-700 dark:text-gray-300">
+                    {func.operation && Array.isArray(func.operation) ? func.operation.join(', ') : func.operation || func.name || ''}
+                    {func.note && <span class="ml-2 text-gray-500">- {func.note}</span>}
+                  </li>
                 ))}
               </ul>
             </div>
