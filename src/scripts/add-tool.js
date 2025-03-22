@@ -444,8 +444,27 @@ async function main() {
   // Process each tool
   for (const toolDefinition of tools) {
     try {
-      await addTool(toolDefinition);
-      console.log(`Tool ${toolDefinition.basicInfo.name} processed successfully!`);
+      // Check if tool already exists
+      const { data: existingTool, error: checkError } = await supabase
+        .from('tools')
+        .select('id')
+        .eq('petrahubid', toolDefinition.basicInfo.petrahubid)
+        .maybeSingle();
+      
+      if (checkError) {
+        console.error(`Error checking if tool ${toolDefinition.basicInfo.name} exists:`, checkError);
+        continue;
+      }
+      
+      if (existingTool) {
+        console.log(`Tool ${toolDefinition.basicInfo.name} already exists. Skipping...`);
+        // Optionally, you could update the tool here instead of skipping
+        // await updateTool(existingTool.id, toolDefinition.basicInfo);
+        // console.log(`Tool ${toolDefinition.basicInfo.name} updated successfully!`);
+      } else {
+        await addTool(toolDefinition);
+        console.log(`Tool ${toolDefinition.basicInfo.name} added successfully!`);
+      }
     } catch (error) {
       console.error(`Error processing tool ${toolDefinition.basicInfo.name}:`, error);
     }
