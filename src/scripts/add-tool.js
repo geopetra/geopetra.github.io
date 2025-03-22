@@ -237,7 +237,7 @@ const tools = [
     tool: {
       name: 'LinaForma',
       petrahubid: 'linaforma',
-      description: 'Inverse workflow for quantitative $P$-$T$',
+      description: 'Inverse workflow for quantitative P-T',
       homepage: 'https://github.com/TMackay-Champion/LinaForma',
       version: '1.0.0',
       accessibility: 'Open source',
@@ -258,7 +258,8 @@ const tools = [
       { operation: ['Modelling'], note: 'Phase diagram generation' }
     ],
     toolTypes: [
-      { type: 'Desktop application' }
+      { type: 'Script package' },
+      { type: 'Command-line tool' }
     ],
     languages: [
       { name: 'MATLAB' }
