@@ -82,6 +82,22 @@ async function addTool(toolDefinition) {
 }
 
 /**
+ * Check if the database has the topic_terms table (new schema)
+ */
+async function checkForNewSchema() {
+  try {
+    const { data, error } = await supabase
+      .from('topic_terms')
+      .select('id')
+      .limit(1);
+    
+    return !error;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
  * Add related data for a tool
  * @param {string} table - The table name
  * @param {Array} items - The items to add
@@ -93,19 +109,70 @@ async function addRelatedData(table, items, toolId) {
     return;
   }
   
-  // Special handling for topics - check if they exist first
+  // Special handling for topics
   if (table === 'topics') {
-    for (const item of items) {
-      // Check if topic exists
-      const { data: existingTopics } = await supabase
-        .from('topics')
-        .select('id')
-        .eq('term', item.term);
+    const useNewSchema = await checkForNewSchema();
+    
+    if (useNewSchema) {
+      // Using new schema with topic_terms and tool_topic_terms
+      for (const item of items) {
+        // Check if topic term exists in topic_terms
+        const { data: existingTerm, error: termError } = await supabase
+          .from('topic_terms')
+          .select('id')
+          .eq('term', item.term)
+          .maybeSingle();
+        
+        let termId;
+        
+        // If topic doesn't exist, add it to topic_terms
+        if (!existingTerm) {
+          console.log(`Adding new topic term: ${item.term}`);
+          const { data: newTerm, error: insertError } = await supabase
+            .from('topic_terms')
+            .insert([{ term: item.term }])
+            .select('id')
+            .single();
+            
+          if (insertError) {
+            console.error(`Error adding topic term "${item.term}":`, insertError);
+            continue;
+          }
+          
+          termId = newTerm.id;
+        } else {
+          termId = existingTerm.id;
+        }
+        
+        // Add the relationship to the junction table
+        const { error: relationError } = await supabase
+          .from('tool_topic_terms')
+          .insert([{ 
+            tool_id: toolId, 
+            term_id: termId 
+          }]);
+          
+        if (relationError) {
+          console.error(`Error adding topic relationship for "${item.term}":`, relationError);
+        }
+      }
       
-      // If topic doesn't exist, add it without tool_id
-      if (!existingTopics || existingTopics.length === 0) {
-        console.log(`Adding new topic: ${item.term}`);
-        await supabase.from('topics').insert([{ term: item.term }]);
+      console.log('Topics added successfully');
+      return;
+    } else {
+      // Using old schema with direct topics relationship
+      for (const item of items) {
+        // Check if topic exists
+        const { data: existingTopics } = await supabase
+          .from('topics')
+          .select('id')
+          .eq('term', item.term);
+        
+        // If topic doesn't exist, add it without tool_id
+        if (!existingTopics || existingTopics.length === 0) {
+          console.log(`Adding new topic: ${item.term}`);
+          await supabase.from('topics').insert([{ term: item.term }]);
+        }
       }
     }
   }

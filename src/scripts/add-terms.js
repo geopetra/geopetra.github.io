@@ -16,11 +16,25 @@ async function testConnection() {
   try {
     console.log('Testing Supabase connection...');
     
-    const { data, error } = await supabase
-      .from('topics')
+    // Try to connect to topic_terms table, fall back to topics if it doesn't exist
+    let { data, error } = await supabase
+      .from('topic_terms')
       .select('*')
       .limit(1);
       
+    if (error && error.code === '42P01') { // Table doesn't exist
+      console.log('topic_terms table not found, checking topics table...');
+      ({ data, error } = await supabase
+        .from('topics')
+        .select('*')
+        .limit(1));
+        
+      if (!error) {
+        console.log('Connection successful, but you need to migrate to the new schema.');
+        console.log('Run: npm run migrate-topics');
+      }
+    }
+    
     if (error) {
       console.error('Error connecting to database:', error);
       return false;
@@ -35,20 +49,53 @@ async function testConnection() {
 }
 
 /**
+ * Check if the database has the topic_terms table (new schema)
+ */
+async function checkForNewSchema() {
+  try {
+    const { data, error } = await supabase
+      .from('topic_terms')
+      .select('id')
+      .limit(1);
+    
+    return !error;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
  * Get all existing terms
  */
 async function getExistingTerms() {
-  const { data, error } = await supabase
-    .from('topics')
-    .select('term')
-    .order('term');
-    
-  if (error) {
-    console.error('Error fetching terms:', error);
-    return [];
-  }
+  const useNewSchema = await checkForNewSchema();
   
-  return data.map(item => item.term);
+  if (useNewSchema) {
+    const { data, error } = await supabase
+      .from('topic_terms')
+      .select('term')
+      .order('term');
+      
+    if (error) {
+      console.error('Error fetching terms:', error);
+      return [];
+    }
+    
+    return data.map(item => item.term);
+  } else {
+    const { data, error } = await supabase
+      .from('topics')
+      .select('term')
+      .order('term');
+      
+    if (error) {
+      console.error('Error fetching terms:', error);
+      return [];
+    }
+    
+    // Get unique terms since they might be duplicated in the old schema
+    return [...new Set(data.map(item => item.term))];
+  }
 }
 
 /**
@@ -62,14 +109,28 @@ async function addTerm(term) {
     return false;
   }
   
-  // Add the new term
-  const { data, error } = await supabase
-    .from('topics')
-    .insert([{ term }]);
-    
-  if (error) {
-    console.error('Error adding term:', error);
-    return false;
+  const useNewSchema = await checkForNewSchema();
+  
+  if (useNewSchema) {
+    // Add the new term to topic_terms
+    const { data, error } = await supabase
+      .from('topic_terms')
+      .insert([{ term }]);
+      
+    if (error) {
+      console.error('Error adding term:', error);
+      return false;
+    }
+  } else {
+    // Add the new term to topics
+    const { data, error } = await supabase
+      .from('topics')
+      .insert([{ term }]);
+      
+    if (error) {
+      console.error('Error adding term:', error);
+      return false;
+    }
   }
   
   console.log(`Term "${term}" added successfully!`);
