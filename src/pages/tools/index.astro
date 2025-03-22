@@ -4,6 +4,9 @@ import { getTools, getAllTopics, getAllOperatingSystems, getAllToolTypes, getAll
 import ToolSearch from '~/components/tools/ToolSearch.astro';
 import { Icon } from 'astro-icon/components';
 
+// Get search parameter from URL
+const searchTerm = Astro.url.searchParams.get('search') || '';
+
 // Fetch all tools and filter options
 const tools = await getTools();
 const topics = await getAllTopics();
@@ -18,104 +21,123 @@ const metadata = {
 ---
 
 <Layout metadata={metadata}>
-  <section class="px-4 py-16 sm:px-6 mx-auto lg:px-8 lg:py-20 max-w-6xl">
-    <div class="mb-10 md:mx-auto text-center md:mb-12 max-w-3xl">
-      <h1 class="text-4xl md:text-5xl font-bold leading-tighter tracking-tighter mb-4 font-heading">
+  <section class="px-4 py-8 sm:px-6 mx-auto lg:px-8 lg:py-12 max-w-6xl">
+    <div class="mb-6 md:mx-auto text-center md:mb-8 max-w-3xl">
+      <h1 class="text-3xl md:text-4xl font-bold leading-tighter tracking-tighter mb-2 font-heading">
         Petrology Tools
       </h1>
-      <p class="text-xl text-gray-600 dark:text-slate-400">
+      <p class="text-lg text-gray-600 dark:text-slate-400">
         Browse and search for tools used in petrology research
       </p>
     </div>
 
     <!-- Search and Filter Component -->
-    <div class="mb-8">
-      <ToolSearch topics={topics} operatingSystems={operatingSystems} toolTypes={toolTypes} languages={languages} />
+    <div class="mb-6 sticky top-0 z-10">
+      <ToolSearch 
+        topics={topics} 
+        operatingSystems={operatingSystems} 
+        toolTypes={toolTypes} 
+        languages={languages}
+        initialSearchTerm={searchTerm}
+      />
     </div>
 
     <!-- Tools Grid -->
-    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {tools.map((tool) => (
         <div 
-          class="tool-card flex flex-col h-full border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg"
+          class="tool-card flex flex-col border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg"
           data-accessibility={tool.accessibility}
         >
-          <div class="p-6 flex-grow">
-            <h2 class="text-xl font-bold mb-2 tool-name">{tool.name}</h2>
-            <p class="text-gray-700 dark:text-gray-300 mb-4 tool-description">{tool.description}</p>
+          <div class="p-4 flex-grow">
+            <h2 class="text-lg font-bold mb-1 tool-name">{tool.name}</h2>
+            <p class="text-sm text-gray-700 dark:text-gray-300 mb-3 line-clamp-2 tool-description">{tool.description}</p>
             
-            {tool.topics && tool.topics.length > 0 && (
-              <div class="mb-4">
-                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Topics</h3>
-                <div class="flex flex-wrap gap-1">
-                  {tool.topics.map((topic) => (
-                    <span class="tool-topic px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-full">
-                      {topic.term}
-                    </span>
-                  ))}
+            <div class="flex flex-wrap gap-1 mb-3">
+              {tool.topics && tool.topics.slice(0, 3).map((topic) => (
+                <span class="tool-topic px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-full">
+                  {topic.term}
+                </span>
+              ))}
+              {tool.topics && tool.topics.length > 3 && (
+                <span class="px-2 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full">
+                  +{tool.topics.length - 3}
+                </span>
+              )}
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+              {tool.operatingSystems && tool.operatingSystems.length > 0 && (
+                <div class="flex items-center">
+                  <span class="flex gap-1">
+                    {tool.operatingSystems.map((os) => (
+                      <span class="tool-os inline-block w-5 h-5" title={os.name}>
+                        {os.name === 'Windows' && (
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+                          </svg>
+                        )}
+                        {os.name === 'Mac' && (
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                          </svg>
+                        )}
+                        {os.name === 'Linux' && (
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489.117.779.567 1.54 1.536 1.986.969.446 2.304.194 3.11-.45.867-.69 1.867-.633 2.698-.377.825.256 1.615.636 2.391.777 1.358.253 2.694-.084 3.604-.707.91-.623 1.381-1.373 1.45-2.422.068-1.054-.188-2.033-.727-3.108-.538-1.076-1.131-1.599-1.989-2.618-.859-1.02-.938-1.508-1.073-2.625-.135-1.152.067-3.017-.494-4.516-.55-1.461-1.373-2.29-2.647-2.238-.318.013-.61.077-.879.123-.742.13-1.123.189-1.277.189zm.485 1.678c.929 0 1.684.755 1.684 1.677a1.68 1.68 0 01-1.684 1.677 1.68 1.68 0 01-1.683-1.677c0-.922.754-1.677 1.683-1.677zm-6.63 8.891c.405 0 .804.105 1.167.309.551.307.997.898 1.499 1.624.176.255.34.508.496.76-.467.39-.784.891-.784 1.438 0 .732.425 1.37 1.044 1.689-.312.078-.64.123-.979.123-2.048 0-3.716-1.627-3.716-3.626 0-2 1.668-3.626 3.716-3.626.108 0 .215.005.32.015-.006-.052-.01-.105-.01-.158 0-1.145.938-2.066 2.094-2.066.334 0 .649.078.929.219-.425.397-.694.949-.694 1.558 0 .304.067.595.185.86-.312.078-.64.123-.979.123-.108 0-.215-.005-.32-.015.006.052.01.105.01.158 0 .147-.016.291-.046.431-.25-.163-.521-.3-.811-.391-.225-.071-.454-.122-.686-.122-.373 0-.72.081-1.035.224.062-.223.093-.455.093-.692 0-1.452-1.192-2.63-2.664-2.63-.366 0-.718.074-1.039.21.019-.114.029-.232.029-.351 0-1.145-.938-2.066-2.094-2.066-.334 0-.649.078-.929.219.425.397.694.949.694 1.558 0 1.145-.938 2.066-2.094 2.066-.334 0-.649-.078-.929-.219.425-.397.694-.949.694-1.558 0-.928-.617-1.716-1.468-1.973.198-.657.532-1.285 1.012-1.833.684-.782 1.58-1.391 2.522-1.391.178 0 .348.024.512.059-.038.115-.058.236-.058.36 0 .655.535 1.185 1.2 1.185.665 0 1.2-.53 1.2-1.185 0-.654-.535-1.185-1.2-1.185-.084 0-.165.009-.244.025.006-.052.01-.105.01-.158 0-1.145-.938-2.066-2.094-2.066-.334 0-.649.078-.929.219.425.397.694.949.694 1.558 0 .928-.617 1.716-1.468 1.973-.198.657-.532 1.285-1.012 1.833-.684.782-1.58 1.391-2.522 1.391-.178 0-.348-.024-.512-.059.038-.115.058-.236.058-.36 0-.655-.535-1.185-1.2-1.185-.665 0-1.2.53-1.2 1.185 0 .654.535 1.185 1.2 1.185.084 0 .165-.009.244-.025-.006.052-.01.105-.01.158 0 1.145.938 2.066 2.094 2.066.334 0 .649-.078.929-.219-.425-.397-.694-.949-.694-1.558 0-.147.016-.291.046-.431.25.163.521.3.811.391.225.071.454.122.686.122.373 0 .72-.081 1.035-.224-.062.223-.093.455-.093.692 0 1.452 1.192 2.63 2.664 2.63z"/>
+                          </svg>
+                        )}
+                      </span>
+                    ))}
+                  </span>
                 </div>
-              </div>
-            )}
-            
-            {tool.operatingSystems && tool.operatingSystems.length > 0 && (
-              <div class="mb-4">
-                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">OS</h3>
-                <div class="flex flex-wrap gap-1">
-                  {tool.operatingSystems.map((os) => (
-                    <span class="tool-os px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-full">
-                      {os.name}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {tool.toolTypes && tool.toolTypes.length > 0 && (
-              <div class="mb-4">
-                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Type</h3>
-                <div class="flex flex-wrap gap-1">
-                  {tool.toolTypes.map((type) => (
-                    <span class="tool-type px-2 py-1 text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 rounded-full">
-                      {type.type}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {tool.languages && tool.languages.length > 0 && (
-              <div class="mb-4">
-                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Languages</h3>
-                <div class="flex flex-wrap gap-1">
-                  {tool.languages.map((lang) => (
-                    <span class="tool-language px-2 py-1 text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 rounded-full">
-                      {lang.name}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {tool.accessibility && (
-              <div class="mb-4">
-                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Accessibility</h3>
-                <span class="px-2 py-1 text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100 rounded-full">
+              )}
+              
+              {tool.accessibility && (
+                <span class="text-xs">
                   {tool.accessibility}
                 </span>
-              </div>
-            )}
+              )}
+              
+              {tool.toolTypes && tool.toolTypes.length > 0 && (
+                <span class="text-xs">
+                  {tool.toolTypes.map((type, i) => (
+                    <span class="tool-type">
+                      {i > 0 ? ', ' : ''}{type.type}
+                    </span>
+                  ))}
+                </span>
+              )}
+            </div>
           </div>
           
-          <div class="p-4 bg-gray-50 dark:bg-gray-800">
+          <div class="p-3 bg-gray-50 dark:bg-gray-800 flex justify-between items-center">
+            <div class="text-xs text-gray-500 dark:text-gray-400">
+              {tool.languages && tool.languages.length > 0 && (
+                <span>
+                  {tool.languages.map((lang, i) => (
+                    <span class="tool-language">
+                      {i > 0 ? ', ' : ''}{lang.name}
+                    </span>
+                  ))}
+                </span>
+              )}
+            </div>
             <a 
               href={`/tools/${tool.petrahubid}`} 
-              class="inline-block w-full text-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+              class="text-sm px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
             >
-              View Details
+              Details
             </a>
           </div>
         </div>
       ))}
+    </div>
+    
+    <!-- No Results Message -->
+    <div id="no-results" class="hidden text-center py-10">
+      <h3 class="text-xl font-semibold">No tools match your search criteria</h3>
+      <p class="text-gray-600 dark:text-gray-400 mt-2">Try adjusting your filters or search term</p>
     </div>
     
     <!-- No Results Message -->
@@ -130,6 +152,7 @@ const metadata = {
   // Client-side JavaScript for search and filtering
   document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search');
+    const searchButton = document.getElementById('search-button');
     const topicFilter = document.getElementById('topic-filter');
     const osFilter = document.getElementById('os-filter');
     const typeFilter = document.getElementById('type-filter');
@@ -142,9 +165,9 @@ const metadata = {
     // Filter function
     function filterTools() {
       const searchTerm = searchInput.value.toLowerCase();
-      const selectedTopic = topicFilter.value;
-      const selectedOS = osFilter.value;
-      const selectedType = typeFilter.value;
+      const selectedTopic = topicFilter ? topicFilter.value : '';
+      const selectedOS = osFilter ? osFilter.value : '';
+      const selectedType = typeFilter ? typeFilter.value : '';
       const selectedLanguage = languageFilter ? languageFilter.value : '';
       const selectedAccessibility = accessibilityFilter ? accessibilityFilter.value : '';
       
@@ -164,15 +187,15 @@ const metadata = {
         
         // Check if card matches OS filter
         const matchesOS = selectedOS === '' || 
-          Array.from(card.querySelectorAll('.tool-os')).some(el => el.textContent.trim() === selectedOS);
+          Array.from(card.querySelectorAll('.tool-os')).some(el => el.title === selectedOS);
         
         // Check if card matches type filter
         const matchesType = selectedType === '' || 
-          Array.from(card.querySelectorAll('.tool-type')).some(el => el.textContent.trim() === selectedType);
+          Array.from(card.querySelectorAll('.tool-type')).some(el => el.textContent.includes(selectedType));
           
         // Check if card matches language filter
         const matchesLanguage = selectedLanguage === '' || 
-          Array.from(card.querySelectorAll('.tool-language')).some(el => el.textContent.trim() === selectedLanguage);
+          Array.from(card.querySelectorAll('.tool-language')).some(el => el.textContent.includes(selectedLanguage));
           
         // Check if card matches accessibility filter
         const matchesAccessibility = selectedAccessibility === '' || 
@@ -188,9 +211,9 @@ const metadata = {
       });
       
       // Show or hide no results message
-      if (visibleCount === 0) {
+      if (visibleCount === 0 && noResults) {
         noResults.style.display = 'block';
-      } else {
+      } else if (noResults) {
         noResults.style.display = 'none';
       }
     }
@@ -215,11 +238,15 @@ const metadata = {
     
     // Add event listeners
     if (searchInput) searchInput.addEventListener('input', filterTools);
+    if (searchButton) searchButton.addEventListener('click', filterTools);
     if (topicFilter) topicFilter.addEventListener('change', filterTools);
     if (osFilter) osFilter.addEventListener('change', filterTools);
     if (typeFilter) typeFilter.addEventListener('change', filterTools);
     if (languageFilter) languageFilter.addEventListener('change', filterTools);
     if (accessibilityFilter) accessibilityFilter.addEventListener('change', filterTools);
     if (resetButton) resetButton.addEventListener('click', resetFilters);
+    
+    // Run initial filter (in case URL has search parameters)
+    filterTools();
   });
 </script>

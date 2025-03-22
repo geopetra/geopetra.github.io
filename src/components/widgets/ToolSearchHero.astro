@@ -1,0 +1,43 @@
+---
+import { Icon } from 'astro-icon/components';
+---
+
+<div class="bg-blue-50 dark:bg-slate-800 py-10 px-4 sm:px-6 rounded-lg shadow-sm">
+  <div class="max-w-4xl mx-auto text-center">
+    <h2 class="text-2xl md:text-3xl font-bold mb-4">Find Petrology Tools</h2>
+    <p class="text-gray-600 dark:text-gray-300 mb-6">Search our database of specialized tools for petrology research</p>
+    
+    <div class="max-w-2xl mx-auto">
+      <form action="/tools" method="get" class="flex flex-col sm:flex-row gap-2">
+        <div class="relative flex-grow">
+          <input
+            type="text"
+            name="search"
+            placeholder="Search for tools..."
+            class="w-full px-4 py-3 pr-10 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+          />
+          <button 
+            type="submit"
+            class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          >
+            <Icon name="tabler:search" class="w-5 h-5" />
+          </button>
+        </div>
+        <a
+          href="/tools"
+          class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors text-center"
+        >
+          Browse All
+        </a>
+      </form>
+      
+      <div class="mt-4 flex flex-wrap justify-center gap-2">
+        <span class="text-sm text-gray-500 dark:text-gray-400">Popular topics:</span>
+        <a href="/tools?topic=Igneous+Petrology" class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400">Igneous Petrology</a>
+        <a href="/tools?topic=Metamorphic+Petrology" class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400">Metamorphic Petrology</a>
+        <a href="/tools?topic=Geochemistry" class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400">Geochemistry</a>
+        <a href="/tools?topic=Phase+Equilibrium+Modelling" class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400">Phase Equilibrium</a>
+      </div>
+    </div>
+  </div>
+</div>
