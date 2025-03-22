@@ -1,91 +1,225 @@
 ---
-import { getTools } from '../../utils/database.js';
 import Layout from '~/layouts/PageLayout.astro';
+import { getTools, getAllTopics, getAllOperatingSystems, getAllToolTypes, getAllLanguages } from '~/utils/database';
+import ToolSearch from '~/components/tools/ToolSearch.astro';
 import { Icon } from 'astro-icon/components';
 
-// Fetch all tools
+// Fetch all tools and filter options
 const tools = await getTools();
-
-// Group tools by first letter for alphabetical listing
-const toolsByLetter = tools.reduce((acc, tool) => {
-  const firstLetter = tool.name.charAt(0).toUpperCase();
-  if (!acc[firstLetter]) {
-    acc[firstLetter] = [];
-  }
-  acc[firstLetter].push(tool);
-  return acc;
-}, {});
-
-// Sort the letters
-const sortedLetters = Object.keys(toolsByLetter).sort();
+const topics = await getAllTopics();
+const operatingSystems = await getAllOperatingSystems();
+const toolTypes = await getAllToolTypes();
+const languages = await getAllLanguages();
 
 const metadata = {
-  title: 'Petrology Tools Database',
-  description: 'Browse our collection of specialized tools for petrology research and analysis',
+  title: 'Petrology Tools',
+  description: 'Browse and search for tools used in petrology research',
 };
 ---
 
 <Layout metadata={metadata}>
   <section class="px-4 py-16 sm:px-6 mx-auto lg:px-8 lg:py-20 max-w-6xl">
     <div class="mb-10 md:mx-auto text-center md:mb-12 max-w-3xl">
-      <h2 class="text-4xl md:text-5xl font-bold leading-tighter tracking-tighter mb-4">
-        Petrology Tools Directory
-      </h2>
+      <h1 class="text-4xl md:text-5xl font-bold leading-tighter tracking-tighter mb-4 font-heading">
+        Petrology Tools
+      </h1>
       <p class="text-xl text-gray-600 dark:text-slate-400">
-        Browse our comprehensive collection of tools for petrological research and analysis
+        Browse and search for tools used in petrology research
       </p>
     </div>
 
-    {sortedLetters.length > 0 ? (
-      <div class="mb-8">
-        <div class="flex flex-wrap justify-center gap-2 mb-4">
-          {sortedLetters.map((letter) => (
-            <a href={`#section-${letter}`} class="px-3 py-1 bg-blue-100 dark:bg-blue-900 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800">
-              {letter}
-            </a>
-          ))}
-        </div>
-      </div>
-    ) : (
-      <div class="text-center py-10">
-        <p class="text-xl">No tools found in the database.</p>
-      </div>
-    )}
+    <!-- Search and Filter Component -->
+    <div class="mb-8">
+      <ToolSearch topics={topics} operatingSystems={operatingSystems} toolTypes={toolTypes} languages={languages} />
+    </div>
 
-    {sortedLetters.map((letter) => (
-      <div id={`section-${letter}`} class="mb-12">
-        <h3 class="text-2xl font-bold mb-6 pb-2 border-b border-gray-300 dark:border-gray-700">
-          {letter}
-        </h3>
-        <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {toolsByLetter[letter].map((tool) => (
-            <div class="bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-              <div class="p-5">
-                <h4 class="text-xl font-semibold mb-2">{tool.name}</h4>
-                <p class="text-gray-700 dark:text-gray-400 mb-4 line-clamp-3">
-                  {tool.description}
-                </p>
-                <div class="flex flex-wrap gap-2 mb-4">
-                  {tool.topics && tool.topics.slice(0, 3).map((topic) => (
-                    <span class="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900 rounded-full">
+    <!-- Tools Grid -->
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {tools.map((tool) => (
+        <div 
+          class="tool-card flex flex-col h-full border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg"
+          data-accessibility={tool.accessibility}
+        >
+          <div class="p-6 flex-grow">
+            <h2 class="text-xl font-bold mb-2 tool-name">{tool.name}</h2>
+            <p class="text-gray-700 dark:text-gray-300 mb-4 tool-description">{tool.description}</p>
+            
+            {tool.topics && tool.topics.length > 0 && (
+              <div class="mb-4">
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Topics</h3>
+                <div class="flex flex-wrap gap-1">
+                  {tool.topics.map((topic) => (
+                    <span class="tool-topic px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-full">
                       {topic.term}
                     </span>
                   ))}
-                  {tool.topics && tool.topics.length > 3 && (
-                    <span class="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 rounded-full">
-                      +{tool.topics.length - 3} more
-                    </span>
-                  )}
                 </div>
-                <a href={`/tools/${tool.petrahubid}`} class="inline-flex items-center text-blue-600 hover:text-blue-800">
-                  View details
-                  <Icon name="tabler:arrow-right" class="w-4 h-4 ml-1" />
-                </a>
               </div>
-            </div>
-          ))}
+            )}
+            
+            {tool.operatingSystems && tool.operatingSystems.length > 0 && (
+              <div class="mb-4">
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">OS</h3>
+                <div class="flex flex-wrap gap-1">
+                  {tool.operatingSystems.map((os) => (
+                    <span class="tool-os px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-full">
+                      {os.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {tool.toolTypes && tool.toolTypes.length > 0 && (
+              <div class="mb-4">
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Type</h3>
+                <div class="flex flex-wrap gap-1">
+                  {tool.toolTypes.map((type) => (
+                    <span class="tool-type px-2 py-1 text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 rounded-full">
+                      {type.type}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {tool.languages && tool.languages.length > 0 && (
+              <div class="mb-4">
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Languages</h3>
+                <div class="flex flex-wrap gap-1">
+                  {tool.languages.map((lang) => (
+                    <span class="tool-language px-2 py-1 text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 rounded-full">
+                      {lang.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {tool.accessibility && (
+              <div class="mb-4">
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Accessibility</h3>
+                <span class="px-2 py-1 text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100 rounded-full">
+                  {tool.accessibility}
+                </span>
+              </div>
+            )}
+          </div>
+          
+          <div class="p-4 bg-gray-50 dark:bg-gray-800">
+            <a 
+              href={`/tools/${tool.petrahubid}`} 
+              class="inline-block w-full text-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+            >
+              View Details
+            </a>
+          </div>
         </div>
-      </div>
-    ))}
+      ))}
+    </div>
+    
+    <!-- No Results Message -->
+    <div id="no-results" class="hidden text-center py-10">
+      <h3 class="text-xl font-semibold">No tools match your search criteria</h3>
+      <p class="text-gray-600 dark:text-gray-400 mt-2">Try adjusting your filters or search term</p>
+    </div>
   </section>
 </Layout>
+
+<script>
+  // Client-side JavaScript for search and filtering
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('search');
+    const topicFilter = document.getElementById('topic-filter');
+    const osFilter = document.getElementById('os-filter');
+    const typeFilter = document.getElementById('type-filter');
+    const languageFilter = document.getElementById('language-filter');
+    const accessibilityFilter = document.getElementById('accessibility-filter');
+    const resetButton = document.getElementById('reset-filters');
+    const toolCards = document.querySelectorAll('.tool-card');
+    const noResults = document.getElementById('no-results');
+    
+    // Filter function
+    function filterTools() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const selectedTopic = topicFilter.value;
+      const selectedOS = osFilter.value;
+      const selectedType = typeFilter.value;
+      const selectedLanguage = languageFilter ? languageFilter.value : '';
+      const selectedAccessibility = accessibilityFilter ? accessibilityFilter.value : '';
+      
+      let visibleCount = 0;
+      
+      toolCards.forEach(card => {
+        const name = card.querySelector('.tool-name').textContent.toLowerCase();
+        const description = card.querySelector('.tool-description').textContent.toLowerCase();
+        const accessibility = card.dataset.accessibility ? card.dataset.accessibility.toLowerCase() : '';
+        
+        // Check if card matches search term
+        const matchesSearch = name.includes(searchTerm) || description.includes(searchTerm);
+        
+        // Check if card matches topic filter
+        const matchesTopic = selectedTopic === '' || 
+          Array.from(card.querySelectorAll('.tool-topic')).some(el => el.textContent.trim() === selectedTopic);
+        
+        // Check if card matches OS filter
+        const matchesOS = selectedOS === '' || 
+          Array.from(card.querySelectorAll('.tool-os')).some(el => el.textContent.trim() === selectedOS);
+        
+        // Check if card matches type filter
+        const matchesType = selectedType === '' || 
+          Array.from(card.querySelectorAll('.tool-type')).some(el => el.textContent.trim() === selectedType);
+          
+        // Check if card matches language filter
+        const matchesLanguage = selectedLanguage === '' || 
+          Array.from(card.querySelectorAll('.tool-language')).some(el => el.textContent.trim() === selectedLanguage);
+          
+        // Check if card matches accessibility filter
+        const matchesAccessibility = selectedAccessibility === '' || 
+          accessibility.includes(selectedAccessibility.toLowerCase());
+        
+        // Show or hide card based on filters
+        if (matchesSearch && matchesTopic && matchesOS && matchesType && matchesLanguage && matchesAccessibility) {
+          card.style.display = '';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      
+      // Show or hide no results message
+      if (visibleCount === 0) {
+        noResults.style.display = 'block';
+      } else {
+        noResults.style.display = 'none';
+      }
+    }
+    
+    // Reset filters function
+    function resetFilters() {
+      if (searchInput) searchInput.value = '';
+      if (topicFilter) topicFilter.value = '';
+      if (osFilter) osFilter.value = '';
+      if (typeFilter) typeFilter.value = '';
+      if (languageFilter) languageFilter.value = '';
+      if (accessibilityFilter) accessibilityFilter.value = '';
+      
+      // Show all cards
+      toolCards.forEach(card => {
+        card.style.display = '';
+      });
+      
+      // Hide no results message
+      if (noResults) noResults.style.display = 'none';
+    }
+    
+    // Add event listeners
+    if (searchInput) searchInput.addEventListener('input', filterTools);
+    if (topicFilter) topicFilter.addEventListener('change', filterTools);
+    if (osFilter) osFilter.addEventListener('change', filterTools);
+    if (typeFilter) typeFilter.addEventListener('change', filterTools);
+    if (languageFilter) languageFilter.addEventListener('change', filterTools);
+    if (accessibilityFilter) accessibilityFilter.addEventListener('change', filterTools);
+    if (resetButton) resetButton.addEventListener('click', resetFilters);
+  });
+</script>

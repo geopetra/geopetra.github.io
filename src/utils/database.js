@@ -314,3 +314,63 @@ export const updateTool = async (toolId, updates) => {
   
   return true;
 };
+
+// Get all unique topics for filtering
+export const getAllTopics = async () => {
+  const { data, error } = await supabase
+    .from('topics')
+    .select('id, term')
+    .order('term');
+    
+  if (error) {
+    console.error('Error fetching topics:', error);
+    return [];
+  }
+  
+  return data || [];
+};
+
+// Get all unique operating systems for filtering
+export const getAllOperatingSystems = async () => {
+  const { data, error } = await supabase
+    .from('operating_systems')
+    .select('id, name')
+    .order('name');
+    
+  if (error) {
+    console.error('Error fetching operating systems:', error);
+    return [];
+  }
+  
+  return data || [];
+};
+
+// Get all unique tool types for filtering
+export const getAllToolTypes = async () => {
+  const { data, error } = await supabase
+    .from('tool_types')
+    .select('id, type')
+    .order('type');
+    
+  if (error) {
+    console.error('Error fetching tool types:', error);
+    return [];
+  }
+  
+  return data || [];
+};
+
+// Get all unique programming languages for filtering
+export const getAllLanguages = async () => {
+  const { data, error } = await supabase
+    .from('languages')
+    .select('id, name')
+    .order('name');
+    
+  if (error) {
+    console.error('Error fetching languages:', error);
+    return [];
+  }
+  
+  return data || [];
+};

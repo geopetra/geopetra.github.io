@@ -1,0 +1,94 @@
+---
+// Tool search and filter component
+const { topics = [], operatingSystems = [], toolTypes = [], languages = [] } = Astro.props;
+---
+
+<div class="mb-8 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+  <div class="mb-4">
+    <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search Tools</label>
+    <input
+      type="text"
+      id="search"
+      placeholder="Search by name, description..."
+      class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+    />
+  </div>
+  
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div>
+      <label for="topic-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Topic</label>
+      <select
+        id="topic-filter"
+        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+      >
+        <option value="">All Topics</option>
+        {topics.map((topic) => (
+          <option value={topic.term}>{topic.term}</option>
+        ))}
+      </select>
+    </div>
+    
+    <div>
+      <label for="os-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Operating System</label>
+      <select
+        id="os-filter"
+        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+      >
+        <option value="">All Operating Systems</option>
+        {operatingSystems.map((os) => (
+          <option value={os.name}>{os.name}</option>
+        ))}
+      </select>
+    </div>
+    
+    <div>
+      <label for="type-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tool Type</label>
+      <select
+        id="type-filter"
+        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+      >
+        <option value="">All Tool Types</option>
+        {toolTypes.map((type) => (
+          <option value={type.type}>{type.type}</option>
+        ))}
+      </select>
+    </div>
+  </div>
+  
+  <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label for="language-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Programming Language</label>
+      <select
+        id="language-filter"
+        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+      >
+        <option value="">All Languages</option>
+        {languages.map((lang) => (
+          <option value={lang.name}>{lang.name}</option>
+        ))}
+      </select>
+    </div>
+    
+    <div>
+      <label for="accessibility-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Accessibility</label>
+      <select
+        id="accessibility-filter"
+        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+      >
+        <option value="">All Accessibility</option>
+        <option value="Open Source">Open Source</option>
+        <option value="Free">Free</option>
+        <option value="Commercial">Commercial</option>
+      </select>
+    </div>
+  </div>
+  
+  <div class="mt-4 text-right">
+    <button
+      id="reset-filters"
+      class="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-md transition-colors"
+    >
+      Reset Filters
+    </button>
+  </div>
+</div>
