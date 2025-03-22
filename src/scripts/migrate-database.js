@@ -183,6 +183,37 @@ async function createNewTables() {
   
   console.log('Tables already exist. Continuing with migration...');
   return true;
+  
+  // Check if tables already exist
+  const { error: topicTermsError } = await supabase
+    .from('topic_terms')
+    .select('id')
+    .limit(1);
+    
+  const { error: junctionError } = await supabase
+    .from('tool_topic_terms')
+    .select('tool_id')
+    .limit(1);
+    
+  if (topicTermsError || junctionError) {
+    console.log('Tables do not exist yet. Please create them using the SQL above.');
+    
+    // Ask user if they've created the tables
+    return new Promise((resolve) => {
+      rl.question('Have you created the tables in Supabase? (yes/no): ', (answer) => {
+        if (answer.toLowerCase() === 'yes') {
+          console.log('Continuing with migration...');
+          resolve(true);
+        } else {
+          console.log('Please create the tables before continuing.');
+          resolve(false);
+        }
+      });
+    });
+  }
+  
+  console.log('Tables already exist. Continuing with migration...');
+  return true;
 }
 
 /**
@@ -462,7 +493,23 @@ async function migrateTopics() {
 }
 
 /**
- * Main function
+ * Check if the database has the topic_terms table (new schema)
+ */
+async function checkForNewSchema() {
+  try {
+    const { data, error } = await supabase
+      .from('topic_terms')
+      .select('id')
+      .limit(1);
+    
+    return !error;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * Main function to run the migration
  */
 async function main() {
   // Test connection first
@@ -472,24 +519,46 @@ async function main() {
     process.exit(1);
   }
   
-  console.log('\nThis script will migrate your topics to a many-to-many relationship structure.');
+  console.log('\nThis script will migrate your database to a normalized structure with many-to-many relationships.');
   console.log('WARNING: This is a one-way operation. Make sure you have a backup of your database.');
   
-  rl.question('Do you want to proceed? (yes/no): ', async (answer) => {
-    if (answer.toLowerCase() !== 'yes') {
+  rl.question('\nDo you want to continue? (y/n): ', async (answer) => {
+    if (answer.toLowerCase() !== 'y') {
       console.log('Migration cancelled.');
       rl.close();
       return;
     }
     
-    // Create new tables (or check if they exist)
-    const tablesCreated = await createNewTables();
-    if (!tablesCreated) {
-      console.error('Tables not ready. Migration aborted.');
-      rl.close();
-      return;
+    // Check if new schema already exists
+    const newSchemaExists = await checkForNewSchema();
+    if (newSchemaExists) {
+      console.log('New schema already exists. Proceeding with data migration only.');
+    } else {
+      // Show SQL to create new tables
+      await createNewTables();
+      
+      rl.question('\nHave you created the new tables in Supabase? (y/n): ', async (answer) => {
+        if (answer.toLowerCase() !== 'y') {
+          console.log('Please create the tables before continuing. Migration cancelled.');
+          rl.close();
+          return;
+        }
+        
+        await runMigration();
+      });
     }
     
+    if (newSchemaExists) {
+      await runMigration();
+    }
+  });
+}
+
+/**
+ * Run all migration steps
+ */
+async function runMigration() {
+  try {
     // Migrate topics
     const topicsMigrated = await migrateTopics();
     if (!topicsMigrated) {
@@ -539,11 +608,14 @@ async function main() {
     }
     
     console.log('\nMigration completed successfully!');
-    console.log('You can now update your application to use the new schema.');
-    console.log('The old topics table has not been dropped. You can drop it manually after verifying the migration.');
+    console.log('Your database now uses a normalized structure with many-to-many relationships.');
+    console.log('You can now use the add-tool.js script to add and update tools with the new schema.');
     
     rl.close();
-  });
+  } catch (error) {
+    console.error('Migration failed:', error);
+    rl.close();
+  }
 }
 
 // Run the script
