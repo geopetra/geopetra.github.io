@@ -273,7 +273,7 @@ async function showMenu() {
           if (isNaN(index) || index < 0 || index >= tools.length) {
             console.log('Invalid tool number.');
             showMenu();
-            break;
+            return;
           }
           
           const toolDetails = await getToolDetails(tools[index].id);
@@ -297,7 +297,7 @@ async function showMenu() {
           if (isNaN(index) || index < 0 || index >= tools.length) {
             console.log('Invalid tool number.');
             showMenu();
-            break;
+            return;
           }
           
           const toolDetails = await getToolDetails(tools[index].id);
@@ -322,7 +322,7 @@ async function showMenu() {
           if (isNaN(index) || index < 0 || index >= tools.length) {
             console.log('Invalid tool number.');
             showMenu();
-            break;
+            return;
           }
           
           const tool = tools[index];
