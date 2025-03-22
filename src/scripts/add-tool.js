@@ -3,6 +3,13 @@
 import 'dotenv/config';
 import { supabase } from '../utils/supabase.js';
 
+// Debug environment variables
+console.log('Environment variables in Node.js script:');
+console.log('- PUBLIC_SUPABASE_URL:', process.env.PUBLIC_SUPABASE_URL ? 'Found' : 'Missing');
+console.log('- SUPABASE_URL:', process.env.SUPABASE_URL ? 'Found' : 'Missing');
+console.log('- PUBLIC_SUPABASE_ANON_KEY:', process.env.PUBLIC_SUPABASE_ANON_KEY ? 'Found' : 'Missing');
+console.log('- SUPABASE_ANON_KEY:', process.env.SUPABASE_ANON_KEY ? 'Found' : 'Missing');
+
 /**
  * Test the database connection
  */
