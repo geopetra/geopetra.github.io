@@ -171,6 +171,146 @@ async function deleteRelatedData(table, toolId) {
 }
 
 /**
+ * Check if a tool type exists and add it if it doesn't
+ * @param {string} type - The tool type to check/add
+ */
+async function ensureToolTypeExists(type) {
+  // Check if the tool type exists in the tool_type_options table
+  const { data: existingType, error: typeError } = await supabase
+    .from('tool_type_options')
+    .select('type')
+    .eq('type', type)
+    .maybeSingle();
+  
+  if (typeError) {
+    console.error(`Error checking tool type "${type}":`, typeError);
+    return false;
+  }
+  
+  // If the tool type doesn't exist, add it
+  if (!existingType) {
+    console.log(`Adding new tool type option: ${type}`);
+    const { error: insertError } = await supabase
+      .from('tool_type_options')
+      .insert([{ type }]);
+      
+    if (insertError) {
+      console.error(`Error adding tool type option "${type}":`, insertError);
+      return false;
+    }
+    
+    console.log(`Tool type option "${type}" added successfully`);
+  }
+  
+  return true;
+}
+
+/**
+ * Check if a function operation exists and add it if it doesn't
+ * @param {string} operation - The function operation to check/add
+ */
+async function ensureFunctionExists(operation) {
+  // Check if the function exists in the function_options table
+  const { data: existingFunction, error: functionError } = await supabase
+    .from('function_options')
+    .select('operation')
+    .eq('operation', operation)
+    .maybeSingle();
+  
+  if (functionError) {
+    console.error(`Error checking function "${operation}":`, functionError);
+    return false;
+  }
+  
+  // If the function doesn't exist, add it
+  if (!existingFunction) {
+    console.log(`Adding new function option: ${operation}`);
+    const { error: insertError } = await supabase
+      .from('function_options')
+      .insert([{ operation }]);
+      
+    if (insertError) {
+      console.error(`Error adding function option "${operation}":`, insertError);
+      return false;
+    }
+    
+    console.log(`Function option "${operation}" added successfully`);
+  }
+  
+  return true;
+}
+
+/**
+ * Check if an OS exists and add it if it doesn't
+ * @param {string} name - The OS name to check/add
+ */
+async function ensureOSExists(name) {
+  // Check if the OS exists in the os_options table
+  const { data: existingOS, error: osError } = await supabase
+    .from('os_options')
+    .select('name')
+    .eq('name', name)
+    .maybeSingle();
+  
+  if (osError) {
+    console.error(`Error checking OS "${name}":`, osError);
+    return false;
+  }
+  
+  // If the OS doesn't exist, add it
+  if (!existingOS) {
+    console.log(`Adding new OS option: ${name}`);
+    const { error: insertError } = await supabase
+      .from('os_options')
+      .insert([{ name }]);
+      
+    if (insertError) {
+      console.error(`Error adding OS option "${name}":`, insertError);
+      return false;
+    }
+    
+    console.log(`OS option "${name}" added successfully`);
+  }
+  
+  return true;
+}
+
+/**
+ * Check if a language exists and add it if it doesn't
+ * @param {string} name - The language name to check/add
+ */
+async function ensureLanguageExists(name) {
+  // Check if the language exists in the language_options table
+  const { data: existingLang, error: langError } = await supabase
+    .from('language_options')
+    .select('name')
+    .eq('name', name)
+    .maybeSingle();
+  
+  if (langError) {
+    console.error(`Error checking language "${name}":`, langError);
+    return false;
+  }
+  
+  // If the language doesn't exist, add it
+  if (!existingLang) {
+    console.log(`Adding new language option: ${name}`);
+    const { error: insertError } = await supabase
+      .from('language_options')
+      .insert([{ name }]);
+      
+    if (insertError) {
+      console.error(`Error adding language option "${name}":`, insertError);
+      return false;
+    }
+    
+    console.log(`Language option "${name}" added successfully`);
+  }
+  
+  return true;
+}
+
+/**
  * Add related data for a tool
  * @param {string} table - The table name
  * @param {Array} items - The items to add
@@ -179,6 +319,118 @@ async function deleteRelatedData(table, toolId) {
 async function addRelatedData(table, items, toolId) {
   if (!items || items.length === 0) {
     console.log(`No ${table} to add`);
+    return;
+  }
+  
+  // Special handling for tool types
+  if (table === 'tool_types') {
+    for (const item of items) {
+      // Ensure the tool type exists in the options table
+      const typeExists = await ensureToolTypeExists(item.type);
+      if (!typeExists) {
+        console.warn(`Skipping tool type "${item.type}" as it couldn't be added to options`);
+        continue;
+      }
+      
+      // Add the tool type to the tool
+      const { error } = await supabase
+        .from('tool_types')
+        .insert([{ 
+          type: item.type,
+          tool_id: toolId 
+        }]);
+        
+      if (error) {
+        console.error(`Error adding tool type "${item.type}":`, error);
+      }
+    }
+    
+    console.log(`${table} added successfully`);
+    return;
+  }
+  
+  // Special handling for functions
+  if (table === 'functions') {
+    for (const item of items) {
+      const operations = Array.isArray(item.operation) ? item.operation : [item.operation];
+      
+      for (const operation of operations) {
+        // Ensure the function exists in the options table
+        const functionExists = await ensureFunctionExists(operation);
+        if (!functionExists) {
+          console.warn(`Skipping function "${operation}" as it couldn't be added to options`);
+          continue;
+        }
+      }
+      
+      // Add the function to the tool
+      const { error } = await supabase
+        .from('functions')
+        .insert([{ 
+          ...item,
+          tool_id: toolId 
+        }]);
+        
+      if (error) {
+        console.error(`Error adding function:`, error);
+      }
+    }
+    
+    console.log(`${table} added successfully`);
+    return;
+  }
+  
+  // Special handling for operating systems
+  if (table === 'operating_systems') {
+    for (const item of items) {
+      // Ensure the OS exists in the options table
+      const osExists = await ensureOSExists(item.name);
+      if (!osExists) {
+        console.warn(`Skipping OS "${item.name}" as it couldn't be added to options`);
+        continue;
+      }
+      
+      // Add the OS to the tool
+      const { error } = await supabase
+        .from('operating_systems')
+        .insert([{ 
+          name: item.name,
+          tool_id: toolId 
+        }]);
+        
+      if (error) {
+        console.error(`Error adding OS "${item.name}":`, error);
+      }
+    }
+    
+    console.log(`${table} added successfully`);
+    return;
+  }
+  
+  // Special handling for languages
+  if (table === 'languages') {
+    for (const item of items) {
+      // Ensure the language exists in the options table
+      const langExists = await ensureLanguageExists(item.name);
+      if (!langExists) {
+        console.warn(`Skipping language "${item.name}" as it couldn't be added to options`);
+        continue;
+      }
+      
+      // Add the language to the tool
+      const { error } = await supabase
+        .from('languages')
+        .insert([{ 
+          name: item.name,
+          tool_id: toolId 
+        }]);
+        
+      if (error) {
+        console.error(`Error adding language "${item.name}":`, error);
+      }
+    }
+    
+    console.log(`${table} added successfully`);
     return;
   }
   
@@ -345,12 +597,78 @@ async function main() {
   // Parse command line arguments
   const args = process.argv.slice(2);
   const skipUpdates = args.includes('--skip-updates');
+  const addEntityType = args.includes('--add-entity');
   
   // Test connection first
   const connected = await testConnection();
   if (!connected) {
     console.error('Database connection failed. Exiting.');
     process.exit(1);
+  }
+  
+  // If just adding an entity type
+  if (addEntityType) {
+    const entityIndex = args.indexOf('--add-entity');
+    const entityType = args[entityIndex + 1];
+    const entityValue = args[entityIndex + 2];
+    
+    if (!entityType || !entityValue || entityType.startsWith('--') || entityValue.startsWith('--')) {
+      console.error('Please provide an entity type and value to add.');
+      console.error('Example: --add-entity tool-type "Script package"');
+      console.error('Supported entity types: tool-type, function, os, language, topic, petrology-term');
+      process.exit(1);
+    }
+    
+    console.log(`Adding ${entityType}: ${entityValue}`);
+    
+    let success = false;
+    
+    switch (entityType) {
+      case 'tool-type':
+        success = await ensureToolTypeExists(entityValue);
+        break;
+      case 'function':
+        success = await ensureFunctionExists(entityValue);
+        break;
+      case 'os':
+        success = await ensureOSExists(entityValue);
+        break;
+      case 'language':
+        success = await ensureLanguageExists(entityValue);
+        break;
+      case 'topic':
+        // Add to topic_terms
+        const { error: topicError } = await supabase
+          .from('topic_terms')
+          .insert([{ term: entityValue }])
+          .onConflict('term')
+          .ignore();
+        success = !topicError;
+        if (topicError) console.error(`Error adding topic "${entityValue}":`, topicError);
+        break;
+      case 'petrology-term':
+        // Add to petrology_terms
+        const { error: petroError } = await supabase
+          .from('petrology_terms')
+          .insert([{ term: entityValue }])
+          .onConflict('term')
+          .ignore();
+        success = !petroError;
+        if (petroError) console.error(`Error adding petrology term "${entityValue}":`, petroError);
+        break;
+      default:
+        console.error(`Unknown entity type: ${entityType}`);
+        console.error('Supported entity types: tool-type, function, os, language, topic, petrology-term');
+        process.exit(1);
+    }
+    
+    if (success) {
+      console.log(`${entityType} "${entityValue}" is now available for use.`);
+    } else {
+      console.error(`Failed to add ${entityType} "${entityValue}".`);
+    }
+    process.exit(0);
+    return;
   }
   
   console.log(`Running with update mode: ${skipUpdates ? 'disabled' : 'enabled'}`);
