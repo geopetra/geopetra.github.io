@@ -174,7 +174,7 @@ const tools = [
       { operation: ['Modelling'], note: 'Phase diagram generation' }
     ],
     toolTypes: [
-      { type: 'MATLAB script package' }
+      { type: 'Desktop application' }
     ],
     languages: [
       { name: 'MATLAB' }
