@@ -93,6 +93,23 @@ async function addRelatedData(table, items, toolId) {
     return;
   }
   
+  // Special handling for topics - check if they exist first
+  if (table === 'topics') {
+    for (const item of items) {
+      // Check if topic exists
+      const { data: existingTopics } = await supabase
+        .from('topics')
+        .select('id')
+        .eq('term', item.term);
+      
+      // If topic doesn't exist, add it without tool_id
+      if (!existingTopics || existingTopics.length === 0) {
+        console.log(`Adding new topic: ${item.term}`);
+        await supabase.from('topics').insert([{ term: item.term }]);
+      }
+    }
+  }
+  
   // Add tool_id to each item
   const itemsWithToolId = items.map(item => ({
     ...item,
