@@ -1,7 +1,21 @@
 ---
 import { getToolWithDetails } from '../../utils/database.js';
+import { supabase } from '../../utils/supabase.js';
 import Layout from '~/layouts/PageLayout.astro';
 import { Icon } from 'astro-icon/components';
+
+// This function is required for dynamic routes in Astro
+export async function getStaticPaths() {
+  // Fetch all tools to generate paths
+  const { data: tools } = await supabase
+    .from('tools')
+    .select('petrahubid');
+  
+  // Return an array of objects with params for each path
+  return tools.map(tool => ({
+    params: { petrahubid: tool.petrahubid },
+  }));
+}
 
 // Get the tool ID from the URL
 const { petrahubid } = Astro.params;
