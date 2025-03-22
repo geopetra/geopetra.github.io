@@ -253,9 +253,9 @@ const tools = [
       { name: 'Linux' }
     ],
     functions: [
-      { function_name: 'Phase equilibria modeling', description: 'Models phase equilibria in igneous and metamorphic systems', note: 'Uses thermodynamic databases', operation: ['Phase equilibria modeling'] },
-      { function_name: 'Geothermobarometry', description: 'Calculates pressure and temperature conditions', note: 'Multiple calibrations available', operation: ['Geothermobarometry'] },
-      { function_name: 'Mineral chemistry analysis', description: 'Analyzes mineral compositions', note: 'Supports various mineral groups', operation: ['Mineral chemistry analysis'] }
+      { function_name: 'Phase equilibria modeling', description: 'Models phase equilibria in igneous and metamorphic systems', note: 'Uses thermodynamic databases' },
+      { function_name: 'Geothermobarometry', description: 'Calculates pressure and temperature conditions', note: 'Multiple calibrations available' },
+      { function_name: 'Mineral chemistry analysis', description: 'Analyzes mineral compositions', note: 'Supports various mineral groups' }
     ],
     toolTypes: [
       { type: 'Desktop application' },
@@ -307,8 +307,8 @@ const tools = [
       { name: 'Windows' }
     ],
     functions: [
-      { function_name: 'Thermodynamic calculations', description: 'Performs thermodynamic calculations for mineral assemblages', note: 'Based on Gibbs free energy minimization', operation: ['Thermodynamic calculations'] },
-      { function_name: 'Phase diagram generation', description: 'Generates phase diagrams for rock compositions', note: 'P-T, T-X, and P-X diagrams', operation: ['Phase diagram generation'] }
+      { function_name: 'Thermodynamic calculations', description: 'Performs thermodynamic calculations for mineral assemblages', note: 'Based on Gibbs free energy minimization' },
+      { function_name: 'Phase diagram generation', description: 'Generates phase diagrams for rock compositions', note: 'P-T, T-X, and P-X diagrams' }
     ],
     toolTypes: [
       { type: 'Workflow' },
@@ -326,8 +326,8 @@ const tools = [
       homepage: 'https://github.com/geothermo/geothermo',
       accessibility: 'Open Source',
       cost: 'Free',
-      development_stage: 'Beta',
-      license: 'Apache 2.0',
+      development_stage: 'Emerging',
+      license: 'Apache',
       documentation: 'https://geothermo.readthedocs.io/',
       citation: JSON.stringify({
         papers: [
@@ -361,9 +361,9 @@ const tools = [
       { name: 'Mac' }
     ],
     functions: [
-      { function_name: 'Thermodynamic modeling', description: 'Comprehensive thermodynamic modeling of geological systems', note: 'Uses multiple databases', operation: ['Thermodynamic modeling'] },
-      { function_name: 'Phase diagram calculation', description: 'Calculates phase diagrams for various compositions', note: 'Supports P-T, T-X diagrams', operation: ['Phase diagram calculation'] },
-      { function_name: 'Reaction path modeling', description: 'Models reaction paths in P-T-X space', note: 'Includes kinetic constraints', operation: ['Reaction path modeling'] }
+      { function_name: 'Thermodynamic modeling', description: 'Comprehensive thermodynamic modeling of geological systems', note: 'Uses multiple databases', },
+      { function_name: 'Phase diagram calculation', description: 'Calculates phase diagrams for various compositions', note: 'Supports P-T, T-X diagrams', },
+      { function_name: 'Reaction path modeling', description: 'Models reaction paths in P-T-X space', note: 'Includes kinetic constraints', }
     ],
     toolTypes: [
       { type: 'Desktop application' },
