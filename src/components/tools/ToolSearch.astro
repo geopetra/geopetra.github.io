@@ -127,6 +127,8 @@ const { topics = [], operatingSystems = [], toolTypes = [], languages = [], init
     const advancedFilters = document.getElementById('advanced-filters');
     const filterIconDown = document.getElementById('filter-icon-down');
     const filterIconUp = document.getElementById('filter-icon-up');
+    const searchInput = document.getElementById('search');
+    const searchButton = document.getElementById('search-button');
     
     // Toggle advanced filters visibility
     if (toggleFilters && advancedFilters) {
@@ -137,14 +139,33 @@ const { topics = [], operatingSystems = [], toolTypes = [], languages = [], init
       });
     }
     
+    // Handle search button click
+    if (searchButton && searchInput) {
+      searchButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Trigger the input event on the search input to filter results
+        searchInput.dispatchEvent(new Event('input'));
+      });
+    }
+    
     // Get URL parameters to set initial filter values
     const urlParams = new URLSearchParams(window.location.search);
     const searchParam = urlParams.get('search');
+    const topicParam = urlParams.get('topic');
     
-    if (searchParam) {
-      const searchInput = document.getElementById('search');
-      if (searchInput) {
-        searchInput.value = searchParam;
+    if (searchParam && searchInput) {
+      searchInput.value = searchParam;
+    }
+    
+    if (topicParam) {
+      const topicFilter = document.getElementById('topic-filter');
+      if (topicFilter) {
+        // Find the option with matching text
+        Array.from(topicFilter.options).forEach(option => {
+          if (option.text === topicParam) {
+            option.selected = true;
+          }
+        });
       }
     }
   });
