@@ -40,40 +40,55 @@ async function testConnection() {
 async function createNewTables() {
   console.log('Creating new tables...');
   
-  // Create topic_terms table (similar to petrology_terms)
-  const { error: createTopicTermsError } = await supabase.rpc('execute_sql', {
-    sql: `
-      CREATE TABLE IF NOT EXISTS topic_terms (
-        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-        term TEXT NOT NULL UNIQUE,
-        uri TEXT,
-        description TEXT
-      );
-    `
-  });
+  console.log('Note: You need to create these tables manually in the Supabase dashboard.');
+  console.log('Please follow these steps:');
+  console.log('1. Go to your Supabase project dashboard');
+  console.log('2. Navigate to the SQL Editor');
+  console.log('3. Run the following SQL:');
+  console.log(`
+    CREATE TABLE IF NOT EXISTS topic_terms (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      term TEXT NOT NULL UNIQUE,
+      uri TEXT,
+      description TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS tool_topic_terms (
+      tool_id UUID REFERENCES tools(id) ON DELETE CASCADE,
+      term_id UUID REFERENCES topic_terms(id) ON DELETE CASCADE,
+      PRIMARY KEY (tool_id, term_id)
+    );
+  `);
   
-  if (createTopicTermsError) {
-    console.error('Error creating topic_terms table:', createTopicTermsError);
-    return false;
+  // Check if tables already exist
+  const { error: topicTermsError } = await supabase
+    .from('topic_terms')
+    .select('id')
+    .limit(1);
+    
+  const { error: junctionError } = await supabase
+    .from('tool_topic_terms')
+    .select('tool_id')
+    .limit(1);
+    
+  if (topicTermsError || junctionError) {
+    console.log('Tables do not exist yet. Please create them using the SQL above.');
+    
+    // Ask user if they've created the tables
+    return new Promise((resolve) => {
+      rl.question('Have you created the tables in Supabase? (yes/no): ', (answer) => {
+        if (answer.toLowerCase() === 'yes') {
+          console.log('Continuing with migration...');
+          resolve(true);
+        } else {
+          console.log('Please create the tables before continuing.');
+          resolve(false);
+        }
+      });
+    });
   }
   
-  // Create tool_topic_terms table (junction table)
-  const { error: createJunctionError } = await supabase.rpc('execute_sql', {
-    sql: `
-      CREATE TABLE IF NOT EXISTS tool_topic_terms (
-        tool_id UUID REFERENCES tools(id) ON DELETE CASCADE,
-        term_id UUID REFERENCES topic_terms(id) ON DELETE CASCADE,
-        PRIMARY KEY (tool_id, term_id)
-      );
-    `
-  });
-  
-  if (createJunctionError) {
-    console.error('Error creating tool_topic_terms table:', createJunctionError);
-    return false;
-  }
-  
-  console.log('New tables created successfully!');
+  console.log('Tables already exist. Continuing with migration...');
   return true;
 }
 
@@ -173,10 +188,10 @@ async function main() {
       return;
     }
     
-    // Create new tables
+    // Create new tables (or check if they exist)
     const tablesCreated = await createNewTables();
     if (!tablesCreated) {
-      console.error('Failed to create new tables. Migration aborted.');
+      console.error('Tables not ready. Migration aborted.');
       rl.close();
       return;
     }
