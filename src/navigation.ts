@@ -94,6 +94,7 @@ export const headerData = {
   ],
   actions: [
     { text: 'Browse Tools', href: '/tools' },
+    { text: 'Blog', href: '/blog' },
     { text: 'Contribute+', href: '/contribute-plus' }
   ],
 };
