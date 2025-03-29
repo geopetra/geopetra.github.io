@@ -82,6 +82,8 @@ const metadata = {
         <div 
           class="tool-card flex flex-col border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg"
           data-accessibility={tool.accessibility}
+          data-date-added={tool.created_at || tool.date_added || ''}
+          data-popularity={tool.views || tool.downloads || tool.popularity || '0'}
         >
           <div class="p-4 flex-grow">
             <div class="flex items-center gap-2 mb-1">
@@ -215,6 +217,8 @@ const metadata = {
         <div 
           class="tool-card flex border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg"
           data-accessibility={tool.accessibility}
+          data-date-added={tool.created_at || tool.date_added || ''}
+          data-popularity={tool.views || tool.downloads || tool.popularity || '0'}
         >
           <div class="p-4 flex-grow">
             <div class="flex justify-between items-start">
@@ -467,18 +471,34 @@ const metadata = {
         const nameA = a.querySelector('.tool-name')?.textContent?.toLowerCase() || '';
         const nameB = b.querySelector('.tool-name')?.textContent?.toLowerCase() || '';
         
+        // Get data attributes for more sophisticated sorting
+        // These could be added to the tool cards when rendering
+        const dateAddedA = a.dataset.dateAdded || '';
+        const dateAddedB = b.dataset.dateAdded || '';
+        const popularityA = parseInt(a.dataset.popularity || '0', 10);
+        const popularityB = parseInt(b.dataset.popularity || '0', 10);
+        
         switch (sortValue) {
           case 'name':
             return nameA.localeCompare(nameB);
           case 'newest':
-            // For demo purposes, just reverse the name sort
-            return nameB.localeCompare(nameA);
+            // If date attributes exist, use them; otherwise fall back to name
+            if (dateAddedA && dateAddedB) {
+              return new Date(dateAddedB).getTime() - new Date(dateAddedA).getTime();
+            }
+            return nameB.localeCompare(nameA); // Fallback
           case 'oldest':
-            // For demo purposes, just use name sort
-            return nameA.localeCompare(nameB);
+            // If date attributes exist, use them; otherwise fall back to name
+            if (dateAddedA && dateAddedB) {
+              return new Date(dateAddedA).getTime() - new Date(dateAddedB).getTime();
+            }
+            return nameA.localeCompare(nameB); // Fallback
           case 'popularity':
-            // For demo purposes, just use name sort
-            return nameA.localeCompare(nameB);
+            // If popularity attributes exist, use them; otherwise fall back to name
+            if (!isNaN(popularityA) && !isNaN(popularityB)) {
+              return popularityB - popularityA; // Higher number = more popular
+            }
+            return nameA.localeCompare(nameB); // Fallback
           default:
             return 0;
         }
