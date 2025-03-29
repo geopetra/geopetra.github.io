@@ -4,6 +4,7 @@ import { getTools, getAllTopics, getAllOperatingSystems, getAllToolTypes, getAll
 import ToolSearch from '~/components/tools/ToolSearch.astro';
 import { Icon } from 'astro-icon/components';
 import { Image } from 'astro:assets';
+import { osLogos } from '~/components/Favicons.astro';
 
 // Get search parameter from URL
 const searchTerm = Astro.url.searchParams.get('search') || '';
@@ -83,40 +84,46 @@ const metadata = {
                     {tool.operatingSystems.map((os) => (
                       <span class="tool-os inline-block w-4 h-4" title={os.name}>
                         {os.name === 'Windows' && (
-                          <img 
-                            src="/assets/favicons/windows-black.png" 
-                            alt="Windows" 
-                            class="w-4 h-4 dark:hidden" 
-                          />
-                          <img 
-                            src="/assets/favicons/windows-white.png" 
-                            alt="Windows" 
-                            class="w-4 h-4 hidden dark:block" 
-                          />
+                          <>
+                            <img 
+                              src={osLogos.windows.black} 
+                              alt="Windows" 
+                              class="w-4 h-4 dark:hidden" 
+                            />
+                            <img 
+                              src={osLogos.windows.white} 
+                              alt="Windows" 
+                              class="w-4 h-4 hidden dark:block" 
+                            />
+                          </>
                         )}
                         {os.name === 'Mac' && (
-                          <img 
-                            src="/assets/favicons/apple-black.png" 
-                            alt="Mac" 
-                            class="w-4 h-4 dark:hidden" 
-                          />
-                          <img 
-                            src="/assets/favicons/apple-white.png" 
-                            alt="Mac" 
-                            class="w-4 h-4 hidden dark:block" 
-                          />
+                          <>
+                            <img 
+                              src={osLogos.apple.black} 
+                              alt="Mac" 
+                              class="w-4 h-4 dark:hidden" 
+                            />
+                            <img 
+                              src={osLogos.apple.white} 
+                              alt="Mac" 
+                              class="w-4 h-4 hidden dark:block" 
+                            />
+                          </>
                         )}
                         {os.name === 'Linux' && (
-                          <img 
-                            src="/assets/favicons/linux-black.png" 
-                            alt="Linux" 
-                            class="w-4 h-4 dark:hidden" 
-                          />
-                          <img 
-                            src="/assets/favicons/linux-white.png" 
-                            alt="Linux" 
-                            class="w-4 h-4 hidden dark:block" 
-                          />
+                          <>
+                            <img 
+                              src={osLogos.linux.black} 
+                              alt="Linux" 
+                              class="w-4 h-4 dark:hidden" 
+                            />
+                            <img 
+                              src={osLogos.linux.white} 
+                              alt="Linux" 
+                              class="w-4 h-4 hidden dark:block" 
+                            />
+                          </>
                         )}
                       </span>
                     ))}
@@ -190,12 +197,12 @@ const metadata = {
                             {os.name === 'Windows' && (
                               <>
                                 <img 
-                                  src="/assets/favicons/windows-black.png" 
+                                  src={osLogos.windows.black} 
                                   alt="Windows" 
                                   class="w-4 h-4 dark:hidden" 
                                 />
                                 <img 
-                                  src="/assets/favicons/windows-white.png" 
+                                  src={osLogos.windows.white} 
                                   alt="Windows" 
                                   class="w-4 h-4 hidden dark:block" 
                                 />
@@ -204,12 +211,12 @@ const metadata = {
                             {os.name === 'Mac' && (
                               <>
                                 <img 
-                                  src="/assets/favicons/apple-black.png" 
+                                  src={osLogos.apple.black} 
                                   alt="Mac" 
                                   class="w-4 h-4 dark:hidden" 
                                 />
                                 <img 
-                                  src="/assets/favicons/apple-white.png" 
+                                  src={osLogos.apple.white} 
                                   alt="Mac" 
                                   class="w-4 h-4 hidden dark:block" 
                                 />
@@ -218,12 +225,12 @@ const metadata = {
                             {os.name === 'Linux' && (
                               <>
                                 <img 
-                                  src="/assets/favicons/linux-black.png" 
+                                  src={osLogos.linux.black} 
                                   alt="Linux" 
                                   class="w-4 h-4 dark:hidden" 
                                 />
                                 <img 
-                                  src="/assets/favicons/linux-white.png" 
+                                  src={osLogos.linux.white} 
                                   alt="Linux" 
                                   class="w-4 h-4 hidden dark:block" 
                                 />
