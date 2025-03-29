@@ -458,9 +458,12 @@ const metadata = {
       if (!sortSelect || !toolsGrid || !toolsList) return;
       
       const sortValue = sortSelect.value;
-      const toolCardsArray = Array.from(toolCards);
       
-      toolCardsArray.sort((a, b) => {
+      // Get original cards from the grid view (source of truth)
+      const gridCards = Array.from(toolsGrid.querySelectorAll('.tool-card'));
+      
+      // Sort the grid cards
+      gridCards.sort((a, b) => {
         const nameA = a.querySelector('.tool-name')?.textContent?.toLowerCase() || '';
         const nameB = b.querySelector('.tool-name')?.textContent?.toLowerCase() || '';
         
@@ -482,14 +485,17 @@ const metadata = {
       });
       
       // Clear existing cards
-      if (toolsGrid) toolsGrid.innerHTML = '';
-      if (toolsList) toolsList.innerHTML = '';
+      toolsGrid.innerHTML = '';
+      toolsList.innerHTML = '';
       
-      // Add sorted cards (without cloning to avoid duplicates)
-      toolCardsArray.forEach(card => {
-        if (toolsGrid) toolsGrid.appendChild(card);
-        // Create a clone only for the list view
-        if (toolsList) toolsList.appendChild(card.cloneNode(true));
+      // Add sorted cards to grid view
+      gridCards.forEach(card => {
+        toolsGrid.appendChild(card);
+      });
+      
+      // Create fresh clones for list view
+      gridCards.forEach(card => {
+        toolsList.appendChild(card.cloneNode(true));
       });
     };
 
