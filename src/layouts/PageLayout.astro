@@ -22,6 +22,8 @@ const { metadata } = Astro.props;
   <slot name="header">
     <Header {...headerData} isSticky showRssFeed showToggleTheme />
   </slot>
+  <!-- Filter dropdown container that appears below header -->
+  <div id="filter-dropdown-container" class="w-full"></div>
   <main>
     <slot />
   </main>
@@ -29,3 +31,39 @@ const { metadata } = Astro.props;
     <Footer {...footerData} />
   </slot>
 </Layout>
+
+<style>
+  /* Styles for the filter dropdown container */
+  #filter-dropdown-container {
+    position: relative;
+    z-index: 30;
+  }
+  
+  /* Ensure the main content doesn't overlap with the filter dropdown */
+  main {
+    position: relative;
+    z-index: 20;
+  }
+</style>
+
+<script>
+  // Set header height as CSS variable for positioning the filter dropdown
+  document.addEventListener('DOMContentLoaded', () => {
+    const updateHeaderHeight = () => {
+      const header = document.getElementById('site-header');
+      if (header) {
+        const headerHeight = header.offsetHeight;
+        document.documentElement.style.setProperty('--header-height', `${headerHeight}px`);
+      }
+    };
+    
+    // Initial measurement
+    updateHeaderHeight();
+    
+    // Update on resize
+    window.addEventListener('resize', updateHeaderHeight);
+    
+    // Update after a short delay to ensure all elements are rendered
+    setTimeout(updateHeaderHeight, 100);
+  });
+</script>
