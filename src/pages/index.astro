@@ -6,10 +6,17 @@ import Note from '~/components/widgets/Note.astro';
 import Features from '~/components/widgets/Features.astro';
 import Features2 from '~/components/widgets/Features2.astro';
 import Content from '~/components/widgets/Content.astro';
-import SearchBar from '~/components/widgets/SearchBar.astro';
+import ToolSearch from '~/components/tools/ToolSearch.astro';
 import FAQs from '~/components/widgets/FAQs.astro';
 import Stats from '~/components/widgets/Stats.astro';
 import CallToAction from '~/components/widgets/CallToAction.astro';
+import { getAllTopics, getAllOperatingSystems, getAllToolTypes, getAllLanguages } from '~/utils/database';
+
+// Fetch filter options
+const topics = await getAllTopics();
+const operatingSystems = await getAllOperatingSystems();
+const toolTypes = await getAllToolTypes();
+const languages = await getAllLanguages();
 
 const metadata = {
   title: 'PETRA: Petrology Tools, Resources, and Applications',
@@ -32,14 +39,12 @@ const metadata = {
         <span class="font-semibold">PETRA</span> is a community-driven hub designed to centralise petrological resources, ensuring easy accessibility for all researchers to the latest tools and methods.
       </span>
       
-      <div class="mt-8">
-        <SearchBar 
-          id="search-home"
-          placeholder="Search for petrological tools..." 
-          classes={{ 
-            container: "mt-4",
-            input: "text-lg py-4" 
-          }}
+      <div class="mt-8 max-w-3xl mx-auto">
+        <ToolSearch 
+          topics={topics} 
+          operatingSystems={operatingSystems} 
+          toolTypes={toolTypes} 
+          languages={languages}
         />
         <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
           Find tools by name, function, or related topics, or browse all tools.

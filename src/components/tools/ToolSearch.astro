@@ -1,22 +1,29 @@
 ---
 // Tool search and filter component
-const { topics = [], operatingSystems = [], toolTypes = [], languages = [], initialSearchTerm = '' } = Astro.props;
+const { 
+  topics = [], 
+  operatingSystems = [], 
+  toolTypes = [], 
+  languages = [], 
+  initialSearchTerm = '',
+  compactMode = false 
+} = Astro.props;
 ---
 
-<div class="mb-6 bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden">
+<div class={`${compactMode ? '' : 'mb-6 bg-gray-50 dark:bg-gray-800 rounded-lg'} overflow-hidden`}>
   <!-- Search bar - always visible -->
-  <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+  <div class={`${compactMode ? 'p-0' : 'p-4 border-b border-gray-200 dark:border-gray-700'}`}>
     <div class="flex gap-2">
       <div class="relative flex-grow">
         <input
           type="text"
-          id="search"
+          id={`search${compactMode ? '-header' : ''}`}
           placeholder="Search by name, description..."
           value={initialSearchTerm}
           class="w-full px-4 py-2 pr-10 border border-gray-300 dark:border-gray-700 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
         />
         <button 
-          id="search-button"
+          id={`search-button${compactMode ? '-header' : ''}`}
           class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -25,14 +32,14 @@ const { topics = [], operatingSystems = [], toolTypes = [], languages = [], init
         </button>
       </div>
       <button
-        id="toggle-filters"
+        id={`toggle-filters${compactMode ? '-header' : ''}`}
         class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors flex items-center"
       >
         <span>Filters</span>
-        <svg id="filter-icon-down" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg id={`filter-icon-down${compactMode ? '-header' : ''}`} xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
         </svg>
-        <svg id="filter-icon-up" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg id={`filter-icon-up${compactMode ? '-header' : ''}`} xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
         </svg>
       </button>
@@ -40,7 +47,7 @@ const { topics = [], operatingSystems = [], toolTypes = [], languages = [], init
   </div>
   
   <!-- Advanced filters - collapsible -->
-  <div id="advanced-filters" class="p-4 hidden">
+  <div id={`advanced-filters${compactMode ? '-header' : ''}`} class={`${compactMode ? 'absolute right-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-50 w-72' : ''} p-4 hidden`}>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
       <div>
         <label for="topic-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Topic</label>
@@ -123,50 +130,75 @@ const { topics = [], operatingSystems = [], toolTypes = [], languages = [], init
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const toggleFilters = document.getElementById('toggle-filters');
-    const advancedFilters = document.getElementById('advanced-filters');
-    const filterIconDown = document.getElementById('filter-icon-down');
-    const filterIconUp = document.getElementById('filter-icon-up');
-    const searchInput = document.getElementById('search');
-    const searchButton = document.getElementById('search-button');
-    
-    // Toggle advanced filters visibility
-    if (toggleFilters && advancedFilters) {
-      toggleFilters.addEventListener('click', () => {
-        advancedFilters.classList.toggle('hidden');
-        filterIconDown.classList.toggle('hidden');
-        filterIconUp.classList.toggle('hidden');
-      });
-    }
-    
-    // Handle search button click
-    if (searchButton && searchInput) {
-      searchButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        // Trigger the input event on the search input to filter results
-        searchInput.dispatchEvent(new Event('input'));
-      });
-    }
-    
-    // Get URL parameters to set initial filter values
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchParam = urlParams.get('search');
-    const topicParam = urlParams.get('topic');
-    
-    if (searchParam && searchInput) {
-      searchInput.value = searchParam;
-    }
-    
-    if (topicParam) {
-      const topicFilter = document.getElementById('topic-filter');
-      if (topicFilter) {
-        // Find the option with matching text
-        Array.from(topicFilter.options).forEach(option => {
-          if (option.text === topicParam) {
-            option.selected = true;
+    // Handle both regular and header versions
+    ['', '-header'].forEach(suffix => {
+      const toggleFilters = document.getElementById(`toggle-filters${suffix}`);
+      const advancedFilters = document.getElementById(`advanced-filters${suffix}`);
+      const filterIconDown = document.getElementById(`filter-icon-down${suffix}`);
+      const filterIconUp = document.getElementById(`filter-icon-up${suffix}`);
+      const searchInput = document.getElementById(`search${suffix}`);
+      const searchButton = document.getElementById(`search-button${suffix}`);
+      
+      // Toggle advanced filters visibility
+      if (toggleFilters && advancedFilters) {
+        toggleFilters.addEventListener('click', (e) => {
+          e.stopPropagation();
+          advancedFilters.classList.toggle('hidden');
+          filterIconDown?.classList.toggle('hidden');
+          filterIconUp?.classList.toggle('hidden');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (event) => {
+          if (toggleFilters && advancedFilters && !toggleFilters.contains(event.target) && !advancedFilters.contains(event.target)) {
+            advancedFilters.classList.add('hidden');
+            filterIconDown?.classList.remove('hidden');
+            filterIconUp?.classList.add('hidden');
           }
         });
       }
-    }
+      
+      // Handle search button click
+      if (searchButton && searchInput) {
+        searchButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          const query = searchInput.value.trim();
+          if (query) {
+            window.location.href = `/tools?search=${encodeURIComponent(query)}`;
+          }
+        });
+        
+        // Handle Enter key press
+        searchInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            const query = searchInput.value.trim();
+            if (query) {
+              window.location.href = `/tools?search=${encodeURIComponent(query)}`;
+            }
+          }
+        });
+      }
+      
+      // Get URL parameters to set initial filter values
+      const urlParams = new URLSearchParams(window.location.search);
+      const searchParam = urlParams.get('search');
+      const topicParam = urlParams.get('topic');
+      
+      if (searchParam && searchInput) {
+        searchInput.value = searchParam;
+      }
+      
+      if (topicParam) {
+        const topicFilter = document.getElementById('topic-filter');
+        if (topicFilter) {
+          // Find the option with matching text
+          Array.from(topicFilter.options).forEach(option => {
+            if (option.text === topicParam) {
+              option.selected = true;
+            }
+          });
+        }
+      }
+    });
   });
 </script>
