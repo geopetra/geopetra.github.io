@@ -74,7 +74,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         'md:flex md:justify-between': position !== 'center',
       },
       {
-        'md:grid md:grid-cols-[auto_1fr_auto] md:items-center': position === 'center',
+        'md:grid md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center': position === 'center',
       },
       {
         'max-w-7xl': !isFullWidth,
@@ -94,8 +94,8 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       aria-label="Main navigation"
     >
       {currentPath !== '/' && (
-        <div class="md:mr-4 mb-4 md:mb-0 w-full flex flex-col">
-          <div class="w-full md:w-full lg:w-full">
+        <div class="md:mr-4 mb-4 md:mb-0 w-full flex flex-col flex-grow">
+          <div class="w-full">
             <ToolSearch 
               topics={topics} 
               operatingSystems={operatingSystems} 
