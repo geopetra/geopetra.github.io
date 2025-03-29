@@ -489,10 +489,11 @@ const metadata = {
       if (toolsGrid) toolsGrid.innerHTML = '';
       if (toolsList) toolsList.innerHTML = '';
       
-      // Add sorted cards
+      // Add sorted cards (without cloning to avoid duplicates)
       toolCardsArray.forEach(card => {
-        toolsGrid?.appendChild(card.cloneNode(true));
-        toolsList?.appendChild(card.cloneNode(true));
+        if (toolsGrid) toolsGrid.appendChild(card);
+        // Create a clone only for the list view
+        if (toolsList) toolsList.appendChild(card.cloneNode(true));
       });
     };
 
