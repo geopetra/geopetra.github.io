@@ -17,7 +17,7 @@ async function testConnection() {
   try {
     console.log('Testing Supabase connection...');
     
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('tools')
       .select('*')
       .limit(1);
@@ -223,7 +223,7 @@ async function editToolMenu(tool) {
         
         try {
           // Validate JSON
-          const jsonObject = JSON.parse(jsonInput);
+          JSON.parse(jsonInput);
           
           // Update the field
           updateTool(tool.id, { [fieldToEdit]: jsonInput })

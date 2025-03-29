@@ -265,9 +265,6 @@ export const getToolWithDetails = async (petrahubid) => {
       return func;
     });
     
-    // Check if a logo file exists for this tool
-    const logoPath = `/src/assets/tool_logos/${tool.petrahubid.toLowerCase()}_logo`;
-    
     // Replace the nested structures with flattened arrays
     const transformedTool = {
       ...tool,

@@ -17,7 +17,7 @@ async function testConnection() {
     console.log('Testing Supabase connection...');
     
     // Try to connect to topic_terms table, fall back to topics if it doesn't exist
-    let { data, error } = await supabase
+    let { error } = await supabase
       .from('topic_terms')
       .select('*')
       .limit(1);
@@ -53,7 +53,7 @@ async function testConnection() {
  */
 async function checkForNewSchema() {
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('topic_terms')
       .select('id')
       .limit(1);
@@ -113,7 +113,7 @@ async function addTerm(term) {
   
   if (useNewSchema) {
     // Add the new term to topic_terms
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('topic_terms')
       .insert([{ term }]);
       
@@ -123,7 +123,7 @@ async function addTerm(term) {
     }
   } else {
     // Add the new term to topics
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('topics')
       .insert([{ term }]);
       

@@ -16,7 +16,7 @@ async function testConnection() {
   try {
     console.log('Testing Supabase connection...');
     
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('topics')
       .select('*')
       .limit(1);
