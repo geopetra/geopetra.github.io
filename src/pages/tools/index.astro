@@ -3,6 +3,7 @@ import Layout from '~/layouts/PageLayout.astro';
 import { getTools, getAllTopics, getAllOperatingSystems, getAllToolTypes, getAllLanguages } from '~/utils/database';
 import ToolSearch from '~/components/tools/ToolSearch.astro';
 import { Icon } from 'astro-icon/components';
+import { Image } from 'astro:assets';
 
 // Get search parameter from URL
 const searchTerm = Astro.url.searchParams.get('search') || '';
@@ -82,19 +83,40 @@ const metadata = {
                     {tool.operatingSystems.map((os) => (
                       <span class="tool-os inline-block w-4 h-4" title={os.name}>
                         {os.name === 'Windows' && (
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
-                          </svg>
+                          <img 
+                            src="/assets/favicons/windows-black.png" 
+                            alt="Windows" 
+                            class="w-4 h-4 dark:hidden" 
+                          />
+                          <img 
+                            src="/assets/favicons/windows-white.png" 
+                            alt="Windows" 
+                            class="w-4 h-4 hidden dark:block" 
+                          />
                         )}
                         {os.name === 'Mac' && (
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M11.03 2.59a5.5 5.5 0 0 1 3.47 2.06c.43.6.76 1.3.96 2.06.73-.83 1.56-1.46 2.83-1.46 1.36 0 2.6.9 3.07 2.13.44 1.23.4 2.63-.26 3.8-.37.63-.93 1.17-1.43 1.6-.3.26-.6.5-.83.66.23.17.53.4.83.66.5.43 1.07.97 1.43 1.6.67 1.17.7 2.57.27 3.8-.47 1.23-1.71 2.13-3.07 2.13-1.27 0-2.1-.63-2.83-1.46-.2.76-.53 1.47-.97 2.06a5.5 5.5 0 0 1-3.47 2.07c-1.36 0-2.6-.9-3.06-2.13-.44-1.23-.4-2.63.26-3.8.37-.63.93-1.17 1.43-1.6.3-.26.6-.5.83-.66-.23-.17-.53-.4-.83-.66-.5-.43-1.06-.97-1.43-1.6-.67-1.17-.7-2.57-.26-3.8.46-1.23 1.7-2.13 3.06-2.13 1.27 0 2.1.63 2.83 1.46.2-.76.54-1.46.97-2.06a5.5 5.5 0 0 1 3.47-2.07m0-2.03c-1.95 0-3.73.4-5.07 1.8-1.6 1.63-1.73 3.43-1.73 5.57 0 1.1.23 2.23.93 3.1.5.63 1.17 1.13 1.77 1.53-.6.4-1.27.9-1.77 1.53-.7.87-.93 2-.93 3.1 0 2.13.13 3.93 1.73 5.57 1.34 1.4 3.12 1.8 5.07 1.8 1.95 0 3.73-.4 5.07-1.8 1.6-1.63 1.73-3.43 1.73-5.57 0-1.1-.23-2.23-.93-3.1-.5-.63-1.17-1.13-1.77-1.53.6-.4 1.27-.9 1.77-1.53.7-.87.93-2 .93-3.1 0-2.13-.13-3.93-1.73-5.57-1.34-1.4-3.12-1.8-5.07-1.8z"/>
-                          </svg>
+                          <img 
+                            src="/assets/favicons/apple-black.png" 
+                            alt="Mac" 
+                            class="w-4 h-4 dark:hidden" 
+                          />
+                          <img 
+                            src="/assets/favicons/apple-white.png" 
+                            alt="Mac" 
+                            class="w-4 h-4 hidden dark:block" 
+                          />
                         )}
                         {os.name === 'Linux' && (
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12.5 0c-.81 0-1.5.68-1.5 1.5v.68c-.32.08-.64.17-.94.3l-.48-.48a1.5 1.5 0 0 0-2.12 0 1.5 1.5 0 0 0 0 2.12l.48.48a5.2 5.2 0 0 0-.3.94H6.5a1.5 1.5 0 0 0-1.5 1.5 1.5 1.5 0 0 0 1.5 1.5h.68c.08.32.17.64.3.94l-.48.48a1.5 1.5 0 0 0 0 2.12 1.5 1.5 0 0 0 2.12 0l.48-.48c.3.13.62.22.94.3v.68a1.5 1.5 0 0 0 1.5 1.5 1.5 1.5 0 0 0 1.5-1.5v-.68c.32-.08.64-.17.94-.3l.48.48a1.5 1.5 0 0 0 2.12 0 1.5 1.5 0 0 0 0-2.12l-.48-.48c.13-.3.22-.62.3-.94h.68a1.5 1.5 0 0 0 1.5-1.5 1.5 1.5 0 0 0-1.5-1.5h-.68c-.08-.32-.17-.64-.3-.94l.48-.48a1.5 1.5 0 0 0 0-2.12 1.5 1.5 0 0 0-2.12 0l-.48.48a5.2 5.2 0 0 0-.94-.3V1.5a1.5 1.5 0 0 0-1.5-1.5zM12 5a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4z"/>
-                          </svg>
+                          <img 
+                            src="/assets/favicons/linux-black.png" 
+                            alt="Linux" 
+                            class="w-4 h-4 dark:hidden" 
+                          />
+                          <img 
+                            src="/assets/favicons/linux-white.png" 
+                            alt="Linux" 
+                            class="w-4 h-4 hidden dark:block" 
+                          />
                         )}
                       </span>
                     ))}
@@ -166,19 +188,46 @@ const metadata = {
                         {tool.operatingSystems.map((os) => (
                           <span class="tool-os inline-block w-4 h-4" title={os.name}>
                             {os.name === 'Windows' && (
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
-                              </svg>
+                              <>
+                                <img 
+                                  src="/assets/favicons/windows-black.png" 
+                                  alt="Windows" 
+                                  class="w-4 h-4 dark:hidden" 
+                                />
+                                <img 
+                                  src="/assets/favicons/windows-white.png" 
+                                  alt="Windows" 
+                                  class="w-4 h-4 hidden dark:block" 
+                                />
+                              </>
                             )}
                             {os.name === 'Mac' && (
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M11.03 2.59a5.5 5.5 0 0 1 3.47 2.06c.43.6.76 1.3.96 2.06.73-.83 1.56-1.46 2.83-1.46 1.36 0 2.6.9 3.07 2.13.44 1.23.4 2.63-.26 3.8-.37.63-.93 1.17-1.43 1.6-.3.26-.6.5-.83.66.23.17.53.4.83.66.5.43 1.07.97 1.43 1.6.67 1.17.7 2.57.27 3.8-.47 1.23-1.71 2.13-3.07 2.13-1.27 0-2.1-.63-2.83-1.46-.2.76-.53 1.47-.97 2.06a5.5 5.5 0 0 1-3.47 2.07c-1.36 0-2.6-.9-3.06-2.13-.44-1.23-.4-2.63.26-3.8.37-.63.93-1.17 1.43-1.6.3-.26.6-.5.83-.66-.23-.17-.53-.4-.83-.66-.5-.43-1.06-.97-1.43-1.6-.67-1.17-.7-2.57-.26-3.8.46-1.23 1.7-2.13 3.06-2.13 1.27 0 2.1.63 2.83 1.46.2-.76.54-1.46.97-2.06a5.5 5.5 0 0 1 3.47-2.07m0-2.03c-1.95 0-3.73.4-5.07 1.8-1.6 1.63-1.73 3.43-1.73 5.57 0 1.1.23 2.23.93 3.1.5.63 1.17 1.13 1.77 1.53-.6.4-1.27.9-1.77 1.53-.7.87-.93 2-.93 3.1 0 2.13.13 3.93 1.73 5.57 1.34 1.4 3.12 1.8 5.07 1.8 1.95 0 3.73-.4 5.07-1.8 1.6-1.63 1.73-3.43 1.73-5.57 0-1.1-.23-2.23-.93-3.1-.5-.63-1.17-1.13-1.77-1.53.6-.4 1.27-.9 1.77-1.53.7-.87.93-2 .93-3.1 0-2.13-.13-3.93-1.73-5.57-1.34-1.4-3.12-1.8-5.07-1.8z"/>
-                              </svg>
+                              <>
+                                <img 
+                                  src="/assets/favicons/apple-black.png" 
+                                  alt="Mac" 
+                                  class="w-4 h-4 dark:hidden" 
+                                />
+                                <img 
+                                  src="/assets/favicons/apple-white.png" 
+                                  alt="Mac" 
+                                  class="w-4 h-4 hidden dark:block" 
+                                />
+                              </>
                             )}
                             {os.name === 'Linux' && (
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12.5 0c-.81 0-1.5.68-1.5 1.5v.68c-.32.08-.64.17-.94.3l-.48-.48a1.5 1.5 0 0 0-2.12 0 1.5 1.5 0 0 0 0 2.12l.48.48a5.2 5.2 0 0 0-.3.94H6.5a1.5 1.5 0 0 0-1.5 1.5 1.5 1.5 0 0 0 1.5 1.5h.68c.08.32.17.64.3.94l-.48.48a1.5 1.5 0 0 0 0 2.12 1.5 1.5 0 0 0 2.12 0l.48-.48c.3.13.62.22.94.3v.68a1.5 1.5 0 0 0 1.5 1.5 1.5 1.5 0 0 0 1.5-1.5v-.68c.32-.08.64-.17.94-.3l.48.48a1.5 1.5 0 0 0 2.12 0 1.5 1.5 0 0 0 0-2.12l-.48-.48c.13-.3.22-.62.3-.94h.68a1.5 1.5 0 0 0 1.5-1.5 1.5 1.5 0 0 0-1.5-1.5h-.68c-.08-.32-.17-.64-.3-.94l.48-.48a1.5 1.5 0 0 0 0-2.12 1.5 1.5 0 0 0-2.12 0l-.48.48a5.2 5.2 0 0 0-.94-.3V1.5a1.5 1.5 0 0 0-1.5-1.5zM12 5a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4z"/>
-                              </svg>
+                              <>
+                                <img 
+                                  src="/assets/favicons/linux-black.png" 
+                                  alt="Linux" 
+                                  class="w-4 h-4 dark:hidden" 
+                                />
+                                <img 
+                                  src="/assets/favicons/linux-white.png" 
+                                  alt="Linux" 
+                                  class="w-4 h-4 hidden dark:block" 
+                                />
+                              </>
                             )}
                           </span>
                         ))}
@@ -242,63 +291,51 @@ const metadata = {
 <script>
   // Client-side JavaScript for search and filtering
   document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.getElementById('search');
-    const searchButton = document.getElementById('search-button');
-    const topicFilter = document.getElementById('topic-filter');
-    const osFilter = document.getElementById('os-filter');
-    const typeFilter = document.getElementById('type-filter');
-    const languageFilter = document.getElementById('language-filter');
-    const accessibilityFilter = document.getElementById('accessibility-filter');
-    const resetButton = document.getElementById('reset-filters');
-    const toolCards = document.querySelectorAll('.tool-card');
-    const noResults = document.getElementById('no-results');
+    // Get DOM elements
+    const searchInput = document.querySelector<HTMLInputElement>('#search');
+    const searchButton = document.querySelector<HTMLButtonElement>('#search-button');
+    const topicFilter = document.querySelector<HTMLSelectElement>('#topic-filter');
+    const osFilter = document.querySelector<HTMLSelectElement>('#os-filter');
+    const typeFilter = document.querySelector<HTMLSelectElement>('#type-filter');
+    const languageFilter = document.querySelector<HTMLSelectElement>('#language-filter');
+    const accessibilityFilter = document.querySelector<HTMLSelectElement>('#accessibility-filter');
+    const resetButton = document.querySelector<HTMLButtonElement>('#reset-filters');
+    const toolCards = document.querySelectorAll<HTMLElement>('.tool-card');
+    const noResults = document.querySelector<HTMLElement>('#no-results');
     
     // View toggle elements
-    const gridViewBtn = document.getElementById('grid-view-btn');
-    const listViewBtn = document.getElementById('list-view-btn');
-    const toolsGrid = document.getElementById('tools-grid');
-    const toolsList = document.getElementById('tools-list');
-    
+    const gridViewBtn = document.querySelector<HTMLButtonElement>('#grid-view-btn');
+    const listViewBtn = document.querySelector<HTMLButtonElement>('#list-view-btn');
+    const toolsGrid = document.querySelector<HTMLElement>('#tools-grid');
+    const toolsList = document.querySelector<HTMLElement>('#tools-list');
+
     // Filter function
-    function filterTools() {
+    const filterTools = () => {
+      if (!searchInput) return;
+      
       const searchTerm = searchInput.value.toLowerCase();
-      const selectedTopic = topicFilter ? topicFilter.value : '';
-      const selectedOS = osFilter ? osFilter.value : '';
-      const selectedType = typeFilter ? typeFilter.value : '';
-      const selectedLanguage = languageFilter ? languageFilter.value : '';
-      const selectedAccessibility = accessibilityFilter ? accessibilityFilter.value : '';
+      const selectedTopic = topicFilter?.value ?? '';
+      const selectedOS = osFilter?.value ?? '';
+      const selectedType = typeFilter?.value ?? '';
+      const selectedLanguage = languageFilter?.value ?? '';
+      const selectedAccessibility = accessibilityFilter?.value ?? '';
       
       let visibleCount = 0;
       
       toolCards.forEach(card => {
-        const name = card.querySelector('.tool-name').textContent.toLowerCase();
-        const description = card.querySelector('.tool-description').textContent.toLowerCase();
-        const accessibility = card.dataset.accessibility ? card.dataset.accessibility.toLowerCase() : '';
+        const name = card.querySelector('.tool-name')?.textContent?.toLowerCase() ?? '';
+        const description = card.querySelector('.tool-description')?.textContent?.toLowerCase() ?? '';
+        const accessibility = card.dataset.accessibility?.toLowerCase() ?? '';
         
-        // Check if card matches search term
+        // Match conditions
         const matchesSearch = name.includes(searchTerm) || description.includes(searchTerm);
+        const matchesTopic = !selectedTopic || card.querySelector(`.tool-topic[data-topic="${selectedTopic}"]`);
+        const matchesOS = !selectedOS || card.querySelector(`.tool-os[title="${selectedOS}"]`);
+        const matchesType = !selectedType || card.querySelector(`.tool-type[data-type="${selectedType}"]`);
+        const matchesLanguage = !selectedLanguage || card.querySelector(`.tool-language[data-language="${selectedLanguage}"]`);
+        const matchesAccessibility = !selectedAccessibility || accessibility.includes(selectedAccessibility.toLowerCase());
         
-        // Check if card matches topic filter
-        const matchesTopic = selectedTopic === '' || 
-          Array.from(card.querySelectorAll('.tool-topic')).some(el => el.textContent.trim() === selectedTopic);
-        
-        // Check if card matches OS filter
-        const matchesOS = selectedOS === '' || 
-          Array.from(card.querySelectorAll('.tool-os')).some(el => el.title === selectedOS);
-        
-        // Check if card matches type filter
-        const matchesType = selectedType === '' || 
-          Array.from(card.querySelectorAll('.tool-type')).some(el => el.textContent.includes(selectedType));
-          
-        // Check if card matches language filter
-        const matchesLanguage = selectedLanguage === '' || 
-          Array.from(card.querySelectorAll('.tool-language')).some(el => el.textContent.includes(selectedLanguage));
-          
-        // Check if card matches accessibility filter
-        const matchesAccessibility = selectedAccessibility === '' || 
-          accessibility.includes(selectedAccessibility.toLowerCase());
-        
-        // Show or hide card based on filters
+        // Show/hide based on all conditions
         if (matchesSearch && matchesTopic && matchesOS && matchesType && matchesLanguage && matchesAccessibility) {
           card.style.display = '';
           visibleCount++;
@@ -307,89 +344,67 @@ const metadata = {
         }
       });
       
-      // Show or hide no results message
-      if (visibleCount === 0 && noResults) {
-        noResults.style.display = 'block';
-      } else if (noResults) {
-        noResults.style.display = 'none';
+      // Toggle no results message
+      if (noResults) {
+        noResults.style.display = visibleCount === 0 ? 'block' : 'none';
       }
-    }
-    
-    // Reset filters function
-    function resetFilters() {
-      if (searchInput) searchInput.value = '';
-      if (topicFilter) topicFilter.value = '';
-      if (osFilter) osFilter.value = '';
-      if (typeFilter) typeFilter.value = '';
-      if (languageFilter) languageFilter.value = '';
-      if (accessibilityFilter) accessibilityFilter.value = '';
-      
-      // Show all cards
-      toolCards.forEach(card => {
-        card.style.display = '';
+    };
+
+    // Reset filters
+    const resetFilters = () => {
+      [searchInput, topicFilter, osFilter, typeFilter, languageFilter, accessibilityFilter].forEach(filter => {
+        if (filter) filter.value = '';
       });
       
-      // Hide no results message
+      toolCards.forEach(card => card.style.display = '');
       if (noResults) noResults.style.display = 'none';
-    }
+    };
+
+    // View toggles
+    const showGridView = () => {
+      if (!toolsGrid || !toolsList || !gridViewBtn || !listViewBtn) return;
+      
+      toolsGrid.classList.remove('hidden');
+      toolsList.classList.add('hidden');
+      gridViewBtn.classList.add('active-view');
+      listViewBtn.classList.remove('active-view');
+      localStorage.setItem('toolsViewPreference', 'grid');
+    };
+
+    const showListView = () => {
+      if (!toolsGrid || !toolsList || !gridViewBtn || !listViewBtn) return;
+      
+      toolsGrid.classList.add('hidden');
+      toolsList.classList.remove('hidden');
+      gridViewBtn.classList.remove('active-view');
+      listViewBtn.classList.add('active-view');
+      localStorage.setItem('toolsViewPreference', 'list');
+    };
+
+    // Event listeners
+    searchInput?.addEventListener('input', filterTools);
+    searchButton?.addEventListener('click', (e) => {
+      e.preventDefault();
+      filterTools();
+    });
     
-    // View toggle functions
-    function showGridView() {
-      if (toolsGrid && toolsList) {
-        toolsGrid.classList.remove('hidden');
-        toolsList.classList.add('hidden');
-        
-        // Update active button styles
-        gridViewBtn.classList.add('active-view');
-        listViewBtn.classList.remove('active-view');
-        
-        // Store preference
-        localStorage.setItem('toolsViewPreference', 'grid');
-      }
-    }
+    [topicFilter, osFilter, typeFilter, languageFilter, accessibilityFilter].forEach(filter => {
+      filter?.addEventListener('change', filterTools);
+    });
     
-    function showListView() {
-      if (toolsGrid && toolsList) {
-        toolsGrid.classList.add('hidden');
-        toolsList.classList.remove('hidden');
-        
-        // Update active button styles
-        gridViewBtn.classList.remove('active-view');
-        listViewBtn.classList.add('active-view');
-        
-        // Store preference
-        localStorage.setItem('toolsViewPreference', 'list');
-      }
-    }
-    
-    // Add event listeners
-    if (searchInput) searchInput.addEventListener('input', filterTools);
-    if (searchButton) {
-      searchButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        filterTools();
-      });
-    }
-    if (topicFilter) topicFilter.addEventListener('change', filterTools);
-    if (osFilter) osFilter.addEventListener('change', filterTools);
-    if (typeFilter) typeFilter.addEventListener('change', filterTools);
-    if (languageFilter) languageFilter.addEventListener('change', filterTools);
-    if (accessibilityFilter) accessibilityFilter.addEventListener('change', filterTools);
-    if (resetButton) resetButton.addEventListener('click', resetFilters);
-    
-    // View toggle event listeners
-    if (gridViewBtn) gridViewBtn.addEventListener('click', showGridView);
-    if (listViewBtn) listViewBtn.addEventListener('click', showListView);
-    
-    // Load user's view preference
+    resetButton?.addEventListener('click', resetFilters);
+    gridViewBtn?.addEventListener('click', showGridView);
+    listViewBtn?.addEventListener('click', showListView);
+
+    // Initialize view based on preference
     const viewPreference = localStorage.getItem('toolsViewPreference');
     if (viewPreference === 'list') {
       showListView();
     } else {
       showGridView();
     }
-    
-    // Run initial filter (in case URL has search parameters)
+
+    // Initial filter
     filterTools();
   });
 </script>
