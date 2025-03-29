@@ -42,8 +42,8 @@ const metadata = {
     <div class="grid gap-6 row-gap-10 md:grid-cols-1">
       <div class="md:pb-6 md:pr-16">
         <div class="flex items-center justify-between mb-8">
-          <h2 class="text-3xl font-bold tracking-tight sm:text-4xl sm:leading-none">{tool.name}</h2>
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-3">
+            <h2 class="text-3xl font-bold tracking-tight sm:text-4xl sm:leading-none">{tool.name}</h2>
             {/* Try to load logo based on petrahubid */}
             {(() => {
               const logoPath = `/src/assets/tool_logos/${tool.petrahubid.toLowerCase()}_logo`;
@@ -67,11 +67,11 @@ const metadata = {
                 </div>
               );
             })()}
-            <a href="/tools" class="text-blue-600 hover:text-blue-800 flex items-center">
-              <Icon name="tabler:arrow-left" class="w-5 h-5 mr-1" />
-              Back to Tools
-            </a>
           </div>
+          <a href="/tools" class="text-blue-600 hover:text-blue-800 flex items-center">
+            <Icon name="tabler:arrow-left" class="w-5 h-5 mr-1" />
+            Back to Tools
+          </a>
         </div>
 
         {tool.version && (
