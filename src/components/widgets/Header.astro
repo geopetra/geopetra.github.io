@@ -74,7 +74,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         'md:flex md:justify-between': position !== 'center',
       },
       {
-        'md:grid md:grid-cols-3 md:items-center': position === 'center',
+        'md:grid md:grid-cols-[auto_1fr_auto] md:items-center': position === 'center',
       },
       {
         'max-w-7xl': !isFullWidth,
