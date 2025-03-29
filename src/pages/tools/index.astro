@@ -4,6 +4,7 @@ import { getTools, getAllTopics, getAllOperatingSystems, getAllToolTypes, getAll
 import ToolSearch from '~/components/tools/ToolSearch.astro';
 import { Icon } from 'astro-icon/components';
 import { Image } from 'astro:assets';
+import { osLogos } from '~/components/Favicons.astro';
 
 // Get search parameter from URL
 const searchTerm = Astro.url.searchParams.get('search') || '';
@@ -82,7 +83,48 @@ const metadata = {
                   <span class="flex gap-1">
                     {tool.operatingSystems.map((os) => (
                       <span class="tool-os inline-block w-4 h-4" title={os.name}>
-                        <OSLogo name={os.name} />
+                        {os.name === 'Windows' && (
+                          <>
+                            <img 
+                              src={osLogos.windows.black} 
+                              alt="Windows" 
+                              class="w-4 h-4 dark:hidden" 
+                            />
+                            <img 
+                              src={osLogos.windows.white} 
+                              alt="Windows" 
+                              class="w-4 h-4 hidden dark:block" 
+                            />
+                          </>
+                        )}
+                        {os.name === 'Mac' && (
+                          <>
+                            <img 
+                              src={osLogos.apple.black} 
+                              alt="Mac" 
+                              class="w-4 h-4 dark:hidden" 
+                            />
+                            <img 
+                              src={osLogos.apple.white} 
+                              alt="Mac" 
+                              class="w-4 h-4 hidden dark:block" 
+                            />
+                          </>
+                        )}
+                        {os.name === 'Linux' && (
+                          <>
+                            <img 
+                              src={osLogos.linux.black} 
+                              alt="Linux" 
+                              class="w-4 h-4 dark:hidden" 
+                            />
+                            <img 
+                              src={osLogos.linux.white} 
+                              alt="Linux" 
+                              class="w-4 h-4 hidden dark:block" 
+                            />
+                          </>
+                        )}
                       </span>
                     ))}
                   </span>
@@ -152,7 +194,48 @@ const metadata = {
                       <span class="flex gap-1">
                         {tool.operatingSystems.map((os) => (
                           <span class="tool-os inline-block w-4 h-4" title={os.name}>
-                            <OSLogo name={os.name} />
+                            {os.name === 'Windows' && (
+                              <>
+                                <img 
+                                  src={osLogos.windows.black} 
+                                  alt="Windows" 
+                                  class="w-4 h-4 dark:hidden" 
+                                />
+                                <img 
+                                  src={osLogos.windows.white} 
+                                  alt="Windows" 
+                                  class="w-4 h-4 hidden dark:block" 
+                                />
+                              </>
+                            )}
+                            {os.name === 'Mac' && (
+                              <>
+                                <img 
+                                  src={osLogos.apple.black} 
+                                  alt="Mac" 
+                                  class="w-4 h-4 dark:hidden" 
+                                />
+                                <img 
+                                  src={osLogos.apple.white} 
+                                  alt="Mac" 
+                                  class="w-4 h-4 hidden dark:block" 
+                                />
+                              </>
+                            )}
+                            {os.name === 'Linux' && (
+                              <>
+                                <img 
+                                  src={osLogos.linux.black} 
+                                  alt="Linux" 
+                                  class="w-4 h-4 dark:hidden" 
+                                />
+                                <img 
+                                  src={osLogos.linux.white} 
+                                  alt="Linux" 
+                                  class="w-4 h-4 hidden dark:block" 
+                                />
+                              </>
+                            )}
                           </span>
                         ))}
                       </span>
