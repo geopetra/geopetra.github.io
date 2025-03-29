@@ -2,6 +2,30 @@
 import favIcon from '~/assets/favicons/favicon.ico';
 import favIconSvg from '~/assets/favicons/favicon.svg';
 import appleTouchIcon from '~/assets/favicons/apple-touch-icon.png';
+
+// Import OS logos
+import windowsBlack from '~/assets/favicons/windows-black.png';
+import windowsWhite from '~/assets/favicons/windows-white.png';
+import appleBlack from '~/assets/favicons/apple-black.png';
+import appleWhite from '~/assets/favicons/apple-white.png';
+import linuxBlack from '~/assets/favicons/linux-black.png';
+import linuxWhite from '~/assets/favicons/linux-white.png';
+
+// Export the OS logo paths for use in other components
+export const osLogos = {
+  windows: {
+    black: windowsBlack.src,
+    white: windowsWhite.src
+  },
+  apple: {
+    black: appleBlack.src,
+    white: appleWhite.src
+  },
+  linux: {
+    black: linuxBlack.src,
+    white: linuxWhite.src
+  }
+};
 ---
 
 <link rel="shortcut icon" href={favIcon} />
