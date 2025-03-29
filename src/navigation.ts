@@ -20,36 +20,6 @@ export const headerData = {
       ],
     },
     {
-      text: 'Resources',
-      links: [
-        {
-          text: 'Features (Anchor Link)',
-          href: getPermalink('/#features'),
-        },
-        {
-          text: 'Test',
-          href: getPermalink('/resources/test'),
-        },
-        {
-          text: 'Test2',
-          href: getPermalink('/resources/test2'),
-        },
-        {
-          text: 'Test3',
-          href: getPermalink('/resources/test3'),
-        },
-      ],
-    },
-    {
-      text: 'Applications',
-      links: [
-        {
-          text: 'Click-Through',
-          href: getPermalink('/applications/click-through'),
-        },
-      ],
-    },
-    {
       text: 'Blog',
       links: [
         {
@@ -74,23 +44,6 @@ export const headerData = {
         },
       ],
     },
-    {
-      text: 'About',
-      links: [
-        {
-          text: 'Contact',
-          href: getPermalink('/about/contact'),
-        },
-        {
-          text: 'Terms',
-          href: getPermalink('/about/terms'),
-        },
-        {
-          text: 'Privacy policy',
-          href: getPermalink('/about/privacy'),
-        },  
-      ]
-    },
   ],
   actions: [
     { text: 'Browse Tools', href: '/tools' },
@@ -104,12 +57,7 @@ export const footerData = {
       title: 'Product',
       links: [
         { text: 'Features', href: '#' },
-        { text: 'Security', href: '#' },
         { text: 'Team', href: '#' },
-        { text: 'Enterprise', href: '#' },
-        { text: 'Customer stories', href: '#' },
-        { text: 'Pricing', href: '#' },
-        { text: 'Resources', href: '#' },
       ],
     },
   ],
