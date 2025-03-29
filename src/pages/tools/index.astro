@@ -485,14 +485,15 @@ const metadata = {
         }
       });
       
-      // Reorder in grid view
+      // Clear existing cards
+      if (toolsGrid) toolsGrid.innerHTML = '';
+      if (toolsList) toolsList.innerHTML = '';
+      
+      // Add sorted cards
       toolCardsArray.forEach(card => {
         toolsGrid?.appendChild(card.cloneNode(true));
         toolsList?.appendChild(card.cloneNode(true));
       });
-      
-      // Remove original cards
-      toolCards.forEach(card => card.remove());
     };
 
     // View toggles
