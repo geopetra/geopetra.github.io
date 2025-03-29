@@ -33,18 +33,32 @@ const {
 </div>
 
 <script>
-  // Basic search functionality
+  // Enhanced search functionality
   document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search');
+    const searchButton = document.querySelector('[aria-label="Search"]');
+    
+    // Function to handle search
+    const performSearch = () => {
+      const query = searchInput.value;
+      if (query.trim()) {
+        window.location.href = `/tools?search=${encodeURIComponent(query)}`;
+      }
+    };
+    
+    // Event listeners
     if (searchInput) {
+      // Handle Enter key press
       searchInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-          const query = searchInput.value;
-          if (query.trim()) {
-            window.location.href = `/tools?search=${encodeURIComponent(query)}`;
-          }
+          performSearch();
         }
       });
+      
+      // Handle search button click
+      if (searchButton) {
+        searchButton.addEventListener('click', performSearch);
+      }
     }
   });
 </script>

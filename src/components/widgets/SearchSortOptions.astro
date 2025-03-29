@@ -1,0 +1,56 @@
+---
+export interface Props {
+  classes?: Record<string, string>;
+}
+
+const { classes = {} } = Astro.props;
+---
+
+<div class:list={["sort-options w-full max-w-3xl mx-auto mt-2 mb-4", classes?.container]}>
+  <div class="flex flex-wrap items-center justify-start gap-2 text-sm">
+    <span class="font-medium text-gray-700 dark:text-gray-300">Sort by:</span>
+    <button 
+      class="sort-option px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors" 
+      data-sort="name"
+    >
+      Name
+    </button>
+    <button 
+      class="sort-option px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors" 
+      data-sort="date"
+    >
+      Publication Date
+    </button>
+    <button 
+      class="sort-option px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors" 
+      data-sort="relevance"
+    >
+      Relevance
+    </button>
+  </div>
+</div>
+
+<script>
+  // Sort functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const sortButtons = document.querySelectorAll('.sort-option');
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentSort = urlParams.get('sort') || 'name';
+    
+    // Highlight the current sort option
+    sortButtons.forEach(button => {
+      const sortType = button.getAttribute('data-sort');
+      if (sortType === currentSort) {
+        button.classList.add('bg-blue-200', 'dark:bg-blue-800');
+        button.classList.remove('bg-gray-100', 'dark:bg-gray-800');
+      }
+      
+      // Add click event to update sort parameter
+      button.addEventListener('click', () => {
+        const sortType = button.getAttribute('data-sort');
+        urlParams.set('sort', sortType);
+        window.location.href = `${window.location.pathname}?${urlParams.toString()}`;
+      });
+    });
+  });
+</script>
