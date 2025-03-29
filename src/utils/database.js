@@ -24,8 +24,7 @@ export const getTools = async () => {
       tool_language_relations(
         language_id,
         languages(id, name)
-      ),
-      tool_functions(*)
+      )
     `)
     .order('name');
     
@@ -36,6 +35,9 @@ export const getTools = async () => {
   
   // Transform the nested data to a more usable format
   return data.map(tool => {
+    // Add console.log to debug the data structure
+    console.log('Raw tool data:', JSON.stringify(tool, null, 2));
+    
     const topics = (tool.tool_topics || []).map(relation => ({
       id: relation.topics?.id,
       term: relation.topics?.term

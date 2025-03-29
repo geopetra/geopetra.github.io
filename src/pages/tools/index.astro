@@ -11,6 +11,11 @@ const searchTerm = Astro.url.searchParams.get('search') || '';
 
 // Fetch all tools and filter options
 const tools = await getTools();
+console.log('Tools fetched:', tools.length);
+if (tools.length > 0) {
+  console.log('First tool:', tools[0].name);
+}
+
 const topics = await getAllTopics();
 const operatingSystems = await getAllOperatingSystems();
 const toolTypes = await getAllToolTypes();
@@ -368,12 +373,20 @@ const metadata = {
     const filterTools = () => {
       if (!searchInput) return;
       
+      console.log('Running filter function');
+      console.log('Total tool cards:', toolCards.length);
+      
       const searchTerm = searchInput.value.toLowerCase();
       const selectedTopic = topicFilter?.value ?? '';
       const selectedOS = osFilter?.value ?? '';
       const selectedType = typeFilter?.value ?? '';
       const selectedLanguage = languageFilter?.value ?? '';
       const selectedAccessibility = accessibilityFilter?.value ?? '';
+      
+      console.log('Search term:', searchTerm);
+      console.log('Selected topic:', selectedTopic);
+      console.log('Selected OS:', selectedOS);
+      console.log('Selected type:', selectedType);
       
       let visibleCount = 0;
       
@@ -397,6 +410,17 @@ const metadata = {
         const matchesType = !selectedType || card.querySelector(`.tool-type[data-type="${selectedType}"]`);
         const matchesLanguage = !selectedLanguage || card.querySelector(`.tool-language[data-language="${selectedLanguage}"]`);
         const matchesAccessibility = !selectedAccessibility || accessibility.includes(selectedAccessibility.toLowerCase());
+        
+        // Debug the matching conditions
+        if (card === toolCards[0]) {
+          console.log('First card matching conditions:');
+          console.log('- matchesSearch:', matchesSearch);
+          console.log('- matchesTopic:', matchesTopic);
+          console.log('- matchesOS:', matchesOS);
+          console.log('- matchesType:', matchesType);
+          console.log('- matchesLanguage:', matchesLanguage);
+          console.log('- matchesAccessibility:', matchesAccessibility);
+        }
         
         // Show/hide based on all conditions
         if (matchesSearch && matchesTopic && matchesOS && matchesType && matchesLanguage && matchesAccessibility) {
@@ -467,7 +491,14 @@ const metadata = {
       showGridView();
     }
 
-    // Initial filter
-    filterTools();
+    // Make sure all cards are visible initially
+    toolCards.forEach(card => {
+      card.style.display = '';
+    });
+    
+    // Only run initial filter if there's a search term
+    if (searchInput && searchInput.value.trim() !== '') {
+      filterTools();
+    }
   });
 </script>
