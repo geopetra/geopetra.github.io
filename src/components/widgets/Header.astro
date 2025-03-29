@@ -90,7 +90,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
             id={`search-${currentPath.replace(/\//g, '-')}`}
             placeholder="Search for tools..." 
             classes={{ 
-              container: "w-full md:w-64 lg:w-80",
+              container: "w-full md:w-80 lg:w-96",
               input: "py-2 text-sm" 
             }}
           />
@@ -114,7 +114,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
             ]}
             href="/tools"
           >
-            Tools
+            Browse Tools
           </a>
         </li>
         <li>
@@ -125,7 +125,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
             ]}
             href="/contribute"
           >
-            Contribute
+            Contribute+
           </a>
         </li>
       </ul>
