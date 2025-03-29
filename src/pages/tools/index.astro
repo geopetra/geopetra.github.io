@@ -141,7 +141,7 @@ const metadata = {
             
             <div class="flex flex-wrap gap-1 mb-3">
               {tool.topics && tool.topics.slice(0, 3).map((topic) => (
-                <span class="tool-topic px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-full">
+                <span class="tool-topic px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-full" data-topic={topic.term}>
                   {topic.term}
                 </span>
               ))}
@@ -162,13 +162,31 @@ const metadata = {
               {tool.toolTypes && tool.toolTypes.length > 0 && (
                 <span class="text-xs">
                   {tool.toolTypes.map((type, i) => (
-                    <span class="tool-type">
+                    <span class="tool-type" data-type={type.type}>
                       {i > 0 ? ', ' : ''}{type.type}
                     </span>
                   ))}
                 </span>
               )}
             </div>
+            
+            {tool.functions && tool.functions.length > 0 && (
+              <div class="mt-2">
+                <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">Functions:</p>
+                <div class="flex flex-wrap gap-1 mt-1">
+                  {tool.functions.slice(0, 2).map((func) => (
+                    <span class="tool-function px-2 py-0.5 text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 rounded-full" title={func.description || ''} data-function={func.function_name}>
+                      {func.function_name}
+                    </span>
+                  ))}
+                  {tool.functions.length > 2 && (
+                    <span class="px-2 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full">
+                      +{tool.functions.length - 2}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
           
           <div class="p-3 bg-gray-50 dark:bg-gray-800 flex justify-between items-center">
@@ -266,7 +284,7 @@ const metadata = {
             
             <div class="flex flex-wrap gap-1 mb-2">
               {tool.topics && tool.topics.slice(0, 5).map((topic) => (
-                <span class="tool-topic px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-full">
+                <span class="tool-topic px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-full" data-topic={topic.term}>
                   {topic.term}
                 </span>
               ))}
@@ -287,13 +305,31 @@ const metadata = {
               {tool.toolTypes && tool.toolTypes.length > 0 && (
                 <span>
                   {tool.toolTypes.map((type, i) => (
-                    <span class="tool-type">
+                    <span class="tool-type" data-type={type.type}>
                       {i > 0 ? ', ' : ''}{type.type}
                     </span>
                   ))}
                 </span>
               )}
             </div>
+            
+            {tool.functions && tool.functions.length > 0 && (
+              <div class="mt-2">
+                <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">Functions:</p>
+                <div class="flex flex-wrap gap-1 mt-1">
+                  {tool.functions.slice(0, 3).map((func) => (
+                    <span class="tool-function px-2 py-0.5 text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 rounded-full" title={func.description || ''} data-function={func.function_name}>
+                      {func.function_name}
+                    </span>
+                  ))}
+                  {tool.functions.length > 3 && (
+                    <span class="px-2 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full">
+                      +{tool.functions.length - 3}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       ))}
@@ -346,8 +382,16 @@ const metadata = {
         const description = card.querySelector('.tool-description')?.textContent?.toLowerCase() ?? '';
         const accessibility = card.dataset.accessibility?.toLowerCase() ?? '';
         
+        // Get function names for search
+        const functionElements = card.querySelectorAll('.tool-function');
+        const functionNames = Array.from(functionElements).map(el => el.textContent?.toLowerCase() || '');
+        const functionDescriptions = Array.from(functionElements).map(el => el.getAttribute('title')?.toLowerCase() || '');
+        
         // Match conditions
-        const matchesSearch = name.includes(searchTerm) || description.includes(searchTerm);
+        const matchesSearch = name.includes(searchTerm) || 
+                             description.includes(searchTerm) || 
+                             functionNames.some(fn => fn.includes(searchTerm)) ||
+                             functionDescriptions.some(desc => desc.includes(searchTerm));
         const matchesTopic = !selectedTopic || card.querySelector(`.tool-topic[data-topic="${selectedTopic}"]`);
         const matchesOS = !selectedOS || card.querySelector(`.tool-os[title="${selectedOS}"]`);
         const matchesType = !selectedType || card.querySelector(`.tool-type[data-type="${selectedType}"]`);

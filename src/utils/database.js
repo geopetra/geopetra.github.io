@@ -12,6 +12,7 @@ export const getTools = async () => {
         topic_id,
         topics(id, term)
       ),
+      tool_functions(*),
       tool_type_relations(
         type_id,
         tool_types(id, type)
