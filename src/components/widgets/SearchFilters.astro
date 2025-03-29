@@ -17,9 +17,9 @@ const { classes = {} } = Astro.props;
     Filters
   </button>
   
-  <div id="filters-dropdown" class="hidden absolute mt-2 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-50 w-64">
+  <div id="filters-dropdown" class="hidden absolute right-0 mt-2 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-50 w-72">
     <h3 class="font-bold mb-3 text-gray-700 dark:text-gray-300">Filter by Category</h3>
-    <div class="space-y-2">
+    <div class="space-y-2 max-h-40 overflow-y-auto">
       <div class="flex items-center">
         <input id="filter-geochemical" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
         <label for="filter-geochemical" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Geochemical Analysis</label>
@@ -35,6 +35,22 @@ const { classes = {} } = Astro.props;
       <div class="flex items-center">
         <input id="filter-visualization" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
         <label for="filter-visualization" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Visualization</label>
+      </div>
+      <div class="flex items-center">
+        <input id="filter-thermodynamics" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+        <label for="filter-thermodynamics" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Thermodynamics</label>
+      </div>
+      <div class="flex items-center">
+        <input id="filter-data" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+        <label for="filter-data" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Data Processing</label>
+      </div>
+      <div class="flex items-center">
+        <input id="filter-education" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+        <label for="filter-education" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Educational Resources</label>
+      </div>
+      <div class="flex items-center">
+        <input id="filter-field" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+        <label for="filter-field" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Field Tools</label>
       </div>
     </div>
     
@@ -58,6 +74,22 @@ const { classes = {} } = Astro.props;
       </div>
     </div>
     
+    <h3 class="font-bold mt-4 mb-3 text-gray-700 dark:text-gray-300">Filter by Accessibility</h3>
+    <div class="space-y-2">
+      <div class="flex items-center">
+        <input id="filter-open-source" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+        <label for="filter-open-source" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Open Source</label>
+      </div>
+      <div class="flex items-center">
+        <input id="filter-free" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+        <label for="filter-free" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Free</label>
+      </div>
+      <div class="flex items-center">
+        <input id="filter-paid" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+        <label for="filter-paid" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Paid</label>
+      </div>
+    </div>
+    
     <div class="mt-4 flex justify-between">
       <button id="clear-filters" class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
         Clear all
@@ -77,19 +109,21 @@ const { classes = {} } = Astro.props;
     const applyFiltersButton = document.getElementById('apply-filters');
     
     // Toggle filters dropdown
-    filterButton.addEventListener('click', () => {
-      filtersDropdown.classList.toggle('hidden');
+    filterButton?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      filtersDropdown?.classList.toggle('hidden');
     });
     
     // Close dropdown when clicking outside
     document.addEventListener('click', (event) => {
-      if (!filterButton.contains(event.target) && !filtersDropdown.contains(event.target)) {
+      if (filterButton && filtersDropdown && !filterButton.contains(event.target) && !filtersDropdown.contains(event.target)) {
         filtersDropdown.classList.add('hidden');
       }
     });
     
     // Clear all filters
-    clearFiltersButton.addEventListener('click', () => {
+    clearFiltersButton?.addEventListener('click', () => {
+      if (!filtersDropdown) return;
       const checkboxes = filtersDropdown.querySelectorAll('input[type="checkbox"]');
       checkboxes.forEach(checkbox => {
         checkbox.checked = false;
@@ -97,12 +131,19 @@ const { classes = {} } = Astro.props;
     });
     
     // Apply filters
-    applyFiltersButton.addEventListener('click', () => {
+    applyFiltersButton?.addEventListener('click', () => {
       const urlParams = new URLSearchParams(window.location.search);
+      
+      // Preserve search term if it exists
+      const searchTerm = urlParams.get('search');
+      urlParams.delete('search');
+      if (searchTerm) {
+        urlParams.set('search', searchTerm);
+      }
       
       // Get selected categories
       const categories = [];
-      document.querySelectorAll('[id^="filter-geochemical"], [id^="filter-phase"], [id^="filter-mineral"], [id^="filter-visualization"]').forEach(checkbox => {
+      document.querySelectorAll('[id^="filter-geochemical"], [id^="filter-phase"], [id^="filter-mineral"], [id^="filter-visualization"], [id^="filter-thermodynamics"], [id^="filter-data"], [id^="filter-education"], [id^="filter-field"]').forEach(checkbox => {
         if (checkbox.checked) {
           categories.push(checkbox.id.replace('filter-', ''));
         }
@@ -113,6 +154,14 @@ const { classes = {} } = Astro.props;
       document.querySelectorAll('[id^="filter-windows"], [id^="filter-macos"], [id^="filter-linux"], [id^="filter-web"]').forEach(checkbox => {
         if (checkbox.checked) {
           platforms.push(checkbox.id.replace('filter-', ''));
+        }
+      });
+      
+      // Get selected accessibility options
+      const accessibility = [];
+      document.querySelectorAll('[id^="filter-open-source"], [id^="filter-free"], [id^="filter-paid"]').forEach(checkbox => {
+        if (checkbox.checked) {
+          accessibility.push(checkbox.id.replace('filter-', ''));
         }
       });
       
@@ -127,6 +176,12 @@ const { classes = {} } = Astro.props;
         urlParams.set('platforms', platforms.join(','));
       } else {
         urlParams.delete('platforms');
+      }
+      
+      if (accessibility.length > 0) {
+        urlParams.set('accessibility', accessibility.join(','));
+      } else {
+        urlParams.delete('accessibility');
       }
       
       // Redirect to filtered results
@@ -150,6 +205,33 @@ const { classes = {} } = Astro.props;
         const checkbox = document.getElementById(`filter-${platform}`);
         if (checkbox) checkbox.checked = true;
       });
+    }
+    
+    if (urlParams.has('accessibility')) {
+      const accessibility = urlParams.get('accessibility').split(',');
+      accessibility.forEach(option => {
+        const checkbox = document.getElementById(`filter-${option}`);
+        if (checkbox) checkbox.checked = true;
+      });
+    }
+    
+    // Update filter button to show active state if any filters are applied
+    const hasActiveFilters = urlParams.has('categories') || urlParams.has('platforms') || urlParams.has('accessibility');
+    if (hasActiveFilters && filterButton) {
+      filterButton.classList.add('bg-blue-200', 'dark:bg-blue-700');
+      filterButton.classList.remove('bg-blue-100', 'dark:bg-blue-800');
+      
+      // Add a small indicator badge
+      const badge = document.createElement('span');
+      badge.className = 'ml-1 px-1.5 py-0.5 text-xs bg-blue-500 text-white rounded-full';
+      
+      const totalFilters = 
+        (urlParams.has('categories') ? urlParams.get('categories').split(',').length : 0) +
+        (urlParams.has('platforms') ? urlParams.get('platforms').split(',').length : 0) +
+        (urlParams.has('accessibility') ? urlParams.get('accessibility').split(',').length : 0);
+      
+      badge.textContent = totalFilters.toString();
+      filterButton.appendChild(badge);
     }
   });
 </script>
