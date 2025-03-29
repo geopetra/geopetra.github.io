@@ -23,7 +23,7 @@ const { metadata } = Astro.props;
     <Header {...headerData} isSticky showRssFeed showToggleTheme />
   </slot>
   <!-- Filter dropdown container that appears below header -->
-  <div id="filter-dropdown-container" class="w-full"></div>
+  <div id="filter-dropdown-container" class="w-full sticky top-[var(--header-height)] z-30"></div>
   <main>
     <slot />
   </main>
@@ -35,7 +35,7 @@ const { metadata } = Astro.props;
 <style>
   /* Styles for the filter dropdown container */
   #filter-dropdown-container {
-    position: relative;
+    position: sticky;
     z-index: 30;
   }
   
@@ -65,5 +65,15 @@ const { metadata } = Astro.props;
     
     // Update after a short delay to ensure all elements are rendered
     setTimeout(updateHeaderHeight, 100);
+    
+    // Move the filter dropdown to the container below header if we're on the tools page
+    const path = window.location.pathname;
+    if (path.startsWith('/tools')) {
+      const advancedFilters = document.getElementById('advanced-filters-header');
+      const container = document.getElementById('filter-dropdown-container');
+      if (advancedFilters && container) {
+        container.appendChild(advancedFilters);
+      }
+    }
   });
 </script>

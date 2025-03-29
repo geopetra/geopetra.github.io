@@ -47,7 +47,7 @@ const {
   </div>
   
   <!-- Advanced filters - collapsible -->
-  <div id={`advanced-filters${compactMode ? '-header' : ''}`} class={`${compactMode ? 'fixed left-0 right-0 top-[var(--header-height)] bg-white dark:bg-gray-800 shadow-lg z-[100] border-t border-gray-200 dark:border-gray-700 transition-all duration-300' : ''} p-4 ${compactMode ? 'max-h-0 py-0 overflow-hidden opacity-0' : 'hidden'}`}>
+  <div id={`advanced-filters${compactMode ? '-header' : ''}`} class={`${compactMode ? 'w-full bg-white dark:bg-gray-800 shadow-md z-[100] border-t border-gray-200 dark:border-gray-700 transition-all duration-300 overflow-hidden' : ''} p-4 ${compactMode ? 'max-h-0 py-0 opacity-0' : 'hidden'}`}>
     <div class="flex flex-wrap gap-4 mb-4 max-w-7xl mx-auto px-4">
       <div class="w-full md:w-auto">
         <label for="topic-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Topic</label>
@@ -147,34 +147,22 @@ const {
             if (advancedFilters.classList.contains('max-h-0')) {
               // Open the dropdown
               advancedFilters.classList.remove('max-h-0');
-              advancedFilters.classList.add('max-h-[500px]');
+              advancedFilters.classList.add('max-h-[300px]');
               advancedFilters.classList.remove('py-0');
               advancedFilters.classList.add('py-4');
               advancedFilters.classList.remove('opacity-0');
               advancedFilters.classList.add('opacity-100');
-              
-              // Add body padding to prevent content jump
-              document.body.style.paddingTop = '500px';
-              
-              // Move the filter dropdown to the container below header
-              const container = document.getElementById('filter-dropdown-container');
-              if (container) {
-                container.appendChild(advancedFilters);
-              }
               
               // Force a reflow to ensure the transition works
               void advancedFilters.offsetHeight;
             } else {
               // Close the dropdown
               advancedFilters.classList.add('max-h-0');
-              advancedFilters.classList.remove('max-h-[500px]');
+              advancedFilters.classList.remove('max-h-[300px]');
               advancedFilters.classList.add('py-0');
               advancedFilters.classList.remove('py-4');
               advancedFilters.classList.remove('opacity-100');
               advancedFilters.classList.add('opacity-0');
-              
-              // Remove body padding
-              document.body.style.paddingTop = '0';
             }
           } else {
             // For regular version, use hidden class
@@ -195,14 +183,11 @@ const {
             if (suffix === '-header') {
               // For header version, use max-height transition
               advancedFilters.classList.add('max-h-0');
-              advancedFilters.classList.remove('max-h-[500px]');
+              advancedFilters.classList.remove('max-h-[300px]');
               advancedFilters.classList.add('py-0');
               advancedFilters.classList.remove('py-4');
               advancedFilters.classList.remove('opacity-100');
               advancedFilters.classList.add('opacity-0');
-              
-              // Remove body padding
-              document.body.style.paddingTop = '0';
             } else {
               // For regular version, use hidden class
               advancedFilters.classList.add('hidden');

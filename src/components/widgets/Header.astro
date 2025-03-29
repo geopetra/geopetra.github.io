@@ -94,7 +94,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       class="items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-y-visible md:overflow-x-auto md:justify-self-center"
       aria-label="Main navigation"
     >
-      {currentPath !== '/' && (
+      {currentPath.startsWith('/tools') && (
         <div class="md:mr-0 mb-4 md:mb-0 w-full flex flex-col flex-grow">
           <div class="w-full">
             <ToolSearch 
