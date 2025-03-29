@@ -36,18 +36,12 @@ const metadata = {
       <p class="text-lg text-gray-600 dark:text-slate-400">
         Browse and search for tools used in petrology research
       </p>
+      <p class="text-sm text-gray-500 dark:text-slate-500 mt-2">
+        Use the search and filter options in the header to find specific tools
+      </p>
     </div>
 
-    <!-- Search and Filter Component -->
-    <div class="mb-6 sticky top-0 z-10">
-      <ToolSearch 
-        topics={topics} 
-        operatingSystems={operatingSystems} 
-        toolTypes={toolTypes} 
-        languages={languages}
-        initialSearchTerm={searchTerm}
-      />
-    </div>
+    <!-- Search and Filter Component removed - now in header -->
     
     <!-- View Toggle -->
     <div class="flex justify-end mb-4">
