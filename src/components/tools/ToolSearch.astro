@@ -136,7 +136,7 @@ const {
       const advancedFilters = document.getElementById(`advanced-filters${suffix}`);
       const filterIconDown = document.getElementById(`filter-icon-down${suffix}`);
       const filterIconUp = document.getElementById(`filter-icon-up${suffix}`);
-      const searchInput = document.getElementById(`search${suffix}`);
+      const searchInput = document.getElementById(`search${suffix}`) as HTMLInputElement;
       const searchButton = document.getElementById(`search-button${suffix}`);
       
       // Toggle advanced filters visibility
@@ -150,7 +150,10 @@ const {
         
         // Close dropdown when clicking outside
         document.addEventListener('click', (event) => {
-          if (toggleFilters && advancedFilters && !toggleFilters.contains(event.target) && !advancedFilters.contains(event.target)) {
+          const target = event.target as Node;
+          if (toggleFilters && advancedFilters && 
+              !toggleFilters.contains(target) && 
+              !advancedFilters.contains(target)) {
             advancedFilters.classList.add('hidden');
             filterIconDown?.classList.remove('hidden');
             filterIconUp?.classList.add('hidden');
@@ -189,10 +192,9 @@ const {
       }
       
       if (topicParam) {
-        const topicFilter = document.getElementById('topic-filter');
+        const topicFilter = document.getElementById('topic-filter') as HTMLSelectElement;
         if (topicFilter) {
-          // Find the option with matching text
-          Array.from(topicFilter.options).forEach(option => {
+          Array.from(topicFilter.options).forEach((option: HTMLOptionElement) => {
             if (option.text === topicParam) {
               option.selected = true;
             }
