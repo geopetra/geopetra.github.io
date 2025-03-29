@@ -10,7 +10,7 @@ const {
 } = Astro.props;
 ---
 
-<div class={`${compactMode ? '' : 'mb-6 bg-gray-50 dark:bg-gray-800 rounded-lg'} overflow-hidden`}>
+<div class={`${compactMode ? '' : 'mb-6 bg-gray-50 dark:bg-gray-800 rounded-lg'} overflow-hidden relative`}>
   <!-- Search bar - always visible -->
   <div class={`${compactMode ? 'p-0' : 'p-4 border-b border-gray-200 dark:border-gray-700'}`}>
     <div class="flex gap-2">
@@ -47,7 +47,7 @@ const {
   </div>
   
   <!-- Advanced filters - collapsible -->
-  <div id={`advanced-filters${compactMode ? '-header' : ''}`} class={`${compactMode ? 'fixed left-0 right-0 top-[60px] bg-white dark:bg-gray-800 shadow-lg z-50 border-t border-gray-200 dark:border-gray-700' : ''} p-4 hidden`}>
+  <div id={`advanced-filters${compactMode ? '-header' : ''}`} class={`${compactMode ? 'absolute left-0 right-0 top-full bg-white dark:bg-gray-800 shadow-lg z-50 border-t border-gray-200 dark:border-gray-700 transition-all duration-300' : ''} p-4 ${compactMode ? 'max-h-0 py-0 overflow-hidden' : 'hidden'}`}>
     <div class="flex flex-wrap gap-4 mb-4 max-w-7xl mx-auto">
       <div class="w-full md:w-auto">
         <label for="topic-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Topic</label>
@@ -141,19 +141,27 @@ const {
       if (toggleFilters && advancedFilters) {
         toggleFilters.addEventListener('click', (e) => {
           e.stopPropagation();
-          advancedFilters.classList.toggle('hidden');
+          
+          if (suffix === '-header') {
+            // For header version, use max-height transition
+            if (advancedFilters.classList.contains('max-h-0')) {
+              advancedFilters.classList.remove('max-h-0');
+              advancedFilters.classList.add('max-h-[500px]');
+              advancedFilters.classList.remove('py-0');
+              advancedFilters.classList.add('py-4');
+            } else {
+              advancedFilters.classList.add('max-h-0');
+              advancedFilters.classList.remove('max-h-[500px]');
+              advancedFilters.classList.add('py-0');
+              advancedFilters.classList.remove('py-4');
+            }
+          } else {
+            // For regular version, use hidden class
+            advancedFilters.classList.toggle('hidden');
+          }
+          
           filterIconDown?.classList.toggle('hidden');
           filterIconUp?.classList.toggle('hidden');
-          
-          // Add/remove body padding to prevent content jump when filter bar appears
-          if (suffix === '-header' && !advancedFilters.classList.contains('hidden')) {
-            // Wait for the filter bar to render before measuring its height
-            setTimeout(() => {
-              document.body.style.paddingTop = advancedFilters.offsetHeight + 'px';
-            }, 10);
-          } else if (suffix === '-header') {
-            document.body.style.paddingTop = '0';
-          }
         });
         
         // Close dropdown when clicking outside
@@ -162,14 +170,20 @@ const {
           if (toggleFilters && advancedFilters && 
               !toggleFilters.contains(target) && 
               !advancedFilters.contains(target)) {
-            advancedFilters.classList.add('hidden');
+            
+            if (suffix === '-header') {
+              // For header version, use max-height transition
+              advancedFilters.classList.add('max-h-0');
+              advancedFilters.classList.remove('max-h-[500px]');
+              advancedFilters.classList.add('py-0');
+              advancedFilters.classList.remove('py-4');
+            } else {
+              // For regular version, use hidden class
+              advancedFilters.classList.add('hidden');
+            }
+            
             filterIconDown?.classList.remove('hidden');
             filterIconUp?.classList.add('hidden');
-            
-            // Reset body padding
-            if (suffix === '-header') {
-              document.body.style.paddingTop = '0';
-            }
           }
         });
       }
