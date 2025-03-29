@@ -408,3 +408,338 @@ const metadata = {
     filterTools();
   });
 </script>
+---
+import Layout from '~/layouts/PageLayout.astro';
+import { getTools, getAllTopics, getAllOperatingSystems, getAllToolTypes, getAllLanguages } from '~/utils/database';
+import ToolSearch from '~/components/tools/ToolSearch.astro';
+import { Icon } from 'astro-icon/components';
+import { Image } from 'astro:assets';
+import OSLogo from '~/components/tools/OSLogo.astro';
+
+// Get search parameter from URL
+const searchTerm = Astro.url.searchParams.get('search') || '';
+
+// Fetch all tools and filter options
+const tools = await getTools();
+const topics = await getAllTopics();
+const operatingSystems = await getAllOperatingSystems();
+const toolTypes = await getAllToolTypes();
+const languages = await getAllLanguages();
+
+const metadata = {
+  title: 'Petrology Tools',
+  description: 'Browse and search for tools used in petrology research',
+};
+---
+
+<Layout metadata={metadata}>
+  <section class="px-4 py-8 sm:px-6 mx-auto lg:px-8 lg:py-12 max-w-6xl">
+    <div class="mb-6 md:mx-auto text-center md:mb-8 max-w-3xl">
+      <h1 class="text-3xl md:text-4xl font-bold leading-tighter tracking-tighter mb-2 font-heading">
+        Petrology Tools
+      </h1>
+      <p class="text-lg text-gray-600 dark:text-slate-400">
+        Browse and search for tools used in petrology research
+      </p>
+    </div>
+
+    <!-- Search and Filter Component -->
+    <div class="mb-6 sticky top-0 z-10">
+      <ToolSearch 
+        topics={topics} 
+        operatingSystems={operatingSystems} 
+        toolTypes={toolTypes} 
+        languages={languages}
+        initialSearchTerm={searchTerm}
+      />
+    </div>
+    
+    <!-- View Toggle -->
+    <div class="flex justify-end mb-4">
+      <div class="inline-flex rounded-md shadow-sm" role="group">
+        <button 
+          type="button" 
+          id="grid-view-btn"
+          class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white active-view"
+        >
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" clip-rule="evenodd"></path>
+          </svg>
+        </button>
+        <button 
+          type="button" 
+          id="list-view-btn"
+          class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-r-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+        >
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tools Grid -->
+    <div id="tools-grid" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {tools.map((tool) => (
+        <div 
+          class="tool-card flex flex-col border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg"
+          data-accessibility={tool.accessibility}
+        >
+          <div class="p-4 flex-grow">
+            <div class="flex items-center gap-2 mb-1">
+              <h2 class="text-lg font-bold tool-name">{tool.name}</h2>
+              {tool.operatingSystems && tool.operatingSystems.length > 0 && (
+                <div class="flex items-center">
+                  <span class="flex gap-1">
+                    {tool.operatingSystems.map((os) => (
+                      <span class="tool-os inline-block w-4 h-4" title={os.name}>
+                        <OSLogo name={os.name} />
+                      </span>
+                    ))}
+                  </span>
+                </div>
+              )}
+            </div>
+            <p class="text-sm text-gray-700 dark:text-gray-300 mb-3 line-clamp-2 tool-description">{tool.description}</p>
+            
+            <div class="flex flex-wrap gap-1 mb-3">
+              {tool.topics && tool.topics.slice(0, 3).map((topic) => (
+                <span class="tool-topic px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-full">
+                  {topic.term}
+                </span>
+              ))}
+              {tool.topics && tool.topics.length > 3 && (
+                <span class="px-2 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full">
+                  +{tool.topics.length - 3}
+                </span>
+              )}
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+              {tool.accessibility && (
+                <span class="text-xs">
+                  {tool.accessibility}
+                </span>
+              )}
+              
+              {tool.toolTypes && tool.toolTypes.length > 0 && (
+                <span class="text-xs">
+                  {tool.toolTypes.map((type, i) => (
+                    <span class="tool-type">
+                      {i > 0 ? ', ' : ''}{type.type}
+                    </span>
+                  ))}
+                </span>
+              )}
+            </div>
+          </div>
+          
+          <div class="p-3 bg-gray-50 dark:bg-gray-800 flex justify-between items-center">
+            <a 
+              href={`/tools/${tool.petrahubid}`} 
+              class="text-sm px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+            >
+              Details
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+    
+    <!-- Tools List (hidden by default) -->
+    <div id="tools-list" class="flex flex-col gap-3 hidden">
+      {tools.map((tool) => (
+        <div 
+          class="tool-card flex border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg"
+          data-accessibility={tool.accessibility}
+        >
+          <div class="p-4 flex-grow">
+            <div class="flex justify-between items-start">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <h2 class="text-lg font-bold tool-name">{tool.name}</h2>
+                  {tool.operatingSystems && tool.operatingSystems.length > 0 && (
+                    <div class="flex items-center">
+                      <span class="flex gap-1">
+                        {tool.operatingSystems.map((os) => (
+                          <span class="tool-os inline-block w-4 h-4" title={os.name}>
+                            <OSLogo name={os.name} />
+                          </span>
+                        ))}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-2 line-clamp-2 tool-description">{tool.description}</p>
+              </div>
+              <a 
+                href={`/tools/${tool.petrahubid}`} 
+                class="text-sm px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors ml-4"
+              >
+                Details
+              </a>
+            </div>
+            
+            <div class="flex flex-wrap gap-1 mb-2">
+              {tool.topics && tool.topics.slice(0, 5).map((topic) => (
+                <span class="tool-topic px-2 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-full">
+                  {topic.term}
+                </span>
+              ))}
+              {tool.topics && tool.topics.length > 5 && (
+                <span class="px-2 py-0.5 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full">
+                  +{tool.topics.length - 5}
+                </span>
+              )}
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-3 text-xs text-gray-600 dark:text-gray-400">
+              {tool.accessibility && (
+                <span>
+                  {tool.accessibility}
+                </span>
+              )}
+              
+              {tool.toolTypes && tool.toolTypes.length > 0 && (
+                <span>
+                  {tool.toolTypes.map((type, i) => (
+                    <span class="tool-type">
+                      {i > 0 ? ', ' : ''}{type.type}
+                    </span>
+                  ))}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+    
+    <!-- No Results Message -->
+    <div id="no-results" class="hidden text-center py-10">
+      <h3 class="text-xl font-semibold">No tools match your search criteria</h3>
+      <p class="text-gray-600 dark:text-gray-400 mt-2">Try adjusting your filters or search term</p>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // Client-side JavaScript for search and filtering
+  document.addEventListener('DOMContentLoaded', () => {
+    // Get DOM elements
+    const searchInput = document.querySelector<HTMLInputElement>('#search');
+    const searchButton = document.querySelector<HTMLButtonElement>('#search-button');
+    const topicFilter = document.querySelector<HTMLSelectElement>('#topic-filter');
+    const osFilter = document.querySelector<HTMLSelectElement>('#os-filter');
+    const typeFilter = document.querySelector<HTMLSelectElement>('#type-filter');
+    const languageFilter = document.querySelector<HTMLSelectElement>('#language-filter');
+    const accessibilityFilter = document.querySelector<HTMLSelectElement>('#accessibility-filter');
+    const resetButton = document.querySelector<HTMLButtonElement>('#reset-filters');
+    const toolCards = document.querySelectorAll<HTMLElement>('.tool-card');
+    const noResults = document.querySelector<HTMLElement>('#no-results');
+    
+    // View toggle elements
+    const gridViewBtn = document.querySelector<HTMLButtonElement>('#grid-view-btn');
+    const listViewBtn = document.querySelector<HTMLButtonElement>('#list-view-btn');
+    const toolsGrid = document.querySelector<HTMLElement>('#tools-grid');
+    const toolsList = document.querySelector<HTMLElement>('#tools-list');
+
+    // Filter function
+    const filterTools = () => {
+      if (!searchInput) return;
+      
+      const searchTerm = searchInput.value.toLowerCase();
+      const selectedTopic = topicFilter?.value ?? '';
+      const selectedOS = osFilter?.value ?? '';
+      const selectedType = typeFilter?.value ?? '';
+      const selectedLanguage = languageFilter?.value ?? '';
+      const selectedAccessibility = accessibilityFilter?.value ?? '';
+      
+      let visibleCount = 0;
+      
+      toolCards.forEach(card => {
+        const name = card.querySelector('.tool-name')?.textContent?.toLowerCase() ?? '';
+        const description = card.querySelector('.tool-description')?.textContent?.toLowerCase() ?? '';
+        const accessibility = card.dataset.accessibility?.toLowerCase() ?? '';
+        
+        // Match conditions
+        const matchesSearch = name.includes(searchTerm) || description.includes(searchTerm);
+        const matchesTopic = !selectedTopic || card.querySelector(`.tool-topic[data-topic="${selectedTopic}"]`);
+        const matchesOS = !selectedOS || card.querySelector(`.tool-os[title="${selectedOS}"]`);
+        const matchesType = !selectedType || card.querySelector(`.tool-type[data-type="${selectedType}"]`);
+        const matchesLanguage = !selectedLanguage || card.querySelector(`.tool-language[data-language="${selectedLanguage}"]`);
+        const matchesAccessibility = !selectedAccessibility || accessibility.includes(selectedAccessibility.toLowerCase());
+        
+        // Show/hide based on all conditions
+        if (matchesSearch && matchesTopic && matchesOS && matchesType && matchesLanguage && matchesAccessibility) {
+          card.style.display = '';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      
+      // Toggle no results message
+      if (noResults) {
+        noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+      }
+    };
+
+    // Reset filters
+    const resetFilters = () => {
+      [searchInput, topicFilter, osFilter, typeFilter, languageFilter, accessibilityFilter].forEach(filter => {
+        if (filter) filter.value = '';
+      });
+      
+      toolCards.forEach(card => card.style.display = '');
+      if (noResults) noResults.style.display = 'none';
+    };
+
+    // View toggles
+    const showGridView = () => {
+      if (!toolsGrid || !toolsList || !gridViewBtn || !listViewBtn) return;
+      
+      toolsGrid.classList.remove('hidden');
+      toolsList.classList.add('hidden');
+      gridViewBtn.classList.add('active-view');
+      listViewBtn.classList.remove('active-view');
+      localStorage.setItem('toolsViewPreference', 'grid');
+    };
+
+    const showListView = () => {
+      if (!toolsGrid || !toolsList || !gridViewBtn || !listViewBtn) return;
+      
+      toolsGrid.classList.add('hidden');
+      toolsList.classList.remove('hidden');
+      gridViewBtn.classList.remove('active-view');
+      listViewBtn.classList.add('active-view');
+      localStorage.setItem('toolsViewPreference', 'list');
+    };
+
+    // Event listeners
+    searchInput?.addEventListener('input', filterTools);
+    searchButton?.addEventListener('click', (e) => {
+      e.preventDefault();
+      filterTools();
+    });
+    
+    [topicFilter, osFilter, typeFilter, languageFilter, accessibilityFilter].forEach(filter => {
+      filter?.addEventListener('change', filterTools);
+    });
+    
+    resetButton?.addEventListener('click', resetFilters);
+    gridViewBtn?.addEventListener('click', showGridView);
+    listViewBtn?.addEventListener('click', showListView);
+
+    // Initialize view based on preference
+    const viewPreference = localStorage.getItem('toolsViewPreference');
+    if (viewPreference === 'list') {
+      showListView();
+    } else {
+      showGridView();
+    }
+
+    // Initial filter
+    filterTools();
+  });
+</script>

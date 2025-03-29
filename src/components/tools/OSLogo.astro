@@ -1,0 +1,34 @@
+---
+import { osLogos } from '~/components/Favicons.astro';
+
+interface Props {
+  name: string;
+  size?: string;
+}
+
+const { name, size = "w-4 h-4" } = Astro.props;
+
+// Map OS names to keys in the osLogos object
+const osMap: Record<string, keyof typeof osLogos> = {
+  'Windows': 'windows',
+  'Mac': 'apple',
+  'Linux': 'linux'
+};
+
+const osKey = osMap[name];
+---
+
+{osKey && (
+  <>
+    <img 
+      src={osLogos[osKey].black} 
+      alt={name} 
+      class={`${size} dark:hidden`} 
+    />
+    <img 
+      src={osLogos[osKey].white} 
+      alt={name} 
+      class={`${size} hidden dark:block`} 
+    />
+  </>
+)}
