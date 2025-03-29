@@ -94,7 +94,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       aria-label="Main navigation"
     >
       {currentPath !== '/' && (
-        <div class="md:mr-4 mb-4 md:mb-0 w-full flex flex-col flex-grow">
+        <div class="md:mr-0 mb-4 md:mb-0 w-full flex flex-col flex-grow">
           <div class="w-full">
             <ToolSearch 
               topics={topics} 
