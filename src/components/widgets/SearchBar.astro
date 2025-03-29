@@ -38,7 +38,12 @@ const {
     const searchInputs = document.querySelectorAll('[id^="search"]');
     
     searchInputs.forEach(searchInput => {
-      const searchButton = searchInput.parentElement.querySelector('[aria-label="Search"]');
+      if (!(searchInput instanceof HTMLInputElement)) return;
+      
+      const parentElement = searchInput.parentElement;
+      if (!parentElement) return;
+      
+      const searchButton = parentElement.querySelector('[aria-label="Search"]');
       
       // Function to handle search
       const performSearch = () => {
@@ -50,7 +55,7 @@ const {
       
       // Event listeners
       // Handle Enter key press
-      searchInput.addEventListener('keypress', (e) => {
+      searchInput.addEventListener('keypress', (e: KeyboardEvent) => {
         if (e.key === 'Enter') {
           performSearch();
         }

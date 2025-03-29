@@ -47,7 +47,7 @@ const { classes = {} } = Astro.props;
       
       // Add click event to update sort parameter
       button.addEventListener('click', () => {
-        const sortType = button.getAttribute('data-sort');
+        const sortType = button.getAttribute('data-sort') || 'name';
         urlParams.set('sort', sortType);
         window.location.href = `${window.location.pathname}?${urlParams.toString()}`;
       });

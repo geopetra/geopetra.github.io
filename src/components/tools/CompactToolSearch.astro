@@ -29,12 +29,13 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const quickSearch = document.getElementById('quick-search');
+    const quickSearch = document.getElementById('quick-search') as HTMLInputElement;
     const searchButton = document.getElementById('search-button');
     const advancedSearch = document.getElementById('advanced-search');
     
     // Handle search button click
     function performSearch() {
+      if (!quickSearch) return;
       const searchTerm = quickSearch.value.trim();
       if (searchTerm) {
         window.location.href = `/tools?search=${encodeURIComponent(searchTerm)}`;
