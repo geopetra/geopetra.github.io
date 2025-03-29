@@ -6,7 +6,7 @@ import Note from '~/components/widgets/Note.astro';
 import Features from '~/components/widgets/Features.astro';
 import Features2 from '~/components/widgets/Features2.astro';
 import Content from '~/components/widgets/Content.astro';
-import BlogLatestPosts from '~/components/widgets/BlogLatestPosts.astro';
+import SearchBar from '~/components/widgets/SearchBar.astro';
 import FAQs from '~/components/widgets/FAQs.astro';
 import Stats from '~/components/widgets/Stats.astro';
 import CallToAction from '~/components/widgets/CallToAction.astro';
@@ -22,16 +22,10 @@ const metadata = {
 
   <Hero
     actions={[
-      {
-        variant: 'primary',
-        text: 'Get template',
-        href: 'https://github.com/onwidget/astrowind',
-        target: '_blank',
-        icon: 'tabler:download',
-      },
+      { text: 'Explore Tools', href: '/tools', variant: 'primary' },
       { text: 'Learn more', href: '#features' },
     ]}
-    image={{ src: '~/assets/images/hero-image.png', alt: 'AstroWind Hero Image' }}
+    image={{ src: '~/assets/images/hero-image.png', alt: 'PETRA Hero Image' }}
   >
     <Fragment slot="title">
       <span class="text-accent dark:text-white highlight"> PETRA</span>: Petrology Tools, Resources, and Applications
@@ -40,6 +34,17 @@ const metadata = {
     <Fragment slot="subtitle">
       <span class="hidden sm:inline">
         <span class="font-semibold">PETRA</span> is a community-driven hub designed to centralise petrological resources, ensuring easy accessibility for all researchers to the latest tools and methods.
+      </span>
+      
+      <div class="mt-8">
+        <SearchBar 
+          placeholder="Search for petrological tools..." 
+          classes={{ 
+            container: "mt-4",
+            input: "text-lg py-4" 
+          }}
+        />
+      </div>
     </Fragment>
   </Hero>
 
@@ -333,26 +338,54 @@ const metadata = {
     ]}
   />
 
+  <!-- About Section ***************** -->
+  
+  <Content
+    id="about"
+    tagline="About Us"
+    title="About PETRA"
+    isReversed
+    image={{
+      src: 'https://images.unsplash.com/photo-1581093458791-9f3c3900df7b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80',
+      alt: 'Petrological research',
+    }}
+  >
+    <Fragment slot="content">
+      <p class="mb-4">
+        PETRA (Petrology Tools, Resources, and Applications) is a community-driven hub designed to centralize petrological resources, ensuring easy accessibility for all researchers to the latest tools and methods.
+      </p>
+      <p class="mb-4">
+        Our mission is to foster collaboration, innovation, and knowledge sharing within the petrology community by providing a comprehensive database of tools, resources, and applications relevant to petrological research.
+      </p>
+      <p>
+        Whether you're a student, researcher, or industry professional, PETRA aims to be your go-to platform for discovering and utilizing the best tools available in the field of petrology.
+      </p>
+    </Fragment>
+    
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
   <!-- CallToAction Widget *********** -->
 
   <CallToAction
     actions={[
       {
         variant: 'primary',
-        text: 'Get template',
-        href: 'https://github.com/onwidget/astrowind',
-        target: '_blank',
-        icon: 'tabler:download',
+        text: 'Contribute',
+        href: '/contribute',
+        icon: 'tabler:plus',
       },
     ]}
   >
     <Fragment slot="title">
-      Astro&nbsp;+&nbsp;<br class="block sm:hidden" /><span class="sm:whitespace-nowrap">Tailwind CSS</span>
+      Join Our Community
     </Fragment>
 
     <Fragment slot="subtitle">
-      Be very surprised by these huge fake numbers you are seeing on this page. <br class="hidden md:inline" />Don't
-      waste more time! :P
+      Help us grow the PETRA database by contributing your tools and resources. <br class="hidden md:inline" />
+      Together, we can build a comprehensive resource for the petrology community.
     </Fragment>
   </CallToAction>
 </Layout>

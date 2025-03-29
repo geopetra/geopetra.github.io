@@ -1,0 +1,50 @@
+---
+export interface Props {
+  id?: string;
+  placeholder?: string;
+  classes?: Record<string, string>;
+}
+
+const {
+  id = 'search',
+  placeholder = 'Search for tools...',
+  classes = {},
+} = Astro.props;
+---
+
+<div class:list={["search-container w-full max-w-3xl mx-auto", classes?.container]}>
+  <div class="relative">
+    <input
+      type="text"
+      id={id}
+      class:list={["w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", classes?.input]}
+      placeholder={placeholder}
+    />
+    <button 
+      type="submit" 
+      class:list={["absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-500", classes?.button]}
+      aria-label="Search"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  // Basic search functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('search');
+    if (searchInput) {
+      searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          const query = searchInput.value;
+          if (query.trim()) {
+            window.location.href = `/tools?search=${encodeURIComponent(query)}`;
+          }
+        }
+      });
+    }
+  });
+</script>
