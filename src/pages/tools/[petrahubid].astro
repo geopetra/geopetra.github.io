@@ -42,20 +42,43 @@ const metadata = {
     <div class="grid gap-6 row-gap-10 md:grid-cols-1">
       <div class="md:pb-6 md:pr-16">
         <div class="flex items-center justify-between mb-8">
+          <h2 class="text-3xl font-bold tracking-tight sm:text-4xl sm:leading-none">{tool.name}</h2>
           <div class="flex items-center gap-4">
-            {tool.name === 'LinaForma' && (
-              <img 
-                src="/src/assets/tool_logos/linaforma_logo.png" 
-                alt="LinaForma Logo" 
-                class="h-12 w-auto"
-              />
-            )}
-            <h2 class="text-3xl font-bold tracking-tight sm:text-4xl sm:leading-none">{tool.name}</h2>
+            {/* Try to load logo based on petrahubid */}
+            {(() => {
+              try {
+                // Dynamically import the logo if it exists
+                const logoPath = `/src/assets/tool_logos/${tool.petrahubid.toLowerCase()}_logo`;
+                return (
+                  <div class="h-12 flex items-center">
+                    <img 
+                      src={`${logoPath}.png`}
+                      alt={`${tool.name} Logo`}
+                      class="h-12 w-auto"
+                      onError={`
+                        this.onerror=null;
+                        try {
+                          this.src='${logoPath}.jpg';
+                        } catch(e) {
+                          try {
+                            this.src='${logoPath}.svg';
+                          } catch(e) {
+                            this.style.display='none';
+                          }
+                        }
+                      `}
+                    />
+                  </div>
+                );
+              } catch (e) {
+                return null;
+              }
+            })()}
+            <a href="/tools" class="text-blue-600 hover:text-blue-800 flex items-center">
+              <Icon name="tabler:arrow-left" class="w-5 h-5 mr-1" />
+              Back to Tools
+            </a>
           </div>
-          <a href="/tools" class="text-blue-600 hover:text-blue-800 flex items-center">
-            <Icon name="tabler:arrow-left" class="w-5 h-5 mr-1" />
-            Back to Tools
-          </a>
         </div>
 
         {tool.version && (
