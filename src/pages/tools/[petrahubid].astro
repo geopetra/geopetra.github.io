@@ -135,7 +135,7 @@ const metadata = {
           <div class="mb-8">
             <h3 class="font-semibold mb-3">Topics</h3>
             <div class="flex flex-wrap gap-2">
-              {tool.topics.map((topic) => (
+              {tool.topics.map((topic: { term: string }) => (
                 <span class="px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 rounded-full">
                   {topic.term}
                 </span>
@@ -148,7 +148,7 @@ const metadata = {
           <div class="mb-8">
             <h3 class="font-semibold mb-3">Functions</h3>
             <ul class="list-disc pl-5 space-y-2">
-              {tool.functions.map((func) => (
+              {tool.functions.map((func: { operation?: string; function_name?: string; note?: string }) => (
                 <li>
                   <span class="font-medium">{func.operation || func.function_name || ''}</span>
                   {func.note && <span class="text-gray-600 dark:text-gray-400"> - {func.note}</span>}
@@ -162,7 +162,7 @@ const metadata = {
           <div class="mb-8">
             <h3 class="font-semibold mb-3">Operating Systems</h3>
             <div class="flex flex-wrap gap-2">
-              {tool.operatingSystems.map((os) => (
+              {tool.operatingSystems.map((os: { name: string }) => (
                 <span class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-full">
                   {os.name}
                 </span>
@@ -175,7 +175,7 @@ const metadata = {
           <div class="mb-8">
             <h3 class="font-semibold mb-3">Tool Types</h3>
             <div class="flex flex-wrap gap-2">
-              {tool.toolTypes.map((type) => (
+              {tool.toolTypes.map((type: { type: string }) => (
                 <span class="px-3 py-1 text-sm bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 rounded-full">
                   {type.type}
                 </span>
@@ -188,7 +188,7 @@ const metadata = {
           <div class="mb-8">
             <h3 class="font-semibold mb-3">Programming Languages</h3>
             <div class="flex flex-wrap gap-2">
-              {tool.languages.map((lang) => (
+              {tool.languages.map((lang: { name: string }) => (
                 <span class="px-3 py-1 text-sm bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 rounded-full">
                   {lang.name}
                 </span>
@@ -205,7 +205,7 @@ const metadata = {
                   const citationData = typeof tool.citation === 'string' ? JSON.parse(tool.citation) : tool.citation;
                   return (
                     <div>
-                      {citationData.papers && citationData.papers.map((paper) => (
+                      {citationData.papers && citationData.papers.map((paper: { title: string; authors: string; year: string; journal: string; doi?: string }) => (
                         <div class="mb-3 last:mb-0">
                           <p class="font-medium">{paper.title}</p>
                           <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -238,7 +238,7 @@ const metadata = {
                   const supportData = typeof tool.support === 'string' ? JSON.parse(tool.support) : tool.support;
                   return (
                     <div>
-                      {supportData.contacts && supportData.contacts.map((contact) => (
+                      {supportData.contacts && supportData.contacts.map((contact: { name: string; role?: string; email?: string }) => (
                         <div class="mb-2 last:mb-0">
                           <p class="font-medium">{contact.name} {contact.role && `(${contact.role})`}</p>
                           {contact.email && (

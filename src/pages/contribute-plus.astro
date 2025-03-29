@@ -1,7 +1,6 @@
 ---
 import Layout from '~/layouts/PageLayout.astro';
 import Hero from '~/components/widgets/Hero.astro';
-import Content from '~/components/widgets/Content.astro';
 
 const metadata = {
   title: 'Contribute+ | PETRA',
@@ -210,61 +209,64 @@ const metadata = {
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('contribute-form');
+    const form = document.getElementById('contribute-form') as HTMLFormElement;
     const successMessage = document.getElementById('success-message');
     
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      // Collect form data
-      const formData = new FormData(form);
-      const formDataObj = {};
-      
-      // Convert platforms and categories checkboxes to arrays
-      const platforms = [];
-      const categories = [];
-      
-      formData.forEach((value, key) => {
-        if (key === 'platforms') {
-          platforms.push(value);
-        } else if (key === 'categories') {
-          categories.push(value);
-        } else {
-          formDataObj[key] = value;
-        }
+    if (form && successMessage) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Collect form data
+        const formData = new FormData(form);
+        const formDataObj: Record<string, any> = {};
+        
+        // Convert platforms and categories checkboxes to arrays
+        const platforms: string[] = [];
+        const categories: string[] = [];
+        
+        formData.forEach((value, key) => {
+          if (key === 'platforms') {
+            platforms.push(value.toString());
+          } else if (key === 'categories') {
+            categories.push(value.toString());
+          } else {
+            formDataObj[key] = value;
+          }
+        });
+        
+        formDataObj.platforms = platforms;
+        formDataObj.categories = categories;
+        
+        // Prepare email content
+        const emailContent = `
+          New Tool Submission:
+          
+          Tool Name: ${formDataObj.toolName}
+          Description: ${formDataObj.toolDescription}
+          Website: ${formDataObj.toolWebsite || 'N/A'}
+          Repository: ${formDataObj.toolRepository || 'N/A'}
+          Tool Type: ${formDataObj.toolType}
+          License: ${formDataObj.toolLicense || 'N/A'}
+          Platforms: ${platforms.join(', ') || 'N/A'}
+          Categories: ${categories.join(', ') || 'N/A'}
+          
+          Contributor:
+          Name: ${formDataObj.contributorName}
+          Email: ${formDataObj.contributorEmail}
+          Additional Info: ${formDataObj.additionalInfo || 'N/A'}
+        `;
+        
+        // In a real implementation, you would send this data to a server
+        // For now, we'll simulate a successful submission
+        console.log('Form submission data:', formDataObj);
+        console.log('Email content:', emailContent);
+        
+        // Show success message
+        form.reset();
+        form.classList.add('hidden');
+        successMessage.classList.remove('hidden');
       });
-      
-      formDataObj.platforms = platforms;
-      formDataObj.categories = categories;
-      
-      // Prepare email content
-      const emailContent = `
-        New Tool Submission:
-        
-        Tool Name: ${formDataObj.toolName}
-        Description: ${formDataObj.toolDescription}
-        Website: ${formDataObj.toolWebsite || 'N/A'}
-        Repository: ${formDataObj.toolRepository || 'N/A'}
-        Tool Type: ${formDataObj.toolType}
-        License: ${formDataObj.toolLicense || 'N/A'}
-        Platforms: ${platforms.join(', ') || 'N/A'}
-        Categories: ${categories.join(', ') || 'N/A'}
-        
-        Contributor:
-        Name: ${formDataObj.contributorName}
-        Email: ${formDataObj.contributorEmail}
-        Additional Info: ${formDataObj.additionalInfo || 'N/A'}
-      `;
-      
-      // In a real implementation, you would send this data to a server
-      // For now, we'll simulate a successful submission
-      console.log('Form submission data:', formDataObj);
-      console.log('Email content:', emailContent);
-      
-      // Show success message
-      form.reset();
-      form.classList.add('hidden');
-      successMessage.classList.remove('hidden');
+    }
       
       // In a real implementation, you would send an email to petrahub.team@gmail.com
       // This would typically be done server-side for security reasons
