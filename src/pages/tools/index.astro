@@ -43,8 +43,21 @@ const metadata = {
 
     <!-- Search and Filter Component is now in the header -->
     
-    <!-- View Toggle -->
-    <div class="flex justify-end mb-4">
+    <!-- Sort and View Controls -->
+    <div class="flex justify-between items-center mb-4">
+      <div class="flex items-center">
+        <label for="sort-select" class="mr-2 text-sm font-medium text-gray-700 dark:text-gray-300">Sort by:</label>
+        <select 
+          id="sort-select" 
+          class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2"
+        >
+          <option value="name">Name</option>
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          <option value="popularity">Popularity</option>
+        </select>
+      </div>
+      
       <div class="inline-flex rounded-md shadow-sm" role="group">
         <button 
           type="button" 
@@ -362,6 +375,9 @@ const metadata = {
     const listViewBtn = document.querySelector<HTMLButtonElement>('#list-view-btn');
     const toolsGrid = document.querySelector<HTMLElement>('#tools-grid');
     const toolsList = document.querySelector<HTMLElement>('#tools-list');
+    
+    // Sort elements
+    const sortSelect = document.querySelector<HTMLSelectElement>('#sort-select');
 
     // Filter function
     const filterTools = () => {
@@ -440,6 +456,44 @@ const metadata = {
       toolCards.forEach(card => card.style.display = '');
       if (noResults) noResults.style.display = 'none';
     };
+    
+    // Sort tools
+    const sortTools = () => {
+      if (!sortSelect || !toolsGrid || !toolsList) return;
+      
+      const sortValue = sortSelect.value;
+      const toolCardsArray = Array.from(toolCards);
+      
+      toolCardsArray.sort((a, b) => {
+        const nameA = a.querySelector('.tool-name')?.textContent?.toLowerCase() || '';
+        const nameB = b.querySelector('.tool-name')?.textContent?.toLowerCase() || '';
+        
+        switch (sortValue) {
+          case 'name':
+            return nameA.localeCompare(nameB);
+          case 'newest':
+            // For demo purposes, just reverse the name sort
+            return nameB.localeCompare(nameA);
+          case 'oldest':
+            // For demo purposes, just use name sort
+            return nameA.localeCompare(nameB);
+          case 'popularity':
+            // For demo purposes, just use name sort
+            return nameA.localeCompare(nameB);
+          default:
+            return 0;
+        }
+      });
+      
+      // Reorder in grid view
+      toolCardsArray.forEach(card => {
+        toolsGrid?.appendChild(card.cloneNode(true));
+        toolsList?.appendChild(card.cloneNode(true));
+      });
+      
+      // Remove original cards
+      toolCards.forEach(card => card.remove());
+    };
 
     // View toggles
     const showGridView = () => {
@@ -476,6 +530,7 @@ const metadata = {
     resetButton?.addEventListener('click', resetFilters);
     gridViewBtn?.addEventListener('click', showGridView);
     listViewBtn?.addEventListener('click', showListView);
+    sortSelect?.addEventListener('change', sortTools);
 
     // Initialize view based on preference
     const viewPreference = localStorage.getItem('toolsViewPreference');
