@@ -1,0 +1,284 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import Hero from '~/components/widgets/Hero.astro';
+import Content from '~/components/widgets/Content.astro';
+
+const metadata = {
+  title: 'Contribute+ | PETRA',
+};
+---
+
+<Layout metadata={metadata}>
+  <!-- Hero Widget ******************* -->
+  <Hero>
+    <Fragment slot="title">
+      Contribute to <span class="text-accent dark:text-white highlight">PETRA</span>
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="hidden sm:inline">
+        Help us grow the PETRA database by contributing your tools and resources. Your contributions make PETRA a more valuable resource for the entire petrology community.
+      </span>
+    </Fragment>
+  </Hero>
+
+  <!-- Contribution Form ************* -->
+  <section class="px-4 py-16 sm:px-6 mx-auto lg:px-8 lg:py-20 max-w-6xl">
+    <div class="max-w-3xl mx-auto">
+      <div class="mb-10 md:mx-auto text-center md:mb-12 max-w-3xl">
+        <p class="text-base text-primary-600 dark:text-blue-200 font-semibold tracking-wide uppercase">Contribute+</p>
+        <h2 class="text-4xl md:text-5xl font-bold leading-tighter tracking-tighter mb-4 font-heading">
+          Submit Your Tool
+        </h2>
+        <p class="max-w-3xl mx-auto sm:text-center text-xl text-gray-600 dark:text-slate-400">
+          Fill out the form below to submit your petrological tool or resource to the PETRA database.
+        </p>
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-lg p-6 shadow-xl">
+        <form id="contribute-form" class="space-y-6">
+          <!-- Tool Basic Information -->
+          <div>
+            <h3 class="text-xl font-bold mb-4 border-b pb-2 dark:border-gray-700">Basic Information</h3>
+            <div class="space-y-4">
+              <div>
+                <label for="toolName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tool Name *</label>
+                <input type="text" id="toolName" name="toolName" required
+                  class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              </div>
+              
+              <div>
+                <label for="toolDescription" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description *</label>
+                <textarea id="toolDescription" name="toolDescription" rows="4" required
+                  class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+              </div>
+              
+              <div>
+                <label for="toolWebsite" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Website URL</label>
+                <input type="url" id="toolWebsite" name="toolWebsite"
+                  class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              </div>
+              
+              <div>
+                <label for="toolRepository" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Repository URL</label>
+                <input type="url" id="toolRepository" name="toolRepository"
+                  class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Tool Details -->
+          <div>
+            <h3 class="text-xl font-bold mb-4 border-b pb-2 dark:border-gray-700">Tool Details</h3>
+            <div class="space-y-4">
+              <div>
+                <label for="toolType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tool Type *</label>
+                <select id="toolType" name="toolType" required
+                  class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                  <option value="">Select a type</option>
+                  <option value="Software">Software</option>
+                  <option value="Web Application">Web Application</option>
+                  <option value="Mobile App">Mobile App</option>
+                  <option value="Library">Library</option>
+                  <option value="Database">Database</option>
+                  <option value="Educational Resource">Educational Resource</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              
+              <div>
+                <label for="toolLicense" class="block text-sm font-medium text-gray-700 dark:text-gray-300">License</label>
+                <input type="text" id="toolLicense" name="toolLicense"
+                  class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              </div>
+              
+              <div>
+                <label for="toolPlatforms" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Supported Platforms</label>
+                <div class="mt-2 space-y-2">
+                  <div class="flex items-center">
+                    <input id="windows" name="platforms" type="checkbox" value="Windows" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="windows" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Windows</label>
+                  </div>
+                  <div class="flex items-center">
+                    <input id="macos" name="platforms" type="checkbox" value="macOS" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="macos" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">macOS</label>
+                  </div>
+                  <div class="flex items-center">
+                    <input id="linux" name="platforms" type="checkbox" value="Linux" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="linux" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Linux</label>
+                  </div>
+                  <div class="flex items-center">
+                    <input id="web" name="platforms" type="checkbox" value="Web" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="web" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Web</label>
+                  </div>
+                  <div class="flex items-center">
+                    <input id="mobile" name="platforms" type="checkbox" value="Mobile" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="mobile" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Mobile</label>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <label for="toolCategories" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categories *</label>
+                <div class="mt-2 space-y-2">
+                  <div class="flex items-center">
+                    <input id="geochemical" name="categories" type="checkbox" value="Geochemical Analysis" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="geochemical" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Geochemical Analysis</label>
+                  </div>
+                  <div class="flex items-center">
+                    <input id="phase" name="categories" type="checkbox" value="Phase Equilibria" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="phase" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Phase Equilibria</label>
+                  </div>
+                  <div class="flex items-center">
+                    <input id="mineral" name="categories" type="checkbox" value="Mineral Identification" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="mineral" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Mineral Identification</label>
+                  </div>
+                  <div class="flex items-center">
+                    <input id="geochronology" name="categories" type="checkbox" value="Geochronology" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="geochronology" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Geochronology</label>
+                  </div>
+                  <div class="flex items-center">
+                    <input id="visualization" name="categories" type="checkbox" value="Visualization" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="visualization" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Visualization</label>
+                  </div>
+                  <div class="flex items-center">
+                    <input id="thermodynamics" name="categories" type="checkbox" value="Thermodynamics" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="thermodynamics" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Thermodynamics</label>
+                  </div>
+                  <div class="flex items-center">
+                    <input id="data" name="categories" type="checkbox" value="Data Processing" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="data" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Data Processing</label>
+                  </div>
+                  <div class="flex items-center">
+                    <input id="education" name="categories" type="checkbox" value="Educational Resources" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="education" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Educational Resources</label>
+                  </div>
+                  <div class="flex items-center">
+                    <input id="field" name="categories" type="checkbox" value="Field Tools" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="field" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Field Tools</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Contact Information -->
+          <div>
+            <h3 class="text-xl font-bold mb-4 border-b pb-2 dark:border-gray-700">Contact Information</h3>
+            <div class="space-y-4">
+              <div>
+                <label for="contributorName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Your Name *</label>
+                <input type="text" id="contributorName" name="contributorName" required
+                  class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              </div>
+              
+              <div>
+                <label for="contributorEmail" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Your Email *</label>
+                <input type="email" id="contributorEmail" name="contributorEmail" required
+                  class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              </div>
+              
+              <div>
+                <label for="additionalInfo" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Additional Information</label>
+                <textarea id="additionalInfo" name="additionalInfo" rows="3"
+                  class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex items-center">
+            <input id="terms" name="terms" type="checkbox" required class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+            <label for="terms" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+              I agree to the submission of this information to the PETRA database *
+            </label>
+          </div>
+          
+          <div>
+            <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              Submit Contribution
+            </button>
+          </div>
+        </form>
+        
+        <div id="success-message" class="hidden mt-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+          Thank you for your contribution! We will review your submission and get back to you soon.
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('contribute-form');
+    const successMessage = document.getElementById('success-message');
+    
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Collect form data
+      const formData = new FormData(form);
+      const formDataObj = {};
+      
+      // Convert platforms and categories checkboxes to arrays
+      const platforms = [];
+      const categories = [];
+      
+      formData.forEach((value, key) => {
+        if (key === 'platforms') {
+          platforms.push(value);
+        } else if (key === 'categories') {
+          categories.push(value);
+        } else {
+          formDataObj[key] = value;
+        }
+      });
+      
+      formDataObj.platforms = platforms;
+      formDataObj.categories = categories;
+      
+      // Prepare email content
+      const emailContent = `
+        New Tool Submission:
+        
+        Tool Name: ${formDataObj.toolName}
+        Description: ${formDataObj.toolDescription}
+        Website: ${formDataObj.toolWebsite || 'N/A'}
+        Repository: ${formDataObj.toolRepository || 'N/A'}
+        Tool Type: ${formDataObj.toolType}
+        License: ${formDataObj.toolLicense || 'N/A'}
+        Platforms: ${platforms.join(', ') || 'N/A'}
+        Categories: ${categories.join(', ') || 'N/A'}
+        
+        Contributor:
+        Name: ${formDataObj.contributorName}
+        Email: ${formDataObj.contributorEmail}
+        Additional Info: ${formDataObj.additionalInfo || 'N/A'}
+      `;
+      
+      // In a real implementation, you would send this data to a server
+      // For now, we'll simulate a successful submission
+      console.log('Form submission data:', formDataObj);
+      console.log('Email content:', emailContent);
+      
+      // Show success message
+      form.reset();
+      form.classList.add('hidden');
+      successMessage.classList.remove('hidden');
+      
+      // In a real implementation, you would send an email to petrahub.team@gmail.com
+      // This would typically be done server-side for security reasons
+      // For example:
+      // await fetch('/api/submit-tool', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({
+      //     formData: formDataObj,
+      //     emailTo: 'petrahub.team@gmail.com'
+      //   }),
+      // });
+    });
+  });
+</script>

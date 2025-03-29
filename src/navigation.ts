@@ -93,8 +93,8 @@ export const headerData = {
     },
   ],
   actions: [
-    { text: 'Browse Tools', href: 'https://github.com/onwidget/astrowind', target: '_blank' },
-    { text: 'Contribute+', href: 'https://github.com/onwidget/astrowind', target: '_blank' }
+    { text: 'Browse Tools', href: '/tools' },
+    { text: 'Contribute+', href: '/contribute-plus' }
   ],
 };
 
