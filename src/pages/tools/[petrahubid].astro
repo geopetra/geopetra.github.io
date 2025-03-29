@@ -6,12 +6,15 @@ import { Icon } from 'astro-icon/components';
 
 // This function is required for dynamic routes in Astro
 export async function getStaticPaths() {
-  // Fetch all tools to generate paths
-  const { data: tools } = await supabase
+  const { data: tools, error } = await supabase
     .from('tools')
     .select('petrahubid');
   
-  // Return an array of objects with params for each path
+  if (error || !tools) {
+    console.error('Error fetching tools:', error);
+    return [];
+  }
+
   return tools.map(tool => ({
     params: { petrahubid: tool.petrahubid },
   }));
