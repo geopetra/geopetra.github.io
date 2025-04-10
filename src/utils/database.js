@@ -86,118 +86,319 @@ export const addTool = async (toolData) => {
     languages 
   } = toolData;
   
-  // Begin transaction
-  const { data: tool, error: toolError } = await supabase
-    .from('tools')
-    .insert([basicInfo])
-    .select()
-    .single();
-  
-  if (toolError) throw toolError;
-  
-  // Insert functions
-  if (functions && functions.length > 0) {
-    const functionsWithToolId = functions.map(func => ({
-      ...func,
-      tool_id: tool.id
-    }));
+  try {
+    // Check if tool already exists
+    const { data: existingTool, error: checkError } = await supabase
+      .from('tools')
+      .select('id')
+      .eq('petrahubid', basicInfo.petrahubid)
+      .maybeSingle();
     
-    const { error: functionsError } = await supabase
-      .from('tool_functions')
-      .insert(functionsWithToolId);
+    if (checkError) {
+      console.error(`Error checking if tool ${basicInfo.name} exists:`, checkError);
+      return false;
+    }
+    
+    let toolId;
+    
+    if (existingTool) {
+      // Update existing tool
+      const { error: updateError } = await supabase
+        .from('tools')
+        .update(basicInfo)
+        .eq('id', existingTool.id);
       
-    if (functionsError) throw functionsError;
-  }
-  
-  // Insert tool types
-  if (toolTypes && toolTypes.length > 0) {
-    for (const type of toolTypes) {
-      // Get the type_id from tool_types
-      const { data: typeData } = await supabase
-        .from('tool_types')
-        .select('id')
-        .eq('type', type.type)
-        .single();
+      if (updateError) {
+        console.error(`Error updating tool ${basicInfo.name}:`, updateError);
+        // Continue with the existing ID even if update fails
+      }
+      
+      console.log(`Tool ${basicInfo.name} updated successfully!`);
+      toolId = existingTool.id;
+      
+      // Delete existing relations to recreate them
+      try {
+        const { error: deleteFunctionsError } = await supabase
+          .from('tool_functions')
+          .delete()
+          .eq('tool_id', toolId);
         
-      if (typeData) {
-        // Insert into junction table
-        await supabase
+        if (deleteFunctionsError) {
+          console.error(`Error deleting existing functions for ${basicInfo.name}:`, deleteFunctionsError);
+          // Continue anyway
+        }
+      } catch (e) {
+        console.error(`Exception deleting functions for ${basicInfo.name}:`, e);
+        // Continue anyway
+      }
+      
+      try {
+        const { error: deleteTypesError } = await supabase
           .from('tool_type_relations')
-          .insert([{ 
-            tool_id: tool.id,
-            type_id: typeData.id
-          }]);
-      }
-    }
-  }
-  
-  // Insert topics
-  if (topics && topics.length > 0) {
-    for (const topic of topics) {
-      // Get the topic_id from topics
-      const { data: topicData } = await supabase
-        .from('topics')
-        .select('id')
-        .eq('term', topic.term)
-        .single();
+          .delete()
+          .eq('tool_id', toolId);
         
-      if (topicData) {
-        // Insert into junction table
-        await supabase
+        if (deleteTypesError) {
+          console.error(`Error deleting existing tool types for ${basicInfo.name}:`, deleteTypesError);
+          // Continue anyway
+        }
+      } catch (e) {
+        console.error(`Exception deleting tool types for ${basicInfo.name}:`, e);
+        // Continue anyway
+      }
+      
+      try {
+        const { error: deleteTopicsError } = await supabase
           .from('tool_topics')
-          .insert([{ 
-            tool_id: tool.id,
-            topic_id: topicData.id
-          }]);
-      }
-    }
-  }
-  
-  // Insert operating systems
-  if (operatingSystems && operatingSystems.length > 0) {
-    for (const os of operatingSystems) {
-      // Get the os_id from operating_systems
-      const { data: osData } = await supabase
-        .from('operating_systems')
-        .select('id')
-        .eq('name', os.name)
-        .single();
+          .delete()
+          .eq('tool_id', toolId);
         
-      if (osData) {
-        // Insert into junction table
-        await supabase
+        if (deleteTopicsError) {
+          console.error(`Error deleting existing topics for ${basicInfo.name}:`, deleteTopicsError);
+          // Continue anyway
+        }
+      } catch (e) {
+        console.error(`Exception deleting topics for ${basicInfo.name}:`, e);
+        // Continue anyway
+      }
+      
+      try {
+        const { error: deleteOSError } = await supabase
           .from('tool_os')
-          .insert([{ 
-            tool_id: tool.id,
-            os_id: osData.id
-          }]);
+          .delete()
+          .eq('tool_id', toolId);
+        
+        if (deleteOSError) {
+          console.error(`Error deleting existing OS for ${basicInfo.name}:`, deleteOSError);
+          // Continue anyway
+        }
+      } catch (e) {
+        console.error(`Exception deleting OS for ${basicInfo.name}:`, e);
+        // Continue anyway
       }
-    }
-  }
-  
-  // Insert languages
-  if (languages && languages.length > 0) {
-    for (const lang of languages) {
-      // Get the language_id from languages
-      const { data: langData } = await supabase
-        .from('languages')
+      
+      try {
+        const { error: deleteLanguagesError } = await supabase
+          .from('tool_language_relations')
+          .delete()
+          .eq('tool_id', toolId);
+        
+        if (deleteLanguagesError) {
+          console.error(`Error deleting existing languages for ${basicInfo.name}:`, deleteLanguagesError);
+          // Continue anyway
+        }
+      } catch (e) {
+        console.error(`Exception deleting languages for ${basicInfo.name}:`, e);
+        // Continue anyway
+      }
+    } else {
+      // Add new tool
+      const { data: newTool, error: toolError } = await supabase
+        .from('tools')
+        .insert([basicInfo])
         .select('id')
-        .eq('name', lang.name)
         .single();
         
-      if (langData) {
-        // Insert into junction table
-        await supabase
-          .from('tool_language_relations')
-          .insert([{ 
-            tool_id: tool.id,
-            language_id: langData.id
-          }]);
+      if (toolError) {
+        console.error('Error adding tool:', toolError);
+        return false;
+      }
+      
+      console.log(`Tool ${basicInfo.name} added successfully!`);
+      toolId = newTool.id;
+    }
+    
+    // Add functions
+    if (functions && functions.length > 0) {
+      try {
+        const functionsWithToolId = functions.map(func => {
+          // Remove operation field if it exists
+          const { operation, ...funcWithoutOperation } = func;
+          return {
+            ...funcWithoutOperation,
+            tool_id: toolId
+          };
+        });
+        
+        const { error: functionsError } = await supabase
+          .from('tool_functions')
+          .insert(functionsWithToolId);
+          
+        if (functionsError) {
+          console.error(`Error adding functions for ${basicInfo.name}:`, functionsError);
+          // Continue anyway
+        }
+      } catch (e) {
+        console.error(`Exception adding functions for ${basicInfo.name}:`, e);
+        // Continue anyway
       }
     }
+    
+    // Add tool types
+    if (toolTypes && toolTypes.length > 0) {
+      for (const typeObj of toolTypes) {
+        try {
+          // Get the type ID
+          const { data: typeData, error: typeError } = await supabase
+            .from('tool_types')
+            .select('id')
+            .eq('type', typeObj.type)
+            .single();
+            
+          if (typeError) {
+            console.error(`Error finding tool type "${typeObj.type}":`, typeError);
+            continue;
+          }
+          
+          if (!typeData) {
+            console.error(`Tool type "${typeObj.type}" not found in database`);
+            continue;
+          }
+          
+          // Add the relation
+          const { error: relationError } = await supabase
+            .from('tool_type_relations')
+            .insert([{
+              tool_id: toolId,
+              type_id: typeData.id
+            }]);
+            
+          if (relationError) {
+            console.error(`Error adding tool type relation for "${typeObj.type}":`, relationError);
+            // Continue anyway
+          }
+        } catch (e) {
+          console.error(`Exception processing tool type "${typeObj.type}":`, e);
+          // Continue to next type
+        }
+      }
+    }
+    
+    // Add topics
+    if (topics && topics.length > 0) {
+      for (const topicObj of topics) {
+        try {
+          // Get the topic ID
+          const { data: topicData, error: topicError } = await supabase
+            .from('topics')
+            .select('id')
+            .eq('term', topicObj.term)
+            .single();
+            
+          if (topicError) {
+            console.error(`Error finding topic "${topicObj.term}":`, topicError);
+            continue;
+          }
+          
+          if (!topicData) {
+            console.error(`Topic "${topicObj.term}" not found in database`);
+            continue;
+          }
+          
+          // Add the relation
+          const { error: relationError } = await supabase
+            .from('tool_topics')
+            .insert([{
+              tool_id: toolId,
+              topic_id: topicData.id
+            }]);
+            
+          if (relationError) {
+            console.error(`Error adding topic relation for "${topicObj.term}":`, relationError);
+            // Continue anyway
+          }
+        } catch (e) {
+          console.error(`Exception processing topic "${topicObj.term}":`, e);
+          // Continue to next topic
+        }
+      }
+    }
+    
+    // Add operating systems
+    if (operatingSystems && operatingSystems.length > 0) {
+      for (const osObj of operatingSystems) {
+        try {
+          // Get the OS ID
+          const { data: osData, error: osError } = await supabase
+            .from('operating_systems')
+            .select('id')
+            .eq('name', osObj.name)
+            .single();
+            
+          if (osError) {
+            console.error(`Error finding OS "${osObj.name}":`, osError);
+            continue;
+          }
+          
+          if (!osData) {
+            console.error(`OS "${osObj.name}" not found in database`);
+            continue;
+          }
+          
+          // Add the relation
+          const { error: relationError } = await supabase
+            .from('tool_os')
+            .insert([{
+              tool_id: toolId,
+              os_id: osData.id
+            }]);
+            
+          if (relationError) {
+            console.error(`Error adding OS relation for "${osObj.name}":`, relationError);
+            // Continue anyway
+          }
+        } catch (e) {
+          console.error(`Exception processing OS "${osObj.name}":`, e);
+          // Continue to next OS
+        }
+      }
+    }
+    
+    // Add languages
+    if (languages && languages.length > 0) {
+      for (const langObj of languages) {
+        try {
+          // Get the language ID
+          const { data: langData, error: langError } = await supabase
+            .from('languages')
+            .select('id')
+            .eq('name', langObj.name)
+            .single();
+            
+          if (langError) {
+            console.error(`Error finding language "${langObj.name}":`, langError);
+            continue;
+          }
+          
+          if (!langData) {
+            console.error(`Language "${langObj.name}" not found in database`);
+            continue;
+          }
+          
+          // Add the relation
+          const { error: relationError } = await supabase
+            .from('tool_language_relations')
+            .insert([{
+              tool_id: toolId,
+              language_id: langData.id
+            }]);
+            
+          if (relationError) {
+            console.error(`Error adding language relation for "${langObj.name}":`, relationError);
+            // Continue anyway
+          }
+        } catch (e) {
+          console.error(`Exception processing language "${langObj.name}":`, e);
+          // Continue to next language
+        }
+      }
+    }
+    
+    return true;
+  } catch (error) {
+    console.error(`Error in addTool for ${basicInfo.name}:`, error);
+    return false;
   }
-  
-  return tool;
 };
 
 // Get a tool with all related information

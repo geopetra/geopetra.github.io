@@ -773,40 +773,14 @@ async function main() {
   // Process each tool
   for (const toolDefinition of tools) {
     try {
-      // Check if tool already exists
-      const { data: existingTool, error: checkError } = await supabase
-        .from('tools')
-        .select('id')
-        .eq('petrahubid', toolDefinition.basicInfo.petrahubid)
-        .maybeSingle();
-      
-      if (checkError) {
-        console.error(`Error checking if tool ${toolDefinition.basicInfo.name} exists:`, checkError);
-        continue;
-      }
-      
-      if (existingTool) {
-        if (toolDefinition.basicInfo.petrahubid === 'linaforma') {
-          // Update LinaForma
-          const { error: updateError } = await supabase
-            .from('tools')
-            .update(toolDefinition.basicInfo)
-            .eq('id', existingTool.id);
-          
-          if (updateError) {
-            console.error(`Error updating tool ${toolDefinition.basicInfo.name}:`, updateError);
-          } else {
-            console.log(`Tool ${toolDefinition.basicInfo.name} updated successfully!`);
-          }
-        } else {
-          console.log(`Tool ${toolDefinition.basicInfo.name} already exists. Skipping...`);
-        }
-      } else {
-        await addTool(toolDefinition);
-        console.log(`Tool ${toolDefinition.basicInfo.name} added successfully!`);
+      // Use the improved addTool function which handles both new and existing tools
+      const success = await addTool(toolDefinition);
+      if (!success) {
+        console.error(`Failed to process tool ${toolDefinition.basicInfo.name}`);
       }
     } catch (error) {
-      console.error(`Error processing tool ${toolDefinition.basicInfo.name}:`, error);
+      console.error(`Exception processing tool ${toolDefinition.basicInfo.name}:`, error);
+      // Continue with next tool
     }
   }
   
