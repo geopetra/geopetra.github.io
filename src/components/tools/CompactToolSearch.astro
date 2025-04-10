@@ -52,13 +52,28 @@
         searchButton.setAttribute('onclick', `
           const input = document.getElementById('quick-search');
           if (input && input.value.trim()) {
-            window.location.href = '/tools?search=' + encodeURIComponent(input.value.trim());
+            const isToolsPage = window.location.pathname.includes('/tools');
+            if (isToolsPage && window.filterToolsBySearch) {
+              window.filterToolsBySearch(input.value.trim());
+            } else {
+              window.location.href = '/tools?search=' + encodeURIComponent(input.value.trim());
+            }
           }
           return false;
         `);
         
         // Also keep the event listener as backup
-        searchButton.addEventListener('click', performSearch);
+        searchButton.addEventListener('click', function() {
+          const query = quickSearch?.value.trim();
+          if (!query) return;
+          
+          const isToolsPage = window.location.pathname.includes('/tools');
+          if (isToolsPage && window.filterToolsBySearch) {
+            window.filterToolsBySearch(query);
+          } else {
+            window.location.href = `/tools?search=${encodeURIComponent(query)}`;
+          }
+        });
       }
       
       // Search on Enter key - use direct onkeypress attribute
@@ -66,9 +81,14 @@
         quickSearch.setAttribute('onkeypress', `
           if(event.key === 'Enter') {
             event.preventDefault();
-            const input = document.getElementById('quick-search');
-            if (input && input.value.trim()) {
-              window.location.href = '/tools?search=' + encodeURIComponent(input.value.trim());
+            const query = this.value.trim();
+            if (query) {
+              const isToolsPage = window.location.pathname.includes('/tools');
+              if (isToolsPage && window.filterToolsBySearch) {
+                window.filterToolsBySearch(query);
+              } else {
+                window.location.href = '/tools?search=' + encodeURIComponent(query);
+              }
             }
             return false;
           }
@@ -77,7 +97,15 @@
         // Also keep the event listener as backup
         quickSearch.addEventListener('keypress', function(e) {
           if (e.key === 'Enter') {
-            performSearch();
+            const query = this.value.trim();
+            if (!query) return;
+            
+            const isToolsPage = window.location.pathname.includes('/tools');
+            if (isToolsPage && window.filterToolsBySearch) {
+              window.filterToolsBySearch(query);
+            } else {
+              window.location.href = `/tools?search=${encodeURIComponent(query)}`;
+            }
           }
         });
       }

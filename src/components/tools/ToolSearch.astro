@@ -195,11 +195,37 @@ const {
         });
         
         if (searchButton && searchInput) {
+          // If we're already on the tools page, use client-side filtering
+          const isToolsPage = window.location.pathname.includes('/tools');
+          
+          const performSearch = function() {
+            const query = searchInput.value.trim();
+            if (!query) return;
+            
+            if (isToolsPage) {
+              // On tools page - trigger the filter function
+              if (window.filterToolsBySearch) {
+                window.filterToolsBySearch(query);
+              } else {
+                // Fallback to page reload with search parameter
+                window.location.href = `/tools?search=${encodeURIComponent(query)}`;
+              }
+            } else {
+              // Not on tools page - navigate to tools with search parameter
+              window.location.href = `/tools?search=${encodeURIComponent(query)}`;
+            }
+          };
+          
           // Use onclick attribute for immediate response
           searchButton.setAttribute('onclick', `
             const input = document.getElementById('${`search${suffix}`}');
             if (input && input.value.trim()) {
-              window.location.href = '/tools?search=' + encodeURIComponent(input.value.trim());
+              const isToolsPage = window.location.pathname.includes('/tools');
+              if (isToolsPage && window.filterToolsBySearch) {
+                window.filterToolsBySearch(input.value.trim());
+              } else {
+                window.location.href = '/tools?search=' + encodeURIComponent(input.value.trim());
+              }
             }
             return false;
           `);
@@ -207,10 +233,7 @@ const {
           // Also keep the event listener as backup
           searchButton.addEventListener('click', function(e) {
             e.preventDefault();
-            const query = searchInput.value.trim();
-            if (query) {
-              window.location.href = `/tools?search=${encodeURIComponent(query)}`;
-            }
+            performSearch();
           });
           
           // Handle Enter key
@@ -219,7 +242,12 @@ const {
               event.preventDefault();
               const query = this.value.trim();
               if (query) {
-                window.location.href = '/tools?search=' + encodeURIComponent(query);
+                const isToolsPage = window.location.pathname.includes('/tools');
+                if (isToolsPage && window.filterToolsBySearch) {
+                  window.filterToolsBySearch(query);
+                } else {
+                  window.location.href = '/tools?search=' + encodeURIComponent(query);
+                }
               }
               return false;
             }
@@ -229,10 +257,7 @@ const {
           searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
               e.preventDefault();
-              const query = this.value.trim();
-              if (query) {
-                window.location.href = `/tools?search=${encodeURIComponent(query)}`;
-              }
+              performSearch();
             }
           });
         }

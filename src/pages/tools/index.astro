@@ -362,6 +362,22 @@ const metadata = {
 <script is:inline>
   // Client-side JavaScript for search and filtering
   (function() {
+    // Make filterToolsBySearch available globally
+    window.filterToolsBySearch = function(searchTerm) {
+      const searchInput = document.querySelector('#search');
+      if (searchInput) {
+        searchInput.value = searchTerm;
+      }
+      
+      const searchInputHeader = document.querySelector('#search-header');
+      if (searchInputHeader) {
+        searchInputHeader.value = searchTerm;
+      }
+      
+      // Now trigger the filter
+      filterTools();
+    };
+    
     function initializeToolsPage() {
       // Get DOM elements
       const searchInput = document.querySelector('#search');
@@ -386,12 +402,18 @@ const metadata = {
 
       // Filter function
       const filterTools = function() {
-        if (!searchInput) return;
+        // Get all tool cards again in case they've been reordered
+        const toolCards = document.querySelectorAll('.tool-card');
+        if (!toolCards.length) return;
         
         console.log('Running filter function');
         console.log('Total tool cards:', toolCards.length);
         
-        const searchTerm = searchInput.value.toLowerCase();
+        // Get search term from either the main search or header search
+        const mainSearchInput = document.querySelector('#search');
+        const headerSearchInput = document.querySelector('#search-header');
+        const searchTerm = (mainSearchInput?.value || headerSearchInput?.value || '').toLowerCase();
+        
         const selectedTopic = topicFilter?.value ?? '';
         const selectedOS = osFilter?.value ?? '';
         const selectedType = typeFilter?.value ?? '';
@@ -404,7 +426,9 @@ const metadata = {
         console.log('Selected type:', selectedType);
         
         let visibleCount = 0;
+        let matchScores = [];
         
+        // First pass: calculate match scores for each card
         toolCards.forEach(function(card) {
           const name = card.querySelector('.tool-name')?.textContent?.toLowerCase() ?? '';
           const description = card.querySelector('.tool-description')?.textContent?.toLowerCase() ?? '';
@@ -419,24 +443,72 @@ const metadata = {
             return el.getAttribute('title')?.toLowerCase() || '';
           });
           
-          // Match conditions
-          const matchesSearch = name.includes(searchTerm) || 
-                              description.includes(searchTerm) || 
-                              functionNames.some(function(fn) { return fn.includes(searchTerm); }) ||
-                              functionDescriptions.some(function(desc) { return desc.includes(searchTerm); });
+          // Calculate search relevance score
+          let searchScore = 0;
+          if (searchTerm) {
+            // Exact name match gets highest score
+            if (name === searchTerm) searchScore += 100;
+            // Name starts with search term
+            else if (name.startsWith(searchTerm)) searchScore += 75;
+            // Name contains search term
+            else if (name.includes(searchTerm)) searchScore += 50;
+            // Description contains search term
+            if (description.includes(searchTerm)) searchScore += 25;
+            // Function names/descriptions contain search term
+            if (functionNames.some(fn => fn.includes(searchTerm))) searchScore += 20;
+            if (functionDescriptions.some(desc => desc.includes(searchTerm))) searchScore += 15;
+          } else {
+            // If no search term, all cards get base score
+            searchScore = 1;
+          }
+          
+          // Match conditions for filters
           const matchesTopic = !selectedTopic || card.querySelector(`.tool-topic[data-topic="${selectedTopic}"]`);
           const matchesOS = !selectedOS || card.querySelector(`.tool-os[title="${selectedOS}"]`);
           const matchesType = !selectedType || card.querySelector(`.tool-type[data-type="${selectedType}"]`);
           const matchesLanguage = !selectedLanguage || card.querySelector(`.tool-language[data-language="${selectedLanguage}"]`);
           const matchesAccessibility = !selectedAccessibility || accessibility.includes(selectedAccessibility.toLowerCase());
           
-          // Show/hide based on all conditions
-          if (matchesSearch && matchesTopic && matchesOS && matchesType && matchesLanguage && matchesAccessibility) {
-            card.style.display = '';
+          // Only include cards that match all filter criteria
+          const matchesAllFilters = (!searchTerm || searchScore > 0) && 
+                                   matchesTopic && 
+                                   matchesOS && 
+                                   matchesType && 
+                                   matchesLanguage && 
+                                   matchesAccessibility;
+          
+          if (matchesAllFilters) {
+            matchScores.push({ card, score: searchScore });
             visibleCount++;
-          } else {
-            card.style.display = 'none';
           }
+          
+          // Initially hide all cards
+          card.style.display = 'none';
+        });
+        
+        // Sort cards by relevance score (highest first)
+        matchScores.sort((a, b) => b.score - a.score);
+        
+        // Get parent containers
+        const gridContainer = document.querySelector('#tools-grid');
+        const listContainer = document.querySelector('#tools-list');
+        
+        if (gridContainer) gridContainer.innerHTML = '';
+        if (listContainer) listContainer.innerHTML = '';
+        
+        // Add cards back in sorted order
+        matchScores.forEach(function({ card }) {
+          // Clone the card for both views
+          const gridCard = card.cloneNode(true);
+          const listCard = card.cloneNode(true);
+          
+          // Show the cards
+          gridCard.style.display = '';
+          listCard.style.display = '';
+          
+          // Add to containers
+          if (gridContainer) gridContainer.appendChild(gridCard);
+          if (listContainer) listContainer.appendChild(listCard);
         });
         
         // Toggle no results message
@@ -447,16 +519,27 @@ const metadata = {
 
       // Reset filters
       const resetFilters = function() {
+        // Clear all inputs
         if (searchInput) searchInput.value = '';
+        
+        // Also clear header search if it exists
+        const headerSearch = document.querySelector('#search-header');
+        if (headerSearch) headerSearch.value = '';
+        
         if (topicFilter) topicFilter.value = '';
         if (osFilter) osFilter.value = '';
         if (typeFilter) typeFilter.value = '';
         if (languageFilter) languageFilter.value = '';
         if (accessibilityFilter) accessibilityFilter.value = '';
         
-        toolCards.forEach(function(card) {
-          card.style.display = '';
-        });
+        // Reset URL parameters without page reload
+        const url = new URL(window.location);
+        url.searchParams.delete('search');
+        url.searchParams.delete('topic');
+        window.history.replaceState({}, '', url);
+        
+        // Re-run the filter to show all cards
+        filterTools();
         
         if (noResults) {
           noResults.style.display = 'none';
@@ -594,21 +677,32 @@ const metadata = {
       } else {
         showGridView();
       }
-
-      // Make sure all cards are visible initially
-      toolCards.forEach(function(card) {
-        card.style.display = '';
-      });
       
-      // Only run initial filter if there's a search term
-      if (searchInput && searchInput.value.trim() !== '') {
-        filterTools();
+      // Check URL for search parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const searchParam = urlParams.get('search');
+      const topicParam = urlParams.get('topic');
+      
+      // Set search input value from URL
+      if (searchParam) {
+        if (searchInput) searchInput.value = searchParam;
+        
+        // Also set header search if it exists
+        const headerSearch = document.querySelector('#search-header');
+        if (headerSearch) headerSearch.value = searchParam;
       }
       
-      // Run initial sort
-      if (sortSelect) {
-        sortTools();
+      // Set topic filter from URL
+      if (topicParam && topicFilter) {
+        Array.from(topicFilter.options).forEach(function(option) {
+          if (option.text === topicParam) {
+            option.selected = true;
+          }
+        });
       }
+      
+      // Always run filter to apply any URL parameters
+      filterTools();
     }
 
     // Try to initialize immediately
