@@ -88,6 +88,7 @@ const metadata = {
           data-accessibility={tool.accessibility}
           data-date-added={tool.created_at || tool.date_added || ''}
           data-popularity={tool.views || tool.downloads || tool.popularity || '0'}
+          data-id={tool.petrahubid || tool.id || tool.name.replace(/\s+/g, '-').toLowerCase()}
         >
           <div class="p-4 flex-grow">
             <div class="flex items-center gap-2 mb-1">
@@ -223,6 +224,7 @@ const metadata = {
           data-accessibility={tool.accessibility}
           data-date-added={tool.created_at || tool.date_added || ''}
           data-popularity={tool.views || tool.downloads || tool.popularity || '0'}
+          data-id={tool.petrahubid || tool.id || tool.name.replace(/\s+/g, '-').toLowerCase()}
         >
           <div class="p-4 flex-grow">
             <div class="flex justify-between items-start">
@@ -461,8 +463,15 @@ const metadata = {
         let visibleCount = 0;
         let matchScores = [];
         
+        // Get all cards from the original source
+        const gridCards = Array.from(document.querySelectorAll('#tools-grid > .tool-card'));
+        const listCards = Array.from(document.querySelectorAll('#tools-list > .tool-card'));
+        
+        // Use only grid cards for filtering to avoid duplicates
+        const uniqueCards = gridCards.length > 0 ? gridCards : toolCards;
+        
         // First pass: calculate match scores for each card
-        toolCards.forEach(function(card) {
+        uniqueCards.forEach(function(card) {
           const name = card.querySelector('.tool-name')?.textContent?.toLowerCase() ?? '';
           const description = card.querySelector('.tool-description')?.textContent?.toLowerCase() ?? '';
           const accessibility = card.dataset.accessibility?.toLowerCase() ?? '';
@@ -511,16 +520,26 @@ const metadata = {
                                    matchesAccessibility;
           
           if (matchesAllFilters) {
-            matchScores.push({ card, score: searchScore });
+            // Store the original card ID to avoid duplicates
+            const cardId = card.getAttribute('data-id') || name.replace(/\s+/g, '-').toLowerCase();
+            matchScores.push({ card, score: searchScore, id: cardId });
             visibleCount++;
           }
-          
-          // Initially hide all cards
-          card.style.display = 'none';
+        });
+        
+        // Remove duplicates by ID
+        const uniqueScores = [];
+        const seenIds = new Set();
+        
+        matchScores.forEach(function(item) {
+          if (!seenIds.has(item.id)) {
+            seenIds.add(item.id);
+            uniqueScores.push(item);
+          }
         });
         
         // Sort cards by relevance score (highest first)
-        matchScores.sort((a, b) => b.score - a.score);
+        uniqueScores.sort((a, b) => b.score - a.score);
         
         // Get parent containers
         const gridContainer = document.querySelector('#tools-grid');
@@ -530,8 +549,8 @@ const metadata = {
         if (listContainer) listContainer.innerHTML = '';
         
         // Add cards back in sorted order
-        matchScores.forEach(function({ card }) {
-          // Clone the card for both views
+        uniqueScores.forEach(function({ card }) {
+          // Clone the card for both views to avoid DOM manipulation issues
           const gridCard = card.cloneNode(true);
           const listCard = card.cloneNode(true);
           
