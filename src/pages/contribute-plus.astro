@@ -226,61 +226,52 @@ const metadata = {
         
         formData.forEach((value, key) => {
           if (key === 'platforms') {
-            platforms.push(value.toString());
+            platforms.push(value as string);
           } else if (key === 'categories') {
-            categories.push(value.toString());
+            categories.push(value as string);
           } else {
             formDataObj[key] = value;
           }
         });
         
+        // Add arrays to form data object
         formDataObj.platforms = platforms;
         formDataObj.categories = categories;
         
-        // Prepare email content
+        // Prepare email content with null checks
         const emailContent = `
           New Tool Submission:
           
-          Tool Name: ${formDataObj.toolName}
-          Description: ${formDataObj.toolDescription}
-          Website: ${formDataObj.toolWebsite || 'N/A'}
-          Repository: ${formDataObj.toolRepository || 'N/A'}
-          Tool Type: ${formDataObj.toolType}
-          License: ${formDataObj.toolLicense || 'N/A'}
+          Tool Name: ${String(formDataObj.toolName || '')}
+          Description: ${String(formDataObj.toolDescription || '')}
+          Website: ${String(formDataObj.toolWebsite || 'N/A')}
+          Repository: ${String(formDataObj.toolRepository || 'N/A')}
+          Tool Type: ${String(formDataObj.toolType || '')}
+          License: ${String(formDataObj.toolLicense || 'N/A')}
           Platforms: ${platforms.join(', ') || 'N/A'}
           Categories: ${categories.join(', ') || 'N/A'}
           
           Contributor:
-          Name: ${formDataObj.contributorName}
-          Email: ${formDataObj.contributorEmail}
-          Additional Info: ${formDataObj.additionalInfo || 'N/A'}
+          Name: ${String(formDataObj.contributorName || '')}
+          Email: ${String(formDataObj.contributorEmail || '')}
+          Additional Info: ${String(formDataObj.additionalInfo || 'N/A')}
         `;
         
-        // In a real implementation, you would send this data to a server
-        // For now, we'll simulate a successful submission
+        // Log the submission
         console.log('Form submission data:', formDataObj);
         console.log('Email content:', emailContent);
         
-        // Show success message
-        form.reset();
-        form.classList.add('hidden');
-        successMessage.classList.remove('hidden');
+        try {
+          // Show success message
+          form.reset();
+          form.style.display = 'none';
+          if (successMessage instanceof HTMLElement) {
+            successMessage.style.display = 'block';
+          }
+        } catch (error) {
+          console.error('Error handling form submission:', error);
+        }
       });
     }
-      
-      // In a real implementation, you would send an email to petrahub.team@gmail.com
-      // This would typically be done server-side for security reasons
-      // For example:
-      // await fetch('/api/submit-tool', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     formData: formDataObj,
-      //     emailTo: 'petrahub.team@gmail.com'
-      //   }),
-      // });
-    });
   });
 </script>
