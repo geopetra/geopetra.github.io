@@ -47,13 +47,34 @@
         }
       }
       
-      // Search on button click
+      // Search on button click - use direct onclick attribute for reliability
       if (searchButton) {
+        searchButton.setAttribute('onclick', `
+          const input = document.getElementById('quick-search');
+          if (input && input.value.trim()) {
+            window.location.href = '/tools?search=' + encodeURIComponent(input.value.trim());
+          }
+          return false;
+        `);
+        
+        // Also keep the event listener as backup
         searchButton.addEventListener('click', performSearch);
       }
       
-      // Search on Enter key
+      // Search on Enter key - use direct onkeypress attribute
       if (quickSearch) {
+        quickSearch.setAttribute('onkeypress', `
+          if(event.key === 'Enter') {
+            event.preventDefault();
+            const input = document.getElementById('quick-search');
+            if (input && input.value.trim()) {
+              window.location.href = '/tools?search=' + encodeURIComponent(input.value.trim());
+            }
+            return false;
+          }
+        `);
+        
+        // Also keep the event listener as backup
         quickSearch.addEventListener('keypress', function(e) {
           if (e.key === 'Enter') {
             performSearch();

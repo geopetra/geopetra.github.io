@@ -195,17 +195,45 @@ const {
         });
         
         if (searchButton && searchInput) {
-          const handleSearch = (e) => {
+          // Use onclick attribute for immediate response
+          searchButton.setAttribute('onclick', `
+            const input = document.getElementById('${`search${suffix}`}');
+            if (input && input.value.trim()) {
+              window.location.href = '/tools?search=' + encodeURIComponent(input.value.trim());
+            }
+            return false;
+          `);
+          
+          // Also keep the event listener as backup
+          searchButton.addEventListener('click', function(e) {
             e.preventDefault();
             const query = searchInput.value.trim();
             if (query) {
               window.location.href = `/tools?search=${encodeURIComponent(query)}`;
             }
-          };
+          });
           
-          searchButton.addEventListener('click', handleSearch);
-          searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleSearch(e);
+          // Handle Enter key
+          searchInput.setAttribute('onkeypress', `
+            if(event.key === 'Enter') {
+              event.preventDefault();
+              const query = this.value.trim();
+              if (query) {
+                window.location.href = '/tools?search=' + encodeURIComponent(query);
+              }
+              return false;
+            }
+          `);
+          
+          // Also keep the event listener as backup
+          searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              const query = this.value.trim();
+              if (query) {
+                window.location.href = `/tools?search=${encodeURIComponent(query)}`;
+              }
+            }
           });
         }
         
