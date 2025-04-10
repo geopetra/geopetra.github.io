@@ -39,6 +39,7 @@ const {
         class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors flex items-center"
         aria-expanded="false"
         aria-controls={`advanced-filters${compactMode ? '-header' : ''}`}
+        onclick={`window.toggleAdvancedFilters('${compactMode ? '-header' : ''}'); event.stopPropagation(); return false;`}
       >
         <span>Filters</span>
         <svg id={`filter-icon-down${compactMode ? '-header' : ''}`} xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -135,83 +136,95 @@ const {
 <script is:inline>
   // Execute immediately without waiting for DOMContentLoaded
   (function() {
+    // Define the toggle function outside to ensure it's available immediately
+    window.toggleAdvancedFilters = function(suffix) {
+      const toggleFilters = document.getElementById(`toggle-filters${suffix}`);
+      const advancedFilters = document.getElementById(`advanced-filters${suffix}`);
+      const filterIconDown = document.getElementById(`filter-icon-down${suffix}`);
+      const filterIconUp = document.getElementById(`filter-icon-up${suffix}`);
+      
+      if (!toggleFilters || !advancedFilters) return;
+      
+      if (suffix === '-header') {
+        // For header version, use max-height transition
+        if (advancedFilters.classList.contains('max-h-0')) {
+          // Open the dropdown
+          advancedFilters.classList.remove('max-h-0');
+          advancedFilters.classList.add('max-h-[300px]');
+          advancedFilters.classList.remove('py-0');
+          advancedFilters.classList.add('py-4');
+          advancedFilters.classList.remove('opacity-0');
+          advancedFilters.classList.add('opacity-100');
+          toggleFilters.setAttribute('aria-expanded', 'true');
+          
+          // Force a reflow to ensure the transition works
+          void advancedFilters.offsetHeight;
+        } else {
+          // Close the dropdown
+          advancedFilters.classList.add('max-h-0');
+          advancedFilters.classList.remove('max-h-[300px]');
+          advancedFilters.classList.add('py-0');
+          advancedFilters.classList.remove('py-4');
+          advancedFilters.classList.remove('opacity-100');
+          advancedFilters.classList.add('opacity-0');
+          toggleFilters.setAttribute('aria-expanded', 'false');
+        }
+      } else {
+        // For regular version, use hidden class
+        const isHidden = advancedFilters.classList.contains('hidden');
+        advancedFilters.classList.toggle('hidden');
+        toggleFilters.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+      }
+      
+      if (filterIconDown) filterIconDown.classList.toggle('hidden');
+      if (filterIconUp) filterIconUp.classList.toggle('hidden');
+    };
+    
     function initializeToolSearch() {
       // Handle both regular and header versions
       ['', '-header'].forEach(suffix => {
         const toggleFilters = document.getElementById(`toggle-filters${suffix}`);
         const advancedFilters = document.getElementById(`advanced-filters${suffix}`);
-        const filterIconDown = document.getElementById(`filter-icon-down${suffix}`);
-        const filterIconUp = document.getElementById(`filter-icon-up${suffix}`);
         const searchInput = document.getElementById(`search${suffix}`);
         const searchButton = document.getElementById(`search-button${suffix}`);
         
-        // Toggle advanced filters visibility
-        if (toggleFilters && advancedFilters) {
-          toggleFilters.addEventListener('click', function(e) {
+        // Toggle advanced filters visibility - use direct onclick attribute for reliability
+        if (toggleFilters) {
+          toggleFilters.onclick = function(e) {
             e.stopPropagation();
+            window.toggleAdvancedFilters(suffix);
+          };
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+          const target = event.target;
+          if (toggleFilters && advancedFilters && 
+              !toggleFilters.contains(target) && 
+              !advancedFilters.contains(target)) {
             
             if (suffix === '-header') {
               // For header version, use max-height transition
-              if (advancedFilters.classList.contains('max-h-0')) {
-                // Open the dropdown
-                advancedFilters.classList.remove('max-h-0');
-                advancedFilters.classList.add('max-h-[300px]');
-                advancedFilters.classList.remove('py-0');
-                advancedFilters.classList.add('py-4');
-                advancedFilters.classList.remove('opacity-0');
-                advancedFilters.classList.add('opacity-100');
-                toggleFilters.setAttribute('aria-expanded', 'true');
-                
-                // Force a reflow to ensure the transition works
-                void advancedFilters.offsetHeight;
-              } else {
-                // Close the dropdown
-                advancedFilters.classList.add('max-h-0');
-                advancedFilters.classList.remove('max-h-[300px]');
-                advancedFilters.classList.add('py-0');
-                advancedFilters.classList.remove('py-4');
-                advancedFilters.classList.remove('opacity-100');
-                advancedFilters.classList.add('opacity-0');
-                toggleFilters.setAttribute('aria-expanded', 'false');
-              }
+              advancedFilters.classList.add('max-h-0');
+              advancedFilters.classList.remove('max-h-[300px]');
+              advancedFilters.classList.add('py-0');
+              advancedFilters.classList.remove('py-4');
+              advancedFilters.classList.remove('opacity-100');
+              advancedFilters.classList.add('opacity-0');
+              toggleFilters.setAttribute('aria-expanded', 'false');
             } else {
               // For regular version, use hidden class
-              const isHidden = advancedFilters.classList.contains('hidden');
-              advancedFilters.classList.toggle('hidden');
-              toggleFilters.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+              advancedFilters.classList.add('hidden');
+              toggleFilters.setAttribute('aria-expanded', 'false');
             }
             
-            if (filterIconDown) filterIconDown.classList.toggle('hidden');
-            if (filterIconUp) filterIconUp.classList.toggle('hidden');
-          });
-          
-          // Close dropdown when clicking outside
-          document.addEventListener('click', function(event) {
-            const target = event.target;
-            if (toggleFilters && advancedFilters && 
-                !toggleFilters.contains(target) && 
-                !advancedFilters.contains(target)) {
-              
-              if (suffix === '-header') {
-                // For header version, use max-height transition
-                advancedFilters.classList.add('max-h-0');
-                advancedFilters.classList.remove('max-h-[300px]');
-                advancedFilters.classList.add('py-0');
-                advancedFilters.classList.remove('py-4');
-                advancedFilters.classList.remove('opacity-100');
-                advancedFilters.classList.add('opacity-0');
-                toggleFilters.setAttribute('aria-expanded', 'false');
-              } else {
-                // For regular version, use hidden class
-                advancedFilters.classList.add('hidden');
-                toggleFilters.setAttribute('aria-expanded', 'false');
-              }
-              
-              if (filterIconDown) filterIconDown.classList.remove('hidden');
-              if (filterIconUp) filterIconUp.classList.add('hidden');
-            }
-          });
-        }
+            const filterIconDown = document.getElementById(`filter-icon-down${suffix}`);
+            const filterIconUp = document.getElementById(`filter-icon-up${suffix}`);
+            if (filterIconDown) filterIconDown.classList.remove('hidden');
+            if (filterIconUp) filterIconUp.classList.add('hidden');
+          }
+        });
+      }
         
         // Handle search button click
         if (searchButton && searchInput) {
