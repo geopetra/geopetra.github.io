@@ -216,7 +216,7 @@ const tools = [
       petrahubid: 'magemin',
       description: 'Gibbs energy minimization solver package',
       homepage: 'https://github.com/ComputationalThermodynamics/MAGEMin',
-      accessibility: 'Open-source',
+      accessibility: 'Open Source',
       cost: 'Free',
       development_stage: 'Mature',
       license: 'GPLv3',
@@ -268,7 +268,7 @@ const tools = [
       petrahubid: 'theriak-domino',
       description: 'Programs to calculate and plot thermodynamic functions, equilibrium assemblages and rock-specific equilibrium assemblage diagrams',
       homepage: 'https://github.com/Theriak-Domino',
-      accessibility: 'Open-source',
+      accessibility: 'Open Source',
       cost: 'Free',
       development_stage: 'Mature',
       license: 'GPLv3',
@@ -327,7 +327,7 @@ const tools = [
       petrahubid: 'hpx-eos',
       description: 'Thermodynamic models for minerals and geological fluids',
       homepage: 'https://hpxeosandthermocalc.org/',
-      accessibility: '',
+      accessibility: null,
       cost: 'Free',
       development_stage: 'Mature',
       license: '',
@@ -370,7 +370,7 @@ const tools = [
       petrahubid: 'thermocalc',
       description: 'Phase equilibrium calculation software',
       homepage: 'https://hpxeosandthermocalc.org/',
-      accessibility: '',
+      accessibility: null,
       cost: 'Free',
       development_stage: 'Mature',
       license: '',
@@ -419,7 +419,7 @@ const tools = [
       petrahubid: 'perplex',
       description: 'Calculating phase diagrams, manipulating thermodynamic data, and modeling equilibrium phase fractionation and reactive transport',
       homepage: 'https://www.perplex.ethz.ch/',
-      accessibility: '',
+      accessibility: null,
       cost: 'Free',
       development_stage: 'Mature',
       license: '',
@@ -471,7 +471,7 @@ const tools = [
       petrahubid: 'xmaptools',
       description: 'Open-source software solution for the analysis of quantitative chemical data in 2D and 3D',
       homepage: 'https://xmaptools.ch/',
-      accessibility: 'Open-source',
+      accessibility: 'Open Source',
       cost: 'Free',
       development_stage: 'Mature',
       license: '',
@@ -523,7 +523,7 @@ const tools = [
       { function_name: 'Quantitative compositional analysis', description: 'Analyzes quantitative chemical data in 2D and 3D', note: 'For mineral phases', operation: 'Quantitative compositional analysis' }
     ],
     toolTypes: [
-      { type: 'Desktop Application' }
+      { type: 'Desktop application' }
     ],
     languages: [
       { name: 'MATLAB' },
@@ -537,7 +537,7 @@ const tools = [
       petrahubid: 'bingo-antidote',
       description: 'Iterative thermodynamic modelling',
       homepage: 'https://xmaptools.ch/bingo-antidote/',
-      accessibility: 'Open-source',
+      accessibility: 'Open Source',
       cost: 'Free',
       development_stage: 'Mature',
       license: '',
@@ -583,7 +583,7 @@ const tools = [
       { function_name: 'Iterative thermodynamic modelling', description: 'Performs iterative thermodynamic modelling', note: 'For mineral equilibria', operation: 'Iterative thermodynamic modelling' }
     ],
     toolTypes: [
-      { type: 'Desktop Application' }
+      { type: 'Desktop application' }
     ],
     languages: [
       { name: 'Fortran' },
@@ -596,7 +596,7 @@ const tools = [
       petrahubid: 'minplotx',
       description: 'Tool for formula recalculation, visualization, and comparison of large mineral compositional datasets',
       homepage: 'https://github.com/NilsGies/MinPlotX',
-      accessibility: 'Open-source',
+      accessibility: 'Open Source',
       cost: 'Free',
       development_stage: 'Mature',
       license: 'GPLv3',
@@ -650,7 +650,7 @@ const tools = [
       petrahubid: 'linaforma',
       description: 'Quantitative P-T conditions and uncertainty',
       homepage: 'https://github.com/TMackay-Champion/LinaForma',
-      accessibility: 'Open-source',
+      accessibility: 'Open Source',
       cost: 'Free',
       development_stage: 'Mature',
       license: 'GPLv3',
@@ -703,118 +703,6 @@ const tools = [
       { name: 'MATLAB' }
     ]
   },
-  {
-    basicInfo: {
-      name: 'PetroSim',
-      petrahubid: 'petrosim',
-      description: 'A comprehensive simulation tool for petrological analysis and modeling of igneous and metamorphic processes.',
-      homepage: 'https://github.com/petrosim/petrosim',
-      accessibility: 'Open Source',
-      cost: 'Free',
-      development_stage: 'Mature',
-      license: 'MIT',
-      documentation: 'https://github.com/petrosim/petrosim/docs',
-      citation: JSON.stringify({
-        papers: [
-          {
-            title: 'PetroSim: A new tool for petrological modeling',
-            authors: 'Smith J, Johnson A',
-            journal: 'Journal of Petrology',
-            year: 2022,
-            doi: '10.1234/petrosim'
-          }
-        ]
-      }),
-      support: JSON.stringify({
-        contacts: [
-          {
-            name: 'John Smith',
-            email: 'john@petrosim.org',
-            role: 'Developer'
-          }
-        ]
-      })
-    },
-    topics: [
-      { term: 'Igneous Petrology' },
-      { term: 'Metamorphic Petrology' },
-      { term: 'Geochemistry' }
-    ],
-    operatingSystems: [
-      { name: 'Windows' },
-      { name: 'Mac' },
-      { name: 'Linux' }
-    ],
-    functions: [
-      { function_name: 'Phase equilibria modeling', description: 'Models phase equilibria in igneous and metamorphic systems', note: 'Uses thermodynamic databases', operation: 'Phase equilibria modeling' },
-      { function_name: 'Geothermobarometry', description: 'Calculates pressure and temperature conditions', note: 'Multiple calibrations available', operation: 'Geothermobarometry' },
-      { function_name: 'Mineral chemistry analysis', description: 'Analyzes mineral compositions', note: 'Supports various mineral groups', operation: 'Mineral chemistry analysis' }
-    ],
-    toolTypes: [
-      { type: 'Desktop application' },
-      { type: 'Command-line tool' }
-    ],
-    languages: [
-      { name: 'Python' },
-      { name: 'C++' }
-    ]
-  },
-  {
-    basicInfo: {
-      name: 'GeoThermo',
-      petrahubid: 'geothermo',
-      description: 'Advanced thermodynamic modeling tool for geological processes',
-      homepage: 'https://github.com/geothermo/geothermo',
-      accessibility: 'Open Source',
-      cost: 'Free',
-      development_stage: 'Emerging',
-      license: 'Apache',
-      documentation: 'https://geothermo.readthedocs.io/',
-      citation: JSON.stringify({
-        papers: [
-          {
-            title: 'GeoThermo: A new approach to thermodynamic modeling in geology',
-            authors: 'Johnson R, Williams S',
-            journal: 'Computers & Geosciences',
-            year: 2023,
-            doi: '10.1234/geothermo'
-          }
-        ]
-      }),
-      support: JSON.stringify({
-        contacts: [
-          {
-            name: 'Rachel Johnson',
-            email: 'rjohnson@geothermo.org',
-            role: 'Lead Developer'
-          }
-        ]
-      })
-    },
-    topics: [
-      { term: 'Thermodynamics' },
-      { term: 'Geochemistry' },
-      { term: 'Metamorphic Petrology' }
-    ],
-    operatingSystems: [
-      { name: 'Windows' },
-      { name: 'Linux' },
-      { name: 'Mac' }
-    ],
-    functions: [
-      { function_name: 'Thermodynamic modeling', description: 'Comprehensive thermodynamic modeling of geological systems', note: 'Uses multiple databases', operation: 'Thermodynamic modeling' },
-      { function_name: 'Phase diagram calculation', description: 'Calculates phase diagrams for various compositions', note: 'Supports P-T, T-X diagrams', operation: 'Phase diagram calculation' },
-      { function_name: 'Reaction path modeling', description: 'Models reaction paths in P-T-X space', note: 'Includes kinetic constraints', operation: 'Reaction path modeling' }
-    ],
-    toolTypes: [
-      { type: 'Desktop application' },
-      { type: 'Library' }
-    ],
-    languages: [
-      { name: 'Python' },
-      { name: 'Fortran' }
-    ]
-  }
 ];
 
 // Main function
@@ -898,10 +786,21 @@ async function main() {
       }
       
       if (existingTool) {
-        console.log(`Tool ${toolDefinition.basicInfo.name} already exists. Skipping...`);
-        // Optionally, you could update the tool here instead of skipping
-        // await updateTool(existingTool.id, toolDefinition.basicInfo);
-        // console.log(`Tool ${toolDefinition.basicInfo.name} updated successfully!`);
+        if (toolDefinition.basicInfo.petrahubid === 'linaforma') {
+          // Update LinaForma
+          const { error: updateError } = await supabase
+            .from('tools')
+            .update(toolDefinition.basicInfo)
+            .eq('id', existingTool.id);
+          
+          if (updateError) {
+            console.error(`Error updating tool ${toolDefinition.basicInfo.name}:`, updateError);
+          } else {
+            console.log(`Tool ${toolDefinition.basicInfo.name} updated successfully!`);
+          }
+        } else {
+          console.log(`Tool ${toolDefinition.basicInfo.name} already exists. Skipping...`);
+        }
       } else {
         await addTool(toolDefinition);
         console.log(`Tool ${toolDefinition.basicInfo.name} added successfully!`);
