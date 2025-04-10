@@ -134,9 +134,8 @@ const {
 </div>
 
 <script is:inline>
-  // Execute immediately without waiting for DOMContentLoaded
   (function() {
-    // Define the toggle function outside to ensure it's available immediately
+    // Define the toggle function
     window.toggleAdvancedFilters = function(suffix) {
       const toggleFilters = document.getElementById(`toggle-filters${suffix}`);
       const advancedFilters = document.getElementById(`advanced-filters${suffix}`);
@@ -146,108 +145,70 @@ const {
       if (!toggleFilters || !advancedFilters) return;
       
       if (suffix === '-header') {
-        // For header version, use max-height transition
         if (advancedFilters.classList.contains('max-h-0')) {
-          // Open the dropdown
           advancedFilters.classList.remove('max-h-0');
           advancedFilters.classList.add('max-h-[300px]');
-          advancedFilters.classList.remove('py-0');
-          advancedFilters.classList.add('py-4');
-          advancedFilters.classList.remove('opacity-0');
-          advancedFilters.classList.add('opacity-100');
-          toggleFilters.setAttribute('aria-expanded', 'true');
-          
-          // Force a reflow to ensure the transition works
-          void advancedFilters.offsetHeight;
+          advancedFilters.classList.remove('py-0', 'opacity-0');
         } else {
-          // Close the dropdown
-          advancedFilters.classList.add('max-h-0');
+          advancedFilters.classList.add('max-h-0', 'py-0', 'opacity-0');
           advancedFilters.classList.remove('max-h-[300px]');
-          advancedFilters.classList.add('py-0');
-          advancedFilters.classList.remove('py-4');
-          advancedFilters.classList.remove('opacity-100');
-          advancedFilters.classList.add('opacity-0');
-          toggleFilters.setAttribute('aria-expanded', 'false');
         }
       } else {
-        // For regular version, use hidden class
         const isHidden = advancedFilters.classList.contains('hidden');
         advancedFilters.classList.toggle('hidden');
         toggleFilters.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
       }
       
-      if (filterIconDown) filterIconDown.classList.toggle('hidden');
-      if (filterIconUp) filterIconUp.classList.toggle('hidden');
+      filterIconDown?.classList.toggle('hidden');
+      filterIconUp?.classList.toggle('hidden');
     };
     
     function initializeToolSearch() {
-      // Handle both regular and header versions
       ['', '-header'].forEach(suffix => {
         const toggleFilters = document.getElementById(`toggle-filters${suffix}`);
         const advancedFilters = document.getElementById(`advanced-filters${suffix}`);
         const searchInput = document.getElementById(`search${suffix}`);
         const searchButton = document.getElementById(`search-button${suffix}`);
         
-        // Toggle advanced filters visibility - use direct onclick attribute for reliability
         if (toggleFilters) {
-          toggleFilters.onclick = function(e) {
+          toggleFilters.onclick = (e) => {
             e.stopPropagation();
             window.toggleAdvancedFilters(suffix);
           };
         }
         
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', (event) => {
           const target = event.target;
           if (toggleFilters && advancedFilters && 
+              target && 
               !toggleFilters.contains(target) && 
               !advancedFilters.contains(target)) {
-            
             if (suffix === '-header') {
-              // For header version, use max-height transition
-              advancedFilters.classList.add('max-h-0');
+              advancedFilters.classList.add('max-h-0', 'py-0', 'opacity-0');
               advancedFilters.classList.remove('max-h-[300px]');
-              advancedFilters.classList.add('py-0');
-              advancedFilters.classList.remove('py-4');
-              advancedFilters.classList.remove('opacity-100');
-              advancedFilters.classList.add('opacity-0');
-              toggleFilters.setAttribute('aria-expanded', 'false');
             } else {
-              // For regular version, use hidden class
               advancedFilters.classList.add('hidden');
-              toggleFilters.setAttribute('aria-expanded', 'false');
             }
-            
-            const filterIconDown = document.getElementById(`filter-icon-down${suffix}`);
-            const filterIconUp = document.getElementById(`filter-icon-up${suffix}`);
-            if (filterIconDown) filterIconDown.classList.remove('hidden');
-            if (filterIconUp) filterIconUp.classList.add('hidden');
+            filterIconDown?.classList.remove('hidden');
+            filterIconUp?.classList.add('hidden');
           }
         });
-      }
         
-        // Handle search button click
         if (searchButton && searchInput) {
-          searchButton.addEventListener('click', function(e) {
+          const handleSearch = (e) => {
             e.preventDefault();
             const query = searchInput.value.trim();
             if (query) {
               window.location.href = `/tools?search=${encodeURIComponent(query)}`;
             }
-          });
+          };
           
-          // Handle Enter key press
-          searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-              const query = searchInput.value.trim();
-              if (query) {
-                window.location.href = `/tools?search=${encodeURIComponent(query)}`;
-              }
-            }
+          searchButton.addEventListener('click', handleSearch);
+          searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSearch(e);
           });
         }
         
-        // Get URL parameters to set initial filter values
         const urlParams = new URLSearchParams(window.location.search);
         const searchParam = urlParams.get('search');
         const topicParam = urlParams.get('topic');
@@ -258,8 +219,8 @@ const {
         
         if (topicParam) {
           const topicFilter = document.getElementById('topic-filter');
-          if (topicFilter) {
-            Array.from(topicFilter.options).forEach(function(option) {
+          if (topicFilter && topicFilter.options) {
+            Array.from(topicFilter.options).forEach(option => {
               if (option.text === topicParam) {
                 option.selected = true;
               }
@@ -268,37 +229,25 @@ const {
         }
       });
       
-      // Initialize reset filters button
       const resetFilters = document.getElementById('reset-filters');
       if (resetFilters) {
-        resetFilters.addEventListener('click', function() {
+        resetFilters.addEventListener('click', () => {
           const filterElements = document.querySelectorAll('select[id$="-filter"]');
-          filterElements.forEach(function(element) {
-            if (element instanceof HTMLSelectElement) {
-              element.selectedIndex = 0;
-            }
-          });
-          
           const searchInputs = document.querySelectorAll('input[id^="search"]');
-          searchInputs.forEach(function(input) {
-            if (input instanceof HTMLInputElement) {
-              input.value = '';
-            }
+          
+          filterElements.forEach(element => {
+            element.selectedIndex = 0;
+            element.dispatchEvent(new Event('change'));
           });
           
-          // Trigger any filter change events if needed
-          const event = new Event('change');
-          filterElements.forEach(function(element) {
-            element.dispatchEvent(event);
+          searchInputs.forEach(input => {
+            input.value = '';
           });
         });
       }
     }
 
-    // Try to initialize immediately
     initializeToolSearch();
-    
-    // Also initialize on DOMContentLoaded as a fallback
     document.addEventListener('DOMContentLoaded', initializeToolSearch);
   })();
 </script>
