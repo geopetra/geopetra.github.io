@@ -1,20 +1,27 @@
 ---
 import { SITE } from 'astrowind:config';
+import { Image } from 'astro:assets';
+import logoWhite from '../assets/images/petra_logo_white.jpg';
+import logoBlack from '../assets/images/petra_logo_black.jpg';
 ---
 
 <span
   class="self-center ml-2 rtl:ml-0 rtl:mr-2 text-2xl md:text-xl font-bold text-gray-900 whitespace-nowrap dark:text-white cursor-pointer"
   onclick="window.location.href='/'; return false;"
 >
-  <img 
-    src="/src/assets/images/petra_logo_white.jpg" 
+  <Image 
+    src={logoWhite}
     alt="PETRA Logo" 
     class="w-6 h-6 mr-1 -mt-1 inline-block dark:hidden" 
+    width={24}
+    height={24}
   />
-  <img 
-    src="/src/assets/images/petra_logo_black.jpg" 
+  <Image 
+    src={logoBlack}
     alt="PETRA Logo" 
     class="w-6 h-6 mr-1 -mt-1 hidden dark:inline-block" 
+    width={24}
+    height={24}
   />
   {SITE?.name}
 </span>
