@@ -253,7 +253,7 @@ const tools = [
       { name: 'Linux' }
     ],
     functions: [
-      { function_name: 'Gibbs Energy Minimization', description: 'Performs Gibbs energy minimization calculations', note: 'Efficient solver for phase equilibria', operation: 'Gibbs Energy Minimization' }
+      { function_name: 'Gibbs Energy Minimization', description: 'Performs Gibbs energy minimization calculations', note: 'Efficient solver for phase equilibria' }
     ],
     toolTypes: [
       { type: 'Web application' }
@@ -312,7 +312,7 @@ const tools = [
       { name: 'Linux' }
     ],
     functions: [
-      { function_name: 'Gibbs Energy Minimization', description: 'Performs Gibbs energy minimization calculations', note: 'For equilibrium assemblages', operation: 'Gibbs Energy Minimization' }
+      { function_name: 'Gibbs Energy Minimization', description: 'Performs Gibbs energy minimization calculations', note: 'For equilibrium assemblages' }
     ],
     toolTypes: [
       { type: 'Suite' }
@@ -359,7 +359,7 @@ const tools = [
     ],
     operatingSystems: [],
     functions: [
-      { function_name: 'Thermodynamic Models', description: 'Provides thermodynamic models for minerals and fluids', note: 'For geological applications', operation: 'Thermodynamic Models' }
+      { function_name: 'Thermodynamic Models', description: 'Provides thermodynamic models for minerals and fluids', note: 'For geological applications' }
     ],
     toolTypes: [],
     languages: []
@@ -406,7 +406,7 @@ const tools = [
       { name: 'Mac' }
     ],
     functions: [
-      { function_name: 'Calculate phase equilibria', description: 'Calculates phase equilibria for geological systems', note: 'Based on thermodynamic data', operation: 'Calculate phase equilibria' }
+      { function_name: 'Calculate phase equilibria', description: 'Calculates phase equilibria for geological systems', note: 'Based on thermodynamic data' }
     ],
     toolTypes: [
       { type: 'Command-line tool' }
@@ -456,7 +456,7 @@ const tools = [
       { name: 'Linux' }
     ],
     functions: [
-      { function_name: 'Calculate phase equilibria', description: 'Calculates phase equilibria for geological systems', note: 'For various compositions', operation: 'Calculate phase equilibria' }
+      { function_name: 'Calculate phase equilibria', description: 'Calculates phase equilibria for geological systems', note: 'For various compositions' }
     ],
     toolTypes: [
       { type: 'Suite' }
@@ -520,7 +520,7 @@ const tools = [
       { name: 'Mac' }
     ],
     functions: [
-      { function_name: 'Quantitative compositional analysis', description: 'Analyzes quantitative chemical data in 2D and 3D', note: 'For mineral phases', operation: 'Quantitative compositional analysis' }
+      { function_name: 'Quantitative compositional analysis', description: 'Analyzes quantitative chemical data in 2D and 3D', note: 'For mineral phases' }
     ],
     toolTypes: [
       { type: 'Desktop application' }
@@ -580,7 +580,7 @@ const tools = [
       { name: 'Mac' }
     ],
     functions: [
-      { function_name: 'Iterative thermodynamic modelling', description: 'Performs iterative thermodynamic modelling', note: 'For mineral equilibria', operation: 'Iterative thermodynamic modelling' }
+      { function_name: 'Iterative thermodynamic modelling', description: 'Performs iterative thermodynamic modelling', note: 'For mineral equilibria' }
     ],
     toolTypes: [
       { type: 'Desktop application' }
@@ -632,8 +632,8 @@ const tools = [
       { name: 'Linux' }
     ],
     functions: [
-      { function_name: 'Mineral formula recalculation', description: 'Recalculates mineral formulas from compositional data', note: 'For various mineral groups', operation: 'Mineral formula recalculation' },
-      { function_name: 'Mineral compositional visualization', description: 'Visualizes mineral compositional data', note: 'For large datasets', operation: 'Mineral compositional visualization' }
+      { function_name: 'Mineral formula recalculation', description: 'Recalculates mineral formulas from compositional data', note: 'For various mineral groups' },
+      { function_name: 'Mineral compositional visualization', description: 'Visualizes mineral compositional data', note: 'For large datasets' }
     ],
     toolTypes: [
       { type: 'Desktop application' }
@@ -692,9 +692,9 @@ const tools = [
       { name: 'Linux' }
     ],
     functions: [
-      { function_name: 'Inversion', description: 'Performs inverse modeling for P-T conditions', note: 'For phase equilibria', operation: 'Inversion' },
-      { function_name: 'P-T conditions', description: 'Determines pressure-temperature conditions', note: 'From mineral assemblages', operation: 'P-T conditions' },
-      { function_name: 'Uncertainty estimation', description: 'Estimates uncertainty in P-T determinations', note: 'Statistical approach', operation: 'Uncertainty estimation' }
+      { function_name: 'Inversion', description: 'Performs inverse modeling for P-T conditions', note: 'For phase equilibria' },
+      { function_name: 'P-T conditions', description: 'Determines pressure-temperature conditions', note: 'From mineral assemblages' },
+      { function_name: 'Uncertainty estimation', description: 'Estimates uncertainty in P-T determinations', note: 'Statistical approach' }
     ],
     toolTypes: [
       { type: 'Workflow' }
