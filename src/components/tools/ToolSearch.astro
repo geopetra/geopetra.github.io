@@ -134,35 +134,58 @@ const {
 </div>
 
 <script is:inline>
-  (function() {
-    // Define the toggle function
-    window.toggleAdvancedFilters = function(suffix) {
-      const toggleFilters = document.getElementById(`toggle-filters${suffix}`);
-      const advancedFilters = document.getElementById(`advanced-filters${suffix}`);
-      const filterIconDown = document.getElementById(`filter-icon-down${suffix}`);
-      const filterIconUp = document.getElementById(`filter-icon-up${suffix}`);
-      
-      if (!toggleFilters || !advancedFilters) return;
-      
-      if (suffix === '-header') {
-        if (advancedFilters.classList.contains('max-h-0')) {
-          advancedFilters.classList.remove('max-h-0');
-          advancedFilters.classList.add('max-h-[300px]');
-          advancedFilters.classList.remove('py-0', 'opacity-0');
-        } else {
-          advancedFilters.classList.add('max-h-0', 'py-0', 'opacity-0');
-          advancedFilters.classList.remove('max-h-[300px]');
-        }
-      } else {
-        const isHidden = advancedFilters.classList.contains('hidden');
-        advancedFilters.classList.toggle('hidden');
-        toggleFilters.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
-      }
-      
-      filterIconDown?.classList.toggle('hidden');
-      filterIconUp?.classList.toggle('hidden');
-    };
+  // Define the toggle function globally so it's always available
+  window.toggleAdvancedFilters = function(suffix) {
+    const toggleFilters = document.getElementById(`toggle-filters${suffix}`);
+    const advancedFilters = document.getElementById(`advanced-filters${suffix}`);
+    const filterIconDown = document.getElementById(`filter-icon-down${suffix}`);
+    const filterIconUp = document.getElementById(`filter-icon-up${suffix}`);
     
+    if (!toggleFilters || !advancedFilters) return;
+    
+    if (suffix === '-header') {
+      if (advancedFilters.classList.contains('max-h-0')) {
+        advancedFilters.classList.remove('max-h-0');
+        advancedFilters.classList.add('max-h-[300px]');
+        advancedFilters.classList.remove('py-0', 'opacity-0');
+        advancedFilters.classList.add('py-4', 'opacity-100');
+      } else {
+        advancedFilters.classList.add('max-h-0', 'py-0', 'opacity-0');
+        advancedFilters.classList.remove('max-h-[300px]', 'py-4', 'opacity-100');
+      }
+    } else {
+      const isHidden = advancedFilters.classList.contains('hidden');
+      advancedFilters.classList.toggle('hidden');
+      toggleFilters.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+    }
+    
+    if (filterIconDown) filterIconDown.classList.toggle('hidden');
+    if (filterIconUp) filterIconUp.classList.toggle('hidden');
+  };
+  
+  // Define search function globally
+  window.performToolSearch = function(suffix) {
+    const searchInput = document.getElementById(`search${suffix}`);
+    if (!searchInput) return;
+    
+    const query = searchInput.value.trim();
+    if (!query) return;
+    
+    const isToolsPage = window.location.pathname.includes('/tools');
+    if (isToolsPage && window.filterToolsBySearch) {
+      window.filterToolsBySearch(query);
+      
+      // Update URL without page reload
+      const url = new URL(window.location);
+      url.searchParams.set('search', query);
+      window.history.replaceState({}, '', url);
+    } else {
+      window.location.href = `/tools?search=${encodeURIComponent(query)}`;
+    }
+  };
+  
+  // Initialize search functionality
+  (function() {
     function initializeToolSearch() {
       ['', '-header'].forEach(suffix => {
         const toggleFilters = document.getElementById(`toggle-filters${suffix}`);
@@ -170,94 +193,26 @@ const {
         const searchInput = document.getElementById(`search${suffix}`);
         const searchButton = document.getElementById(`search-button${suffix}`);
         
-        if (toggleFilters) {
-          toggleFilters.onclick = (e) => {
-            e.stopPropagation();
-            window.toggleAdvancedFilters(suffix);
-          };
+        // Add direct HTML attributes for maximum reliability
+        if (searchButton) {
+          searchButton.setAttribute('onclick', `window.performToolSearch('${suffix}'); return false;`);
         }
         
-        document.addEventListener('click', (event) => {
-          const target = event.target;
-          if (toggleFilters && advancedFilters && 
-              target && 
-              !toggleFilters.contains(target) && 
-              !advancedFilters.contains(target)) {
-            if (suffix === '-header') {
-              advancedFilters.classList.add('max-h-0', 'py-0', 'opacity-0');
-              advancedFilters.classList.remove('max-h-[300px]');
-            } else {
-              advancedFilters.classList.add('hidden');
-            }
-            filterIconDown?.classList.remove('hidden');
-            filterIconUp?.classList.add('hidden');
-          }
-        });
+        if (searchInput) {
+          searchInput.setAttribute('onkeydown', `if(event.key === 'Enter') { event.preventDefault(); window.performToolSearch('${suffix}'); return false; }`);
+        }
         
+        // Also add event listeners as backup
         if (searchButton && searchInput) {
-          // If we're already on the tools page, use client-side filtering
-          const isToolsPage = window.location.pathname.includes('/tools');
-          
-          const performSearch = function() {
-            const query = searchInput.value.trim();
-            if (!query) return;
-            
-            if (isToolsPage) {
-              // On tools page - trigger the filter function
-              if (window.filterToolsBySearch) {
-                window.filterToolsBySearch(query);
-              } else {
-                // Fallback to page reload with search parameter
-                window.location.href = `/tools?search=${encodeURIComponent(query)}`;
-              }
-            } else {
-              // Not on tools page - navigate to tools with search parameter
-              window.location.href = `/tools?search=${encodeURIComponent(query)}`;
-            }
-          };
-          
-          // Use onclick attribute for immediate response
-          searchButton.setAttribute('onclick', `
-            const input = document.getElementById('${`search${suffix}`}');
-            if (input && input.value.trim()) {
-              const isToolsPage = window.location.pathname.includes('/tools');
-              if (isToolsPage && window.filterToolsBySearch) {
-                window.filterToolsBySearch(input.value.trim());
-              } else {
-                window.location.href = '/tools?search=' + encodeURIComponent(input.value.trim());
-              }
-            }
-            return false;
-          `);
-          
-          // Also keep the event listener as backup
           searchButton.addEventListener('click', function(e) {
             e.preventDefault();
-            performSearch();
+            window.performToolSearch(suffix);
           });
           
-          // Handle Enter key
-          searchInput.setAttribute('onkeypress', `
-            if(event.key === 'Enter') {
-              event.preventDefault();
-              const query = this.value.trim();
-              if (query) {
-                const isToolsPage = window.location.pathname.includes('/tools');
-                if (isToolsPage && window.filterToolsBySearch) {
-                  window.filterToolsBySearch(query);
-                } else {
-                  window.location.href = '/tools?search=' + encodeURIComponent(query);
-                }
-              }
-              return false;
-            }
-          `);
-          
-          // Also keep the event listener as backup
-          searchInput.addEventListener('keypress', function(e) {
+          searchInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
               e.preventDefault();
-              performSearch();
+              window.performToolSearch(suffix);
             }
           });
         }

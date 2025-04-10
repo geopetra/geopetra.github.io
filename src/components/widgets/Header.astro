@@ -155,6 +155,28 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
             button.setAttribute('onclick', 'return true;');
           }
         });
+        
+        // Ensure search button in header works
+        const headerSearchButton = document.getElementById('search-button-header');
+        const headerSearchInput = document.getElementById('search-header');
+        
+        if (headerSearchButton && headerSearchInput) {
+          // Add direct onclick attribute for maximum reliability
+          headerSearchButton.setAttribute('onclick', `window.performToolSearch('-header'); return false;`);
+          
+          // Also add event listener as backup
+          headerSearchButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (window.performToolSearch) {
+              window.performToolSearch('-header');
+            } else {
+              const query = headerSearchInput.value.trim();
+              if (query) {
+                window.location.href = `/tools?search=${encodeURIComponent(query)}`;
+              }
+            }
+          });
+        }
       }
     }
     
@@ -163,5 +185,8 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     
     // Also initialize on DOMContentLoaded as a fallback
     document.addEventListener('DOMContentLoaded', initializeHeader);
+    
+    // Add a third initialization after a short delay to catch any late-loading elements
+    setTimeout(initializeHeader, 500);
   })();
 </script>

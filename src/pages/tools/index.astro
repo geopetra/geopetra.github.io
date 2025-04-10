@@ -364,6 +364,9 @@ const metadata = {
   (function() {
     // Make filterToolsBySearch available globally
     window.filterToolsBySearch = function(searchTerm) {
+      console.log('Filtering tools by search term:', searchTerm);
+      
+      // Update both search inputs
       const searchInput = document.querySelector('#search');
       if (searchInput) {
         searchInput.value = searchTerm;
@@ -375,8 +378,38 @@ const metadata = {
       }
       
       // Now trigger the filter
-      filterTools();
+      if (typeof filterTools === 'function') {
+        filterTools();
+      } else {
+        console.error('filterTools function not available');
+        // Fallback: reload the page with search parameter
+        window.location.href = `/tools?search=${encodeURIComponent(searchTerm)}`;
+      }
     };
+    
+    // Make sure the function is available in the global scope
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!window.filterToolsBySearch) {
+        console.error('filterToolsBySearch not defined in global scope, redefining');
+        window.filterToolsBySearch = function(searchTerm) {
+          const searchInput = document.querySelector('#search');
+          if (searchInput) {
+            searchInput.value = searchTerm;
+          }
+          
+          const searchInputHeader = document.querySelector('#search-header');
+          if (searchInputHeader) {
+            searchInputHeader.value = searchTerm;
+          }
+          
+          if (typeof filterTools === 'function') {
+            filterTools();
+          } else {
+            window.location.href = `/tools?search=${encodeURIComponent(searchTerm)}`;
+          }
+        };
+      }
+    });
     
     function initializeToolsPage() {
       // Get DOM elements
