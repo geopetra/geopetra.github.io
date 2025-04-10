@@ -219,7 +219,7 @@ const tools = [
       accessibility: 'Open Source',
       cost: 'Free',
       development_stage: 'Mature',
-      license: 'GPLv3',
+      license: 'GPL',
       documentation: 'https://github.com/ComputationalThermodynamics/MAGEMin',
       citation: JSON.stringify({
         papers: [
@@ -271,7 +271,7 @@ const tools = [
       accessibility: 'Open Source',
       cost: 'Free',
       development_stage: 'Mature',
-      license: 'GPLv3',
+      license: 'GPL',
       documentation: 'https://github.com/Theriak-Domino',
       citation: JSON.stringify({
         papers: [
@@ -330,7 +330,7 @@ const tools = [
       accessibility: null,
       cost: 'Free',
       development_stage: 'Mature',
-      license: '',
+      license: null,
       documentation: 'https://hpxeosandthermocalc.org/',
       citation: JSON.stringify({
         papers: [
@@ -373,7 +373,7 @@ const tools = [
       accessibility: null,
       cost: 'Free',
       development_stage: 'Mature',
-      license: '',
+      license: null,
       documentation: 'https://hpxeosandthermocalc.org/',
       citation: JSON.stringify({
         papers: [
@@ -422,7 +422,7 @@ const tools = [
       accessibility: null,
       cost: 'Free',
       development_stage: 'Mature',
-      license: '',
+      license: null,
       documentation: 'https://www.perplex.ethz.ch/',
       citation: JSON.stringify({
         papers: [
@@ -474,7 +474,7 @@ const tools = [
       accessibility: 'Open Source',
       cost: 'Free',
       development_stage: 'Mature',
-      license: '',
+      license: null,
       documentation: 'https://xmaptools.ch/',
       citation: JSON.stringify({
         papers: [
@@ -540,7 +540,7 @@ const tools = [
       accessibility: 'Open Source',
       cost: 'Free',
       development_stage: 'Mature',
-      license: '',
+      license: null,
       documentation: 'https://xmaptools.ch/bingo-antidote/',
       citation: JSON.stringify({
         papers: [
@@ -599,7 +599,7 @@ const tools = [
       accessibility: 'Open Source',
       cost: 'Free',
       development_stage: 'Mature',
-      license: 'GPLv3',
+      license: 'GPL',
       documentation: 'https://github.com/NilsGies/MinPlotX',
       citation: JSON.stringify({
         papers: [
@@ -653,7 +653,7 @@ const tools = [
       accessibility: 'Open Source',
       cost: 'Free',
       development_stage: 'Mature',
-      license: 'GPLv3',
+      license: 'GPL',
       documentation: 'https://github.com/TMackay-Champion/LinaForma',
       citation: JSON.stringify({
         papers: [
