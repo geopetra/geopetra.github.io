@@ -47,25 +47,19 @@ const metadata = {
             {/* Try to load logo based on petrahubid */}
             {(() => {
               const logoPath = `/src/assets/tool_logos/${tool.petrahubid.toLowerCase()}_logo`;
-              return (
-                <div class="h-12 flex items-center">
-                  <img 
-                    src={`${logoPath}.png`}
-                    alt={`${tool.name} Logo`}
-                    class="h-12 w-auto object-contain"
-                    onerror={`
-                      this.onerror=null;
-                      if (this.src.endsWith('.png')) {
-                        this.src = '${logoPath}.jpg';
-                      } else if (this.src.endsWith('.jpg')) {
-                        this.src = '${logoPath}.svg';
-                      } else {
-                        this.style.display = 'none';
-                      }
-                    `}
-                  />
-                </div>
-              );
+              // Only attempt to show logo if we know it exists
+              if (tool.logo) {
+                return (
+                  <div class="h-12 flex items-center">
+                    <img 
+                      src={tool.logo}
+                      alt={`${tool.name} Logo`}
+                      class="h-12 w-auto object-contain"
+                    />
+                  </div>
+                );
+              }
+              return null;
             })()}
           </div>
           <a href="/tools" class="text-blue-600 hover:text-blue-800 flex items-center">
